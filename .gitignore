@@ -1,0 +1,51 @@
+# Xcode
+DerivedData/
+*.xcworkspace/
+*.xcuserdata/
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+
+# Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Firebase / Google Services
+PokerNight/GoogleService-Info.plist
+
+# Environment / API Keys
+.env
+Secrets.plist
+
+# Swift Playgrounds
+playground.xcworkspace/
+timeline.xctimeline
+
+# Logs & Cache
+*.log
+*.swp
+*.swo
+*.DS_Store
+
+# Temporary files
+*.tmp
+*.lock
+
+# macOS system files
+.DS_Store
+*.icloud
