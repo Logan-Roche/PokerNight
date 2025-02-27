@@ -52,6 +52,9 @@
 			membershipExceptions = (
 				Assets/Comfortaa.ttf,
 				Assets/Roboto.ttf,
+				Database_Manager.swift,
+				Logged_Out_View.swift,
+				Models/temp.swift,
 			);
 			target = 34577CE62D6C3B1D0013F2C1 /* PokerNightTests */;
 		};
@@ -60,6 +63,9 @@
 			membershipExceptions = (
 				Assets/Comfortaa.ttf,
 				Assets/Roboto.ttf,
+				Database_Manager.swift,
+				Logged_Out_View.swift,
+				Models/temp.swift,
 			);
 			target = 34577CF02D6C3B1D0013F2C1 /* PokerNightUITests */;
 		};
@@ -471,6 +477,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"PokerNight/Preview Content\"";
+				DEVELOPMENT_TEAM = V6FY7GRAS6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PokerNight/Info.plist;
@@ -510,6 +517,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"PokerNight/Preview Content\"";
+				DEVELOPMENT_TEAM = V6FY7GRAS6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PokerNight/Info.plist;
