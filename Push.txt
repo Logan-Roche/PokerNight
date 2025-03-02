@@ -1,0 +1,7 @@
+Title:
+
+Description:
+
+Tasks Completed: App Icon
+
+Tasks In Progress: Apple Wallet Integration (limited due to Entitlement), Database Implementation

@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseCore
 import FirebaseFirestore
+import FinanceKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
@@ -20,12 +21,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct PokerNightApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @StateObject var dbManager = Database_Manager()
+    //@StateObject var dbManager = Database_Manager()
+    
+    
     
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(dbManager)
+                //.environmentObject(dbManager)
         }
     }
 }

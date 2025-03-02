@@ -12,3 +12,4 @@ struct temp: Identifiable, Codable {
     var text: String
     var timestamp:Date
 }
+

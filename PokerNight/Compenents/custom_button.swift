@@ -16,7 +16,7 @@ struct custom_button: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.headline)
+                .font(.custom("Roboto", size: 20))
                 .foregroundColor(textColor)
                 .padding()
                 .frame(maxWidth: .infinity)
@@ -26,4 +26,7 @@ struct custom_button: View {
         }
         .padding(.horizontal)
     }
+}
+#Preview {
+    custom_button(title: "test", backgroundColor: .black, textColor: .white, action: {print("hello")})
 }

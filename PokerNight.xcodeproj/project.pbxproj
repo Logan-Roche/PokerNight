@@ -21,6 +21,7 @@
 		34577D1E2D6C47720013F2C1 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = 34577D1D2D6C47720013F2C1 /* FirebasePerformance */; };
 		34577D202D6C47720013F2C1 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = 34577D1F2D6C47720013F2C1 /* FirebaseRemoteConfig */; };
 		34577D222D6C47720013F2C1 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 34577D212D6C47720013F2C1 /* FirebaseStorage */; };
+		346D42942D73751F00CE9B31 /* Push.txt in Resources */ = {isa = PBXBuildFile; fileRef = 346D42932D73751F00CE9B31 /* Push.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		34577CD62D6C3B1B0013F2C1 /* PokerNight.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PokerNight.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		34577CE72D6C3B1D0013F2C1 /* PokerNightTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PokerNightTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		34577CF12D6C3B1D0013F2C1 /* PokerNightUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PokerNightUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		346D42932D73751F00CE9B31 /* Push.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Push.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -55,6 +57,7 @@
 				Database_Manager.swift,
 				Logged_Out_View.swift,
 				Models/temp.swift,
+				Models/User.swift,
 			);
 			target = 34577CE62D6C3B1D0013F2C1 /* PokerNightTests */;
 		};
@@ -66,6 +69,7 @@
 				Database_Manager.swift,
 				Logged_Out_View.swift,
 				Models/temp.swift,
+				Models/User.swift,
 			);
 			target = 34577CF02D6C3B1D0013F2C1 /* PokerNightUITests */;
 		};
@@ -143,6 +147,7 @@
 		34577CCD2D6C3B1B0013F2C1 = {
 			isa = PBXGroup;
 			children = (
+				346D42932D73751F00CE9B31 /* Push.txt */,
 				34577CD82D6C3B1B0013F2C1 /* PokerNight */,
 				34577CEA2D6C3B1D0013F2C1 /* PokerNightTests */,
 				34577CF42D6C3B1D0013F2C1 /* PokerNightUITests */,
@@ -297,6 +302,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				346D42942D73751F00CE9B31 /* Push.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
