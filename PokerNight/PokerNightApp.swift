@@ -27,8 +27,13 @@ struct PokerNightApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                //.environmentObject(dbManager)
+          NavigationView {
+              Authenticated_View {
+            } content: {
+                ContentView()
+            }
+          }
+          
         }
-    }
+      }
 }

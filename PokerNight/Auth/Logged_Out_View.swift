@@ -1,10 +1,3 @@
-//
-//  Logged_Out_View.swift
-//  PokerNight
-//
-//  Created by Logan Roche on 2/26/25.
-//
-
 import SwiftUI
 
 struct Logged_Out_View: View {
@@ -33,7 +26,7 @@ struct Logged_Out_View: View {
                         .padding(.horizontal, 20)
                         .padding(.top, 20)
                         .padding(.bottom, 10)
-                    custom_button(title: "Sign-In", backgroundColor: .black, action: {print("Log-In")})
+                    custom_button(title: "Register", backgroundColor: .black, action: {print("Log-In")})
                         .padding(.horizontal, 20)
                 
                 }

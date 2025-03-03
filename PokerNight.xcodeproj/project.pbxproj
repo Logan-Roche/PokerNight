@@ -54,10 +54,14 @@
 			membershipExceptions = (
 				Assets/Comfortaa.ttf,
 				Assets/Roboto.ttf,
+				Auth/Authenticated_View.swift,
+				Auth/Authentication_View_Model.swift,
+				Auth/Authentication_View.swift,
+				Auth/Log_In_View.swift,
+				Auth/Logged_Out_View.swift,
+				Auth/Sign_Up_View.swift,
+				Auth/User_Profile_View.swift,
 				Database_Manager.swift,
-				Logged_Out_View.swift,
-				Models/temp.swift,
-				Models/User.swift,
 			);
 			target = 34577CE62D6C3B1D0013F2C1 /* PokerNightTests */;
 		};
@@ -66,10 +70,14 @@
 			membershipExceptions = (
 				Assets/Comfortaa.ttf,
 				Assets/Roboto.ttf,
+				Auth/Authenticated_View.swift,
+				Auth/Authentication_View_Model.swift,
+				Auth/Authentication_View.swift,
+				Auth/Log_In_View.swift,
+				Auth/Logged_Out_View.swift,
+				Auth/Sign_Up_View.swift,
+				Auth/User_Profile_View.swift,
 				Database_Manager.swift,
-				Logged_Out_View.swift,
-				Models/temp.swift,
-				Models/User.swift,
 			);
 			target = 34577CF02D6C3B1D0013F2C1 /* PokerNightUITests */;
 		};
@@ -487,6 +495,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PokerNight/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PokerNight;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -527,6 +537,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PokerNight/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PokerNight;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

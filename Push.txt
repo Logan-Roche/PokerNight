@@ -1,7 +1,15 @@
-Title:
+Title: Completed Email Authentication
 
 Description:
 
-Tasks Completed: App Icon
+Tasks Completed: Email Authenticaion, Login Page, Sign-Up Page
 
-Tasks In Progress: Apple Wallet Integration (limited due to Entitlement), Database Implementation
+Tasks In Progress: Apple Authenticaion, Google Authenticaion
+
+
+
+
+
+Notes:
+
+Change font of Register page, make gradient color for buttons

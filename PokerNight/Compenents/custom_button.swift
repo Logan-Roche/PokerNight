@@ -1,10 +1,3 @@
-//
-//  custom_button.swift
-//  PokerNight
-//
-//  Created by Logan Roche on 2/24/25.
-//
-
 import SwiftUI
 
 struct custom_button: View {
@@ -16,7 +9,8 @@ struct custom_button: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.custom("Roboto", size: 20))
+                .font(.custom("Roboto", size: 17))
+                .fontWeight(Font.Weight.bold)
                 .foregroundColor(textColor)
                 .padding()
                 .frame(maxWidth: .infinity)
