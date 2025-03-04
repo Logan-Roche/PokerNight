@@ -29,6 +29,7 @@ private enum FocusableField: Hashable {
 struct Sign_Up_View: View {
     @EnvironmentObject var viewModel: Authentication_View_Model
     @Environment(\.dismiss) var dismiss
+    
 
   @FocusState private var focus: FocusableField?
 
@@ -39,7 +40,7 @@ struct Sign_Up_View: View {
       }
     }
   }
-
+    
   var body: some View {
     VStack {
       Image("SignUp")
@@ -47,9 +48,9 @@ struct Sign_Up_View: View {
         .aspectRatio(contentMode: .fit)
         .frame(minHeight: 300, maxHeight: 400)
       Text("Sign up")
-        .font(.largeTitle)
-        .fontWeight(.bold)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .font(.custom("Comfortaa", size: 40))
+        .fontWeight(.bold)
 
       HStack {
         Image(systemName: "at")
@@ -58,6 +59,8 @@ struct Sign_Up_View: View {
           .disableAutocorrection(true)
           .focused($focus, equals: .email)
           .submitLabel(.next)
+          .font(.custom("Roboto", size: 15))
+          .fontWeight(.bold)
           .onSubmit {
             self.focus = .password
           }
@@ -71,6 +74,8 @@ struct Sign_Up_View: View {
         SecureField("Password", text: $viewModel.password)
           .focused($focus, equals: .password)
           .submitLabel(.next)
+          .font(.custom("Roboto", size: 15))
+          .fontWeight(.bold)
           .onSubmit {
             self.focus = .confirmPassword
           }
@@ -83,6 +88,8 @@ struct Sign_Up_View: View {
         Image(systemName: "lock")
         SecureField("Confirm password", text: $viewModel.confirm_password)
           .focused($focus, equals: .confirmPassword)
+          .font(.custom("Roboto", size: 15))
+          .fontWeight(.bold)
           .submitLabel(.go)
           .onSubmit {
             signUpWithEmailPassword()
@@ -105,10 +112,12 @@ struct Sign_Up_View: View {
           Text("Sign up")
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
+            .font(.custom("Roboto", size: 20))
+            .fontWeight(.bold)
         }
         else {
           ProgressView()
-            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                .progressViewStyle(CircularProgressViewStyle(tint: .white))
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
         }
@@ -116,13 +125,17 @@ struct Sign_Up_View: View {
       .disabled(!viewModel.is_valid)
       .frame(maxWidth: .infinity)
       .buttonStyle(.borderedProminent)
+    
 
       HStack {
         Text("Already have an account?")
+              .font(.custom("Roboto", size: 17))
+              .fontWeight(.bold)
         Button(action: { viewModel.switchFlow() }) {
           Text("Log in")
-            .fontWeight(.semibold)
-            .foregroundColor(.blue)
+                .font(.custom("Roboto", size: 17))
+                .fontWeight(.bold)
+                .foregroundStyle(.blue)
         }
       }
       .padding([.top, .bottom], 50)
@@ -137,8 +150,8 @@ struct Sign_Up_View_Previews: PreviewProvider {
   static var previews: some View {
       Group {
           Sign_Up_View()
+              .preferredColorScheme(.dark)
           Sign_Up_View()
-        .preferredColorScheme(.dark)
     }
       .environmentObject(Authentication_View_Model())
   }

@@ -2,7 +2,6 @@
 import SwiftUI
 import AuthenticationServices
 
-// see https://michael-ginn.medium.com/creating-optional-viewbuilder-parameters-in-swiftui-views-a0d4e3e1a0ae
 extension Authenticated_View where Unauthenticated == EmptyView {
   init(@ViewBuilder content: @escaping () -> Content) {
     self.unauthenticated = nil
@@ -11,9 +10,10 @@ extension Authenticated_View where Unauthenticated == EmptyView {
 }
 
 struct Authenticated_View<Content, Unauthenticated>: View where Content: View, Unauthenticated: View {
-  @StateObject private var viewModel = Authentication_View_Model()
-  @State private var presentingLoginScreen = false
-//  @State private var presentingProfileScreen = false
+    @StateObject private var viewModel = Authentication_View_Model()
+    @State private var presentingLoginScreen = false
+    @State public var presentingProfileScreen = false
+
 
   var unauthenticated: Unauthenticated?
   @ViewBuilder var content: () -> Content
@@ -28,8 +28,9 @@ struct Authenticated_View<Content, Unauthenticated>: View where Content: View, U
     self.content = content
   }
 
-
-  let background_color = Color(red: 23 / 255, green: 23 / 255, blue: 25 / 255)
+    let gradient = LinearGradient(colors: [.gradientColorLeft, .gradientColorRight], startPoint: .top, endPoint: .topTrailing)
+    @Environment(\.colorScheme) var colorScheme
+    
   var body: some View {
     switch viewModel.authentication_state {
     case .unauthenticated, .authenticating:
@@ -66,16 +67,15 @@ struct Authenticated_View<Content, Unauthenticated>: View where Content: View, U
                           .foregroundColor(.white)
                           .padding()
                           .frame(maxWidth: .infinity)
-                          .background(.black)
+                          .background(gradient)
                           .cornerRadius(10)
                           .shadow(radius: 3)
                   }
-                  .padding(.horizontal, 35)
-                  .padding(.top, 30)
+                  .padding(EdgeInsets(top: 30, leading: 35, bottom: 15, trailing: 35))
               
               }
               .frame(maxWidth: .infinity, alignment: .bottom)
-              .background(background_color)
+              .background(.colorScheme)
 
               
           }
@@ -84,6 +84,8 @@ struct Authenticated_View<Content, Unauthenticated>: View where Content: View, U
               .resizable()
               .scaledToFill()
               .ignoresSafeArea())
+          .tint(.red)
+        
           
       }
       .sheet(isPresented: $presentingLoginScreen) {
@@ -93,32 +95,36 @@ struct Authenticated_View<Content, Unauthenticated>: View where Content: View, U
     case .authenticated:
       VStack {
         content()
-          .environmentObject(viewModel)
-//        Text("You're logged in as \(viewModel.displayName).")
-//        Button("Tap here to view your profile") {
-//          presentingProfileScreen.toggle()
-//        }
-      }
+              .environmentObject(viewModel)
+                }
       .onReceive(NotificationCenter.default.publisher(for: ASAuthorizationAppleIDProvider.credentialRevokedNotification)) { event in
         viewModel.Sign_Out()
         if let userInfo = event.userInfo, let info = userInfo["info"] {
           print(info)
         }
       }
-//      .sheet(isPresented: $presentingProfileScreen) {
-//        NavigationView {
-//          UserProfileView()
-//            .environmentObject(viewModel)
-//        }
-//      }
+      .sheet(isPresented: $presentingProfileScreen) {
+              NavigationView {
+                User_Profile_View()
+                  .environmentObject(viewModel)
+              }
+            }
     }
   }
 }
 
 struct AuthenticatedView_Previews: PreviewProvider {
   static var previews: some View {
-    Authenticated_View {
-      ContentView()
-    }
+      Group{
+          Authenticated_View {
+            ContentView()
+          }
+          .preferredColorScheme(.dark)
+          Authenticated_View {
+              ContentView()
+            }
+          
+      }
   }
 }
+

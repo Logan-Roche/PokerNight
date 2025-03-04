@@ -1,15 +1,13 @@
-Title: Completed Email Authentication
+Title:
 
-Description:
+Description: Completed Tast: Sign-In with Apple
 
-Tasks Completed: Email Authenticaion, Login Page, Sign-Up Page
+Tasks Completed: Darkmode/Lightmode Authentication Screens, Sign-In with Apple, 
 
-Tasks In Progress: Apple Authenticaion, Google Authenticaion
-
-
+Tasks In Progress: Log-Out Button
 
 
 
 Notes:
 
-Change font of Register page, make gradient color for buttons
+
