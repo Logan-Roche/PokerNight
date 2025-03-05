@@ -1,10 +1,10 @@
 Title:
 
-Description: Completed Tast: Sign-In with Apple
+Description: Completed: All Authtication (Apple, Google, Email)
 
-Tasks Completed: Darkmode/Lightmode Authentication Screens, Sign-In with Apple, 
+Tasks Completed: Sign In with Google (Logic and UI), Resized App Icon (Smaller), Altered Sign In and Sign Up View, Added more contract to title screen
 
-Tasks In Progress: Log-Out Button
+Tasks In Progress:
 
 
 

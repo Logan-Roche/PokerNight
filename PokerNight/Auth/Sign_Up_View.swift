@@ -19,6 +19,7 @@
 
 import SwiftUI
 import Combine
+import AuthenticationServices
 
 private enum FocusableField: Hashable {
   case email
@@ -40,6 +41,16 @@ struct Sign_Up_View: View {
       }
     }
   }
+    
+    private func Sign_In_With_Google() {
+        Task {
+            if await viewModel.Sign_In_With_Google() == true {
+                dismiss()
+            }
+        }
+    }
+    
+    @Environment(\.colorScheme) var colorScheme
     
   var body: some View {
     VStack {
@@ -98,6 +109,8 @@ struct Sign_Up_View: View {
       .padding(.vertical, 6)
       .background(Divider(), alignment: .bottom)
       .padding(.bottom, 8)
+        
+        
 
 
       if !viewModel.error_message.isEmpty {
@@ -112,7 +125,7 @@ struct Sign_Up_View: View {
           Text("Sign up")
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity)
-            .font(.custom("Roboto", size: 20))
+            .font(.custom("Confortaa", size: 20))
             .fontWeight(.bold)
         }
         else {
@@ -125,17 +138,48 @@ struct Sign_Up_View: View {
       .disabled(!viewModel.is_valid)
       .frame(maxWidth: .infinity)
       .buttonStyle(.borderedProminent)
+        
+        HStack {
+          VStack { Divider() }
+          Text("or")
+          VStack { Divider() }
+        }
+        
+        SignInWithAppleButton(.signUp) { request in
+          viewModel.handleSignInWithAppleRequest(request)
+        } onCompletion: { result in
+          viewModel.handleSignInWithAppleCompletion(result)
+        }
+        .signInWithAppleButtonStyle(.black)
+        .frame(maxWidth: .infinity, minHeight: 50)
+        .cornerRadius(8)
+        
+        Button(action: Sign_In_With_Google) {
+            Text("       Sign up with Google")
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .font(.system(size: 19))
+                .fontWeight(.medium)
+                .background(alignment: .leading) {
+                    Image("Google")
+                        .resizable()
+                        .frame(width: 17, height:17,  alignment: .center)
+                        .scaledToFit()
+                        .offset(x: 82)
+
+                }
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(.black)
     
 
       HStack {
         Text("Already have an account?")
-              .font(.custom("Roboto", size: 17))
-              .fontWeight(.bold)
         Button(action: { viewModel.switchFlow() }) {
           Text("Log in")
-                .font(.custom("Roboto", size: 17))
-                .fontWeight(.bold)
-                .foregroundStyle(.blue)
+              .fontWeight(.semibold)
+              .foregroundColor(.blue)
         }
       }
       .padding([.top, .bottom], 50)

@@ -23,8 +23,6 @@ struct PokerNightApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     //@StateObject var dbManager = Database_Manager()
     
-    
-    
     var body: some Scene {
         WindowGroup {
           NavigationView {

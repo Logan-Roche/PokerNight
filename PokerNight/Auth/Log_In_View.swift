@@ -8,7 +8,7 @@ private enum FocusableField: Hashable {
 }
 
 struct Log_In_View: View {
-    @EnvironmentObject var viewModel: Authentication_View_Model
+  @EnvironmentObject var viewModel: Authentication_View_Model
   @Environment(\.colorScheme) var colorScheme
   @Environment(\.dismiss) var dismiss
 
@@ -21,6 +21,13 @@ struct Log_In_View: View {
       }
     }
   }
+    private func Sign_In_With_Google() {
+        Task {
+            if await viewModel.Sign_In_With_Google() == true {
+                dismiss()
+            }
+        }
+    }
 
   var body: some View {
     VStack {
@@ -75,8 +82,10 @@ struct Log_In_View: View {
         Button(action: Sign_In_With_Email_Password) {
         if viewModel.authentication_state != .authenticating {
           Text("Login")
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity)
+                .font(.custom("Confortaa", size: 20))
+                .fontWeight(.bold)
         }
         else {
           ProgressView()
@@ -100,9 +109,30 @@ struct Log_In_View: View {
       } onCompletion: { result in
         viewModel.handleSignInWithAppleCompletion(result)
       }
-      .signInWithAppleButtonStyle(colorScheme == .light ? .black : .black)
+      .signInWithAppleButtonStyle(.black)
       .frame(maxWidth: .infinity, minHeight: 50)
       .cornerRadius(8)
+        
+        Button(action: Sign_In_With_Google) {
+            Text("       Sign in with Google")
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .font(.system(size: 19))
+                .fontWeight(.medium)
+                .background(alignment: .leading) {
+                    Image("Google")
+                        .resizable()
+                        .frame(width: 17, height:17,  alignment: .center)
+                        .scaledToFit()
+                        .offset(x: 85)
+
+                }
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(.black)
+        
+        
 
       HStack {
         Text("Don't have an account yet?")

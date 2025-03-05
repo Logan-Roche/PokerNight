@@ -51,6 +51,8 @@ struct Authenticated_View<Content, Unauthenticated>: View where Content: View, U
                       .padding(.leading, 10)
                       .font(.custom("Comfortaa", size: 45))
                       .foregroundStyle(.white)
+                      .shadow(color: .black, radius: 10, x: 1, y: 1)
+                  
               }
               .padding(.top, 275)
               
@@ -61,7 +63,7 @@ struct Authenticated_View<Content, Unauthenticated>: View where Content: View, U
                       viewModel.reset()
                       presentingLoginScreen.toggle()
                   }) {
-                      Text("Log-In / Register")
+                      Text("Sign In / Sign Up")
                           .font(.custom("Roboto", size: 17))
                           .fontWeight(Font.Weight.bold)
                           .foregroundColor(.white)

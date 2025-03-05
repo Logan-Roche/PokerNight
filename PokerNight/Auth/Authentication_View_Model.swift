@@ -7,10 +7,15 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseCore
 
 // For Sign in with Apple
 import AuthenticationServices
 import CryptoKit
+
+// For Sing in with Google
+import GoogleSignIn
+import GoogleSignInSwift
 
 enum Authentication_State {
   case unauthenticated
@@ -87,6 +92,8 @@ class Authentication_View_Model: ObservableObject {
         confirm_password = ""
       }
     }
+
+
 
 
 
@@ -285,3 +292,52 @@ private func sha256(_ input: String) -> String {
 
   return hashString
 }
+
+
+// MARK: - Google Authentication
+
+
+enum AuthenticaionError: Error {
+    case token_error(message: String)
+}
+
+extension Authentication_View_Model {
+    func Sign_In_With_Google() async -> Bool {
+        guard let client_id = FirebaseApp.app()?.options.clientID else {
+            fatalError("No Client ID found in firebaes Config")
+        }
+        let config = GIDConfiguration(clientID: client_id)
+        GIDSignIn.sharedInstance.configuration = config
+        
+        guard let window_scene = await UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = await window_scene.windows.first,
+              let root_view_controller = await window.rootViewController else {
+            print("There is no root view controller")
+            return false
+        }
+        
+        do {
+            let user_authentication = try await GIDSignIn.sharedInstance.signIn(withPresenting: root_view_controller)
+            let user = user_authentication.user
+            guard let id_token = user.idToken else {
+                throw AuthenticaionError.token_error(message: "No ID Token Found")
+            }
+            let accessToken = user.accessToken
+            let credential = GoogleAuthProvider.credential(withIDToken: id_token.tokenString, accessToken: accessToken.tokenString)
+            
+            let result = try await Auth.auth().signIn(with: credential)
+            let firebase_user = result.user
+            
+            return true
+        }
+        catch {
+            print(error.localizedDescription)
+            error_message = error.localizedDescription
+            return false
+        }
+    
+        
+        
+    }
+}
+
