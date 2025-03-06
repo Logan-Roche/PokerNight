@@ -101,16 +101,6 @@
 			path = PokerNight;
 			sourceTree = "<group>";
 		};
-		34577CEA2D6C3B1D0013F2C1 /* PokerNightTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PokerNightTests;
-			sourceTree = "<group>";
-		};
-		34577CF42D6C3B1D0013F2C1 /* PokerNightUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PokerNightUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,8 +149,6 @@
 			children = (
 				346D42932D73751F00CE9B31 /* Push.txt */,
 				34577CD82D6C3B1B0013F2C1 /* PokerNight */,
-				34577CEA2D6C3B1D0013F2C1 /* PokerNightTests */,
-				34577CF42D6C3B1D0013F2C1 /* PokerNightUITests */,
 				34577CD72D6C3B1B0013F2C1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -229,9 +217,6 @@
 			dependencies = (
 				34577CE92D6C3B1D0013F2C1 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				34577CEA2D6C3B1D0013F2C1 /* PokerNightTests */,
-			);
 			name = PokerNightTests;
 			packageProductDependencies = (
 			);
@@ -251,9 +236,6 @@
 			);
 			dependencies = (
 				34577CF32D6C3B1D0013F2C1 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				34577CF42D6C3B1D0013F2C1 /* PokerNightUITests */,
 			);
 			name = PokerNightUITests;
 			packageProductDependencies = (

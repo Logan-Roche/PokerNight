@@ -16,10 +16,10 @@ class Database_Manager: ObservableObject {
     }
     
     func loadData() {
-    
-    
+        
+        
     }
-
+    
     
 }
 

@@ -18,14 +18,14 @@ import GoogleSignIn
 import GoogleSignInSwift
 
 enum Authentication_State {
-  case unauthenticated
-  case authenticating
-  case authenticated
+    case unauthenticated
+    case authenticating
+    case authenticated
 }
 
 enum Authentication_Flow {
-  case login
-  case signUp
+    case login
+    case signUp
 }
 
 class Authentication_View_Model: ObservableObject {
@@ -46,251 +46,246 @@ class Authentication_View_Model: ObservableObject {
     init() {
         registerAuthStateHandler()
         verifySignInWithAppleAuthenticationState()
-
+        
         $flow
-          .combineLatest($email, $password, $confirm_password)
-          .map { flow, email, password, confirmPassword in
-            flow == .login
-            ? !(email.isEmpty || password.isEmpty)
-            : !(email.isEmpty || password.isEmpty || confirmPassword.isEmpty)
-          }
-          .assign(to: &$is_valid)
-      }
-
-      private var authStateHandler: AuthStateDidChangeListenerHandle?
-
-      func registerAuthStateHandler() {
+            .combineLatest($email, $password, $confirm_password)
+            .map { flow, email, password, confirmPassword in
+                flow == .login
+                ? !(email.isEmpty || password.isEmpty)
+                : !(email.isEmpty || password.isEmpty || confirmPassword.isEmpty)
+            }
+            .assign(to: &$is_valid)
+    }
+    
+    private var authStateHandler: AuthStateDidChangeListenerHandle?
+    
+    func registerAuthStateHandler() {
         if authStateHandler == nil {
-          authStateHandler = Auth.auth().addStateDidChangeListener { auth, user in
-            self.user = user
-            self.authentication_state = user == nil ? .unauthenticated : .authenticated
-              self.display_name = user?.displayName ?? user?.email ?? ""
-          }
+            authStateHandler = Auth.auth().addStateDidChangeListener { auth, user in
+                self.user = user
+                self.authentication_state = user == nil ? .unauthenticated : .authenticated
+                self.display_name = user?.displayName ?? user?.email ?? ""
+            }
         }
-      }
-
-      func switchFlow() {
+    }
+    
+    func switchFlow() {
         flow = flow == .login ? .signUp : .login
         error_message = ""
-      }
-
-      private func wait() async {
+    }
+    
+    private func wait() async {
         do {
-          print("Wait")
-          try await Task.sleep(nanoseconds: 1_000_000_000)
-          print("Done")
+            print("Wait")
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            print("Done")
         }
         catch {
-          print(error.localizedDescription)
+            print(error.localizedDescription)
         }
-      }
-
-      func reset() {
+    }
+    
+    func reset() {
         flow = .login
         email = ""
         password = ""
         confirm_password = ""
-      }
     }
-
-
-
-
-
+}
 
 // MARK: - Email and Password Authentication
 
 extension Authentication_View_Model {
-  func Sign_In_With_Email_Password() async -> Bool {
-    authentication_state = .authenticating
-    do {
-      try await Auth.auth().signIn(withEmail: self.email, password: self.password)
-      return true
+    func Sign_In_With_Email_Password() async -> Bool {
+        authentication_state = .authenticating
+        do {
+            try await Auth.auth().signIn(withEmail: self.email, password: self.password)
+            return true
+        }
+        catch  {
+            print(error)
+            error_message = error.localizedDescription
+            authentication_state = .unauthenticated
+            return false
+        }
     }
-    catch  {
-      print(error)
-      error_message = error.localizedDescription
-      authentication_state = .unauthenticated
-      return false
+    
+    func Sign_Up_With_Email_Password() async -> Bool {
+        authentication_state = .authenticating
+        do  {
+            try await Auth.auth().createUser(withEmail: email, password: password)
+            return true
+        }
+        catch {
+            print(error)
+            error_message = error.localizedDescription
+            authentication_state = .unauthenticated
+            return false
+        }
     }
-  }
-
-  func Sign_Up_With_Email_Password() async -> Bool {
-    authentication_state = .authenticating
-    do  {
-      try await Auth.auth().createUser(withEmail: email, password: password)
-      return true
+    
+    func Sign_Out() {
+        do {
+            try Auth.auth().signOut()
+        }
+        catch {
+            print(error)
+            error_message = error.localizedDescription
+        }
     }
-    catch {
-      print(error)
-      error_message = error.localizedDescription
-      authentication_state = .unauthenticated
-      return false
+    
+    func Delete_Account() async -> Bool {
+        //    do {
+        //      try await user?.delete()
+        return true
+        //    }
+        //    catch {
+        //      errorMessage = error.localizedDescription
+        //      return false
+        //    }
     }
-  }
-
-  func Sign_Out() {
-    do {
-      try Auth.auth().signOut()
-    }
-    catch {
-      print(error)
-      error_message = error.localizedDescription
-    }
-  }
-
-  func Delete_Account() async -> Bool {
-//    do {
-//      try await user?.delete()
-      return true
-//    }
-//    catch {
-//      errorMessage = error.localizedDescription
-//      return false
-//    }
-  }
 }
 
 // MARK: - Apple Authentication
 
 
 extension Authentication_View_Model {
-
-  func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
-    request.requestedScopes = [.fullName, .email]
-    let nonce = randomNonceString()
-    current_nonce = nonce
-    request.nonce = sha256(nonce)
-  }
-
-  func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
-    if case .failure(let failure) = result {
-      error_message = failure.localizedDescription
+    
+    func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
+        request.requestedScopes = [.fullName, .email]
+        let nonce = randomNonceString()
+        current_nonce = nonce
+        request.nonce = sha256(nonce)
     }
-    else if case .success(let authorization) = result {
-      if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
-        guard let nonce = current_nonce else {
-          fatalError("Invalid state: a login callback was received, but no login request was sent.")
+    
+    func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) {
+        if case .failure(let failure) = result {
+            error_message = failure.localizedDescription
         }
-        guard let appleIDToken = appleIDCredential.identityToken else {
-          print("Unable to fetdch identify token.")
-          return
+        else if case .success(let authorization) = result {
+            if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+                guard let nonce = current_nonce else {
+                    fatalError("Invalid state: a login callback was received, but no login request was sent.")
+                }
+                guard let appleIDToken = appleIDCredential.identityToken else {
+                    print("Unable to fetdch identify token.")
+                    return
+                }
+                guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                    print("Unable to serialise token string from data: \(appleIDToken.debugDescription)")
+                    return
+                }
+                
+                let credential = OAuthProvider.appleCredential( withIDToken: idTokenString,
+                                                                rawNonce: nonce,
+                                                                fullName: appleIDCredential.fullName)
+                Task {
+                    do {
+                        let result = try await Auth.auth().signIn(with: credential)
+                        await updateDisplayName(for: result.user, with: appleIDCredential)
+                    }
+                    catch {
+                        print("Error authenticating: \(error.localizedDescription)")
+                    }
+                }
+            }
         }
-        guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-          print("Unable to serialise token string from data: \(appleIDToken.debugDescription)")
-          return
-        }
-
-        let credential = OAuthProvider.appleCredential( withIDToken: idTokenString,
-                                                        rawNonce: nonce,
-                                                        fullName: appleIDCredential.fullName)
-        Task {
-          do {
-            let result = try await Auth.auth().signIn(with: credential)
-            await updateDisplayName(for: result.user, with: appleIDCredential)
-          }
-          catch {
-            print("Error authenticating: \(error.localizedDescription)")
-          }
-        }
-      }
     }
-  }
-
-  func updateDisplayName(for user: User, with appleIDCredential: ASAuthorizationAppleIDCredential, force: Bool = false) async {
-    if let currentDisplayName = Auth.auth().currentUser?.displayName, !currentDisplayName.isEmpty {
-      // current user is non-empty, don't overwrite it
-    }
-    else {
-      let changeRequest = user.createProfileChangeRequest()
-      changeRequest.displayName = appleIDCredential.displayName()
-      do {
-        try await changeRequest.commitChanges()
-        self.display_name = Auth.auth().currentUser?.displayName ?? ""
-      }
-      catch {
-        print("Unable to update the user's displayname: \(error.localizedDescription)")
-        error_message = error.localizedDescription
-      }
-    }
-  }
-
-  func verifySignInWithAppleAuthenticationState() {
-    let appleIDProvider = ASAuthorizationAppleIDProvider()
-    let providerData = Auth.auth().currentUser?.providerData
-    if let appleProviderData = providerData?.first(where: { $0.providerID == "apple.com" }) {
-      Task {
-        do {
-          let credentialState = try await appleIDProvider.credentialState(forUserID: appleProviderData.uid)
-          switch credentialState {
-          case .authorized:
-            break // The Apple ID credential is valid.
-          case .revoked, .notFound:
-            // The Apple ID credential is either revoked or was not found, so show the sign-in UI.
-            self.Sign_Out()
-          default:
-            break
-          }
+    
+    func updateDisplayName(for user: User, with appleIDCredential: ASAuthorizationAppleIDCredential, force: Bool = false) async {
+        if let currentDisplayName = Auth.auth().currentUser?.displayName, !currentDisplayName.isEmpty {
+            // current user is non-empty, don't overwrite it
         }
-        catch {
+        else {
+            let changeRequest = user.createProfileChangeRequest()
+            changeRequest.displayName = appleIDCredential.displayName()
+            do {
+                try await changeRequest.commitChanges()
+                self.display_name = Auth.auth().currentUser?.displayName ?? ""
+            }
+            catch {
+                print("Unable to update the user's displayname: \(error.localizedDescription)")
+                error_message = error.localizedDescription
+            }
         }
-      }
     }
-  }
-
+    
+    func verifySignInWithAppleAuthenticationState() {
+        let appleIDProvider = ASAuthorizationAppleIDProvider()
+        let providerData = Auth.auth().currentUser?.providerData
+        if let appleProviderData = providerData?.first(where: { $0.providerID == "apple.com" }) {
+            Task {
+                do {
+                    let credentialState = try await appleIDProvider.credentialState(forUserID: appleProviderData.uid)
+                    switch credentialState {
+                    case .authorized:
+                        break // The Apple ID credential is valid.
+                    case .revoked, .notFound:
+                        // The Apple ID credential is either revoked or was not found, so show the sign-in UI.
+                        self.Sign_Out()
+                    default:
+                        break
+                    }
+                }
+                catch {
+                }
+            }
+        }
+    }
+    
 }
 
 extension ASAuthorizationAppleIDCredential {
-  func displayName() -> String {
-    return [self.fullName?.givenName, self.fullName?.familyName]
-      .compactMap( {$0})
-      .joined(separator: " ")
-  }
+    func displayName() -> String {
+        return [self.fullName?.givenName, self.fullName?.familyName]
+            .compactMap( {$0})
+            .joined(separator: " ")
+    }
 }
 
 // Adapted from https://auth0.com/docs/api-auth/tutorials/nonce#generate-a-cryptographically-random-nonce
 private func randomNonceString(length: Int = 32) -> String {
-  precondition(length > 0)
-  let charset: [Character] =
-  Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-  var result = ""
-  var remainingLength = length
-
-  while remainingLength > 0 {
-    let randoms: [UInt8] = (0 ..< 16).map { _ in
-      var random: UInt8 = 0
-      let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
-      if errorCode != errSecSuccess {
-        fatalError(
-          "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
-        )
-      }
-      return random
+    precondition(length > 0)
+    let charset: [Character] =
+    Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+    var result = ""
+    var remainingLength = length
+    
+    while remainingLength > 0 {
+        let randoms: [UInt8] = (0 ..< 16).map { _ in
+            var random: UInt8 = 0
+            let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
+            if errorCode != errSecSuccess {
+                fatalError(
+                    "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
+                )
+            }
+            return random
+        }
+        
+        randoms.forEach { random in
+            if remainingLength == 0 {
+                return
+            }
+            
+            if random < charset.count {
+                result.append(charset[Int(random)])
+                remainingLength -= 1
+            }
+        }
     }
-
-    randoms.forEach { random in
-      if remainingLength == 0 {
-        return
-      }
-
-      if random < charset.count {
-        result.append(charset[Int(random)])
-        remainingLength -= 1
-      }
-    }
-  }
-
-  return result
+    
+    return result
 }
 
 private func sha256(_ input: String) -> String {
-  let inputData = Data(input.utf8)
-  let hashedData = SHA256.hash(data: inputData)
-  let hashString = hashedData.compactMap {
-    String(format: "%02x", $0)
-  }.joined()
-
-  return hashString
+    let inputData = Data(input.utf8)
+    let hashedData = SHA256.hash(data: inputData)
+    let hashString = hashedData.compactMap {
+        String(format: "%02x", $0)
+    }.joined()
+    
+    return hashString
 }
 
 
@@ -335,7 +330,7 @@ extension Authentication_View_Model {
             error_message = error.localizedDescription
             return false
         }
-    
+        
         
         
     }

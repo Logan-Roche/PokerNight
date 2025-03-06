@@ -5,34 +5,34 @@ import FinanceKit
 import FirebaseAuth
 
 struct ContentView: View {
-    //@EnvironmentObject var databaseManager: Database_Manager    
+    //@EnvironmentObject var databaseManager: Database_Manager
+    @State var selectedTab: Tabs = .contacts
     
-    let background_color = Color(red: 23 / 255, green: 23 / 255, blue: 25 / 255)
-    let auth = Auth.auth()
     
     var body: some View {
+        
         VStack{
-            Text("Hello")
-                .foregroundStyle(.white)
-            Button("Log Out")
-            {
-                do {
-                    try auth.signOut()
-                } catch let sign_our_error {
-                    print(sign_our_error)
-                }
-            }
-            .padding()
+            Text("hello")
+            
+            Spacer()
+            
+            Custom_Tab_Bar(selectedTab: $selectedTab)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(background_color)
+        .background(.colorScheme)
+        
+        
         
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
-            //.environmentObject(Database_Manager())
+        Group {
+            ContentView()
+                .preferredColorScheme(.dark)
+            ContentView()
+        }
+        
+        //.environmentObject(Database_Manager())
     }
 }
