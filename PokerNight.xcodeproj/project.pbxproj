@@ -56,12 +56,12 @@
 			membershipExceptions = (
 				Assets/Comfortaa.ttf,
 				Assets/Roboto.ttf,
-				Auth/Authenticated_View.swift,
-				Auth/Authentication_View_Model.swift,
-				Auth/Authentication_View.swift,
-				Auth/Log_In_View.swift,
-				Auth/Sign_Up_View.swift,
-				Auth/User_Profile_View.swift,
+				Authentication/Authenticated_View.swift,
+				Authentication/Authentication_View_Model.swift,
+				Authentication/Authentication_View.swift,
+				Authentication/Log_In_View.swift,
+				Authentication/Sign_Up_View.swift,
+				Authentication/User_Profile_View.swift,
 				Database_Manager.swift,
 			);
 			target = 34577CE62D6C3B1D0013F2C1 /* PokerNightTests */;
@@ -71,12 +71,12 @@
 			membershipExceptions = (
 				Assets/Comfortaa.ttf,
 				Assets/Roboto.ttf,
-				Auth/Authenticated_View.swift,
-				Auth/Authentication_View_Model.swift,
-				Auth/Authentication_View.swift,
-				Auth/Log_In_View.swift,
-				Auth/Sign_Up_View.swift,
-				Auth/User_Profile_View.swift,
+				Authentication/Authenticated_View.swift,
+				Authentication/Authentication_View_Model.swift,
+				Authentication/Authentication_View.swift,
+				Authentication/Log_In_View.swift,
+				Authentication/Sign_Up_View.swift,
+				Authentication/User_Profile_View.swift,
 				Database_Manager.swift,
 			);
 			target = 34577CF02D6C3B1D0013F2C1 /* PokerNightUITests */;

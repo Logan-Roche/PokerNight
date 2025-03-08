@@ -31,7 +31,7 @@ struct Profile_View: View {
             }
             .frame(width: 40, height: 40
             )
-            .background(.accent)
+            .background(.offBlack)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.colorScheme)

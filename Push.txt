@@ -1,8 +1,8 @@
 Title:
 
-Description: Completed: All Authtication (Apple, Google, Email)
+Description: Completed: Custom Tab Bar
 
-Tasks Completed: Sign In with Google (Logic and UI), Resized App Icon (Smaller), Altered Sign In and Sign Up View, Added more contract to title screen
+Tasks Completed: Custom Tab Bar
 
 Tasks In Progress:
 

@@ -6,17 +6,23 @@ import FirebaseAuth
 
 struct ContentView: View {
     //@EnvironmentObject var databaseManager: Database_Manager
-    @State var selectedTab: Tabs = .contacts
+    @State var selectedTab: Tabs = .dashboard
     
     
     var body: some View {
         
         VStack{
-            Text("hello")
             
-            Spacer()
             
+            Spacer()a
+            
+            if selectedTab == .dashboard {
+                Dashboard_View()
+            } else {
+                Profile_View()
+            }
             Custom_Tab_Bar(selectedTab: $selectedTab)
+            
         }
         .background(.colorScheme)
         
