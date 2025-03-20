@@ -188,6 +188,7 @@ extension Authentication_View_Model {
                         print("Error authenticating: \(error.localizedDescription)")
                     }
                 }
+                
             }
         }
     }
@@ -321,7 +322,6 @@ extension Authentication_View_Model {
             let credential = GoogleAuthProvider.credential(withIDToken: id_token.tokenString, accessToken: accessToken.tokenString)
             
             let result = try await Auth.auth().signIn(with: credential)
-            let firebase_user = result.user
             
             return true
         }

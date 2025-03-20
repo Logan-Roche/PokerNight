@@ -9,14 +9,14 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.939864954149-omlnaobes5hl968h3rist87vu1frhdtg</string>
+				<string>com.googleusercontent.apps.939864954149-lakdo60jueju3i3vo0rr13rc93nf8ulp</string>
 			</array>
 		</dict>
 	</array>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 	<key>GIDClientID</key>
-	<string>939864954149-omlnaobes5hl968h3rist87vu1frhdtg.apps.googleusercontent.com</string>
+	<string>939864954149-lakdo60jueju3i3vo0rr13rc93nf8ulp.apps.googleusercontent.com</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Comfortaa.ttf</string>

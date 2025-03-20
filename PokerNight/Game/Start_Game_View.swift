@@ -1,28 +1,29 @@
 //
-//  Dashboard_View.swift
+//  Start_Game_View.swift
 //  PokerNight
 //
-//  Created by Logan Roche on 3/5/25.
+//  Created by Logan Roche on 3/19/25.
 //
 
 import SwiftUI
 
-struct Dashboard_View: View {
+struct Start_Game_View: View {
     var body: some View {
-        VStack{
-            Text("Dashboard")
+        VStack {
+            Text("Start Game")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.colorScheme)
+        
     }
 }
 
-struct Dashboard_View_Previews: PreviewProvider {
+struct Start_Game_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            Dashboard_View()
+            Start_Game_View()
                 .preferredColorScheme(.dark)
-            Dashboard_View()
+            Start_Game_View()
         }
     }
 }

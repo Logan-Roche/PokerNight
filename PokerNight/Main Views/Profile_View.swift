@@ -26,12 +26,6 @@ struct Profile_View: View {
             .tint(.red)
             
             
-            VStack{
-                
-            }
-            .frame(width: 40, height: 40
-            )
-            .background(.offBlack)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.colorScheme)

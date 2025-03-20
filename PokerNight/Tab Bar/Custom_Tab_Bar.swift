@@ -10,12 +10,14 @@ import SwiftUI
 enum Tabs: Int {
     case dashboard = 0
     case profile = 1
+    case start_game = 2
 }
 
 struct Custom_Tab_Bar: View {
     
     @Binding var selectedTab: Tabs
-    var gradient = LinearGradient(colors: [.gradientColorLeft, .gradientColorRight], startPoint: .top, endPoint: .topTrailing)
+    @Binding var start_game_join_game_sheet: Bool
+    let gradient = LinearGradient(colors: [.gradientColorLeft, .gradientColorRight], startPoint: .top, endPoint: .topTrailing)
     
     @Environment(\.colorScheme) var colorScheme
     
@@ -32,13 +34,11 @@ struct Custom_Tab_Bar: View {
                 
                 Custom_Tab_Bar_Button(image_name: "house",
                                       is_active: selectedTab == .dashboard )
-                
-                
             }
             .tint(.gray)
             
             Button {
-                // New Game
+                start_game_join_game_sheet.toggle()
                 
             } label: {
                 VStack (alignment: .center, spacing: 4) {
@@ -80,9 +80,9 @@ struct Custom_Tab_Bar: View {
 struct Custom_Tab_Bar_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            Custom_Tab_Bar(selectedTab: .constant(.profile))
+            Custom_Tab_Bar(selectedTab: .constant(.profile),start_game_join_game_sheet: .constant(false))
                 .preferredColorScheme(.dark)
-            Custom_Tab_Bar(selectedTab: .constant(.profile))
+            Custom_Tab_Bar(selectedTab: .constant(.profile),start_game_join_game_sheet: .constant(false))
         }
     }
 }

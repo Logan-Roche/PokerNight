@@ -49,3 +49,6 @@ timeline.xctimeline
 # macOS system files
 .DS_Store
 *.icloud
+PokerNight/Info.plist
+*.plist
+PokerNight/Info.plist

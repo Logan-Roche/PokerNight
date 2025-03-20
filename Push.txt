@@ -1,10 +1,10 @@
-Title:
+Title: Complted Database Connection
 
-Description: Completed: Custom Tab Bar
+Description:
 
-Tasks Completed: Custom Tab Bar
+Tasks Completed: Database Connection, Tab Bar Button Overlay, New Bundle ID
 
-Tasks In Progress:
+Tasks In Progress: add Game to DB, add user to game in DB, Join Game View, Start Game View,
 
 
 
