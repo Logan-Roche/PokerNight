@@ -14,57 +14,29 @@ class Games_View_Model: ObservableObject {
     @Published var game: Game = Game(date: Date(), title: "", total_buy_in: 0, total_buy_out: 0, player_count: 0, host_id: "" , sb_bb: "N/A", is_active: false, users: [:], transactions: [])
     
     private var db = Firestore.firestore()
+    private var listener: ListenerRegistration?
     
-    func Fetch_Data() {
-        db.collection("Games").addSnapshotListener { (query_snapshot, error) in
-            guard let documents = query_snapshot?.documents else {
-                print("No documents")
-                return
-            }
-            self.games =  documents.compactMap { (query_document_snapshot) -> Game? in
-                return try? query_document_snapshot.data(as: Game.self)
-            }
-        }
-        print("Games Updated")
-    }
+    
     func Start_Game(game: Game, completion: @escaping (String?) -> Void) {
         do {
-                let ref = try db.collection("Games").addDocument(from: game)  // Get the DocumentReference
-                let gameId = ref.documentID                                  // Extract the document ID
-                print("Document added with ID: \(gameId)")
-                completion(gameId)
-            } catch {
-                print("Error adding document: \(error.localizedDescription)")
-                completion(nil)
-            }    }
+            let ref = try db.collection("Games").addDocument(from: game)  // Get the DocumentReference
+            let gameId = ref.documentID                                  // Extract the document ID
+            print("Document added with ID: \(gameId)")
+            completion(gameId)
+        } catch {
+            print("Error adding document: \(error.localizedDescription)")
+            completion(nil)
+        }    }
     
-
-//    func fetchGame(gameId: String, completion: @escaping (Game?) -> Void) {
-//        
-//        let gameRef = db.collection("games").document(gameId)
-//        
-//        gameRef.getDocument { snapshot, error in
-//            guard let document = snapshot, document.exists,
-//                  let game = try? document.data(as: Game.self) else {
-//                print("Failed to fetch game: \(error?.localizedDescription ?? "Unknown error")")
-//                completion(nil)
-//                return
-//            }
-//            
-//            print("Game ID: \(game.id ?? "No ID")")  // Access the gameId here
-//            completion(game)
-//        }
-//    }
-
-
+    
     func Add_or_Update_User_To_Game(gameId: String, user_id: String, user_stats: User_Stats, completion: @escaping (Error?) -> Void) {
-
+        
         let user_stats: [String: Any] = [
             "buy_in": user_stats.buy_in,
             "buy_out": user_stats.buy_out,
             "net":user_stats.net
         ]
-
+        
         // Use Firestore's dot notation to add/update the user inside the "users" dictionary
         db.collection("Games").document(gameId).updateData([
             "users.\(user_id)": user_stats
@@ -78,35 +50,66 @@ class Games_View_Model: ObservableObject {
             }
         }
     }
-
     
-//    func fetchUserStats(userId: String, completion: @escaping (Double, Double, Double) -> Void) {
-//        db.collection("games")
-//            .whereField("users.\(userId)", isGreaterThan: [:])  // Filter games with this user
-//            .getDocuments { snapshot, error in
-//                guard let documents = snapshot?.documents else {
-//                    print("No games found or error: \(error?.localizedDescription ?? "Unknown")")
-//                    completion(0, 0, 0)
-//                    return
-//                }
-//
-//                var totalBuyIn: Double = 0
-//                var totalCashOut: Double = 0
-//                var totalProfit: Double = 0
-//
-//                for document in documents {
-//                    if let userStats = document.data()["users"] as? [String: [String: Any]],
-//                       let stats = userStats[userId] {
-//                        
-//                        totalBuyIn += stats["totalBuyIn"] as? Double ?? 0
-//                        totalCashOut += stats["totalCashOut"] as? Double ?? 0
-//                        totalProfit += stats["profit"] as? Double ?? 0
-//                    }
-//                }
-//
-//                completion(totalBuyIn, totalCashOut, totalProfit)
-//            }
-//    }
-
+    func startListening(gameId: String) {
+        // Remove any existing listener to avoid duplicates
+        listener?.remove()
+        
+        listener = db.collection("Games").document(gameId)
+            .addSnapshotListener { [weak self] (document, error) in
+                guard let doc = document, doc.exists, let data = doc.data() else {
+                    print("No game found or error: \(error?.localizedDescription ?? "Unknown error")")
+                    return
+                }
+                
+                // Map the Firestore data to your `Game` model
+                DispatchQueue.main.async {
+                    self?.game = Game(
+                        id: doc.documentID,
+                        date: (data["date"] as? Timestamp)?.dateValue() ?? Date(),
+                        title: data["title"] as? String ?? "Unknown",
+                        total_buy_in: data["total_buy_in"] as? Double ?? 0.0,
+                        total_buy_out: data["total_buy_out"] as? Double ?? 0.0,
+                        player_count: data["player_count"] as? Int ?? 0,
+                        host_id: data["host_id"] as? String ?? "",
+                        sb_bb: data["sb_bb"] as? String ?? "",
+                        is_active: data["is_active"] as? Bool ?? false,
+                        users: data["users"] as? [String: Game.User_Stats] ?? [:]
+                    )
+                }
+                
+                print("Game Updated: \(self?.game.title ?? "Unknown")")
+            }
+    }
     
+    // Stop listening to prevent memory leaks
+    func stopListening() {
+        listener?.remove()
+        listener = nil
+    }
+    
+    func updateUserCurrentGame(newGameId: String, completion: @escaping (Bool) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            completion(false)  // Return false if no user is logged in
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userRef = db.collection("Users").document(user.uid)
+        
+        // Update the current_game field with the new game ID
+        userRef.updateData([
+            "current_game": newGameId
+        ]) { error in
+            if let error = error {
+                print("Error updating current_game: \(error.localizedDescription)")
+                completion(false)  // Return false if there’s an error
+            } else {
+                print("User's current_game updated successfully")
+                completion(true)  // Return true if the update is successful
+            }
+        }
+    }
+
 }
+

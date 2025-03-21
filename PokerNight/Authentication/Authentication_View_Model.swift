@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseAuth
 import FirebaseCore
+import FirebaseFirestore
 
 // For Sign in with Apple
 import AuthenticationServices
@@ -57,6 +58,66 @@ class Authentication_View_Model: ObservableObject {
             .assign(to: &$is_valid)
     }
     
+    func fetchUserData(completion: @escaping (User_Model?) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            completion(nil)
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userRef = db.collection("Users").document(user.uid)
+        
+        userRef.getDocument { snapshot, error in
+            if let document = snapshot, document.exists {
+                if let data = document.data() {
+                    let model = User_Model(
+                        id: user.uid,
+                        email: user.email ?? "No Email",
+                        displayName: user.displayName,
+                        photoURL: user.photoURL?.absoluteString,
+                        totalBuyIns: data["totalBuyIns"] as? Double ?? 0.0,
+                        gamesPlayed: data["gamesPlayed"] as? Int ?? 0,
+                        current_game: data["current_game"] as? String ?? ""
+                    )
+                    print("Fetched User: \(model)")
+                    completion(model)  // Use the completion handler to return the model
+                }
+            } else {
+                // Create new user if they don't exist
+                let newUser = [
+                    "email": user.email ?? "No Email",
+                    "displayName": user.displayName ?? "No Name",
+                    "photoURL": user.photoURL?.absoluteString ?? "",
+                    "totalBuyIns": 0.0,
+                    "gamesPlayed": 0,
+                    "current_game": ""
+                ] as [String: Any]
+                
+                userRef.setData(newUser) { error in
+                    if let error = error {
+                        print("Error adding user: \(error.localizedDescription)")
+                        completion(nil)
+                    } else {
+                        print("New user added successfully")
+                        // Return the new user model
+                        let newUserModel = User_Model(
+                            id: user.uid,
+                            email: user.email ?? "No Email",
+                            displayName: user.displayName,
+                            photoURL: user.photoURL?.absoluteString,
+                            totalBuyIns: 0.0,
+                            gamesPlayed: 0,
+                            current_game: ""
+                        )
+                        completion(newUserModel)
+                    }
+                }
+            }
+        }
+    }
+    
+    
+
     private var authStateHandler: AuthStateDidChangeListenerHandle?
     
     func registerAuthStateHandler() {
@@ -114,6 +175,10 @@ extension Authentication_View_Model {
         authentication_state = .authenticating
         do  {
             try await Auth.auth().createUser(withEmail: email, password: password)
+            fetchUserData(){ userModel in
+                
+            }
+
             return true
         }
         catch {
@@ -183,6 +248,10 @@ extension Authentication_View_Model {
                     do {
                         let result = try await Auth.auth().signIn(with: credential)
                         await updateDisplayName(for: result.user, with: appleIDCredential)
+                        fetchUserData() { userModel in
+                            
+                        }
+
                     }
                     catch {
                         print("Error authenticating: \(error.localizedDescription)")
@@ -321,7 +390,12 @@ extension Authentication_View_Model {
             let accessToken = user.accessToken
             let credential = GoogleAuthProvider.credential(withIDToken: id_token.tokenString, accessToken: accessToken.tokenString)
             
-            let result = try await Auth.auth().signIn(with: credential)
+            try await Auth.auth().signIn(with: credential)
+            
+            fetchUserData(){ userModel in
+               
+            }
+
             
             return true
         }

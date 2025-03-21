@@ -1,13 +1,14 @@
-Title: Complted Database Connection
+Title: Completed: Add Game to DB, Start Game View, Add user to DB
 
 Description:
 
-Tasks Completed: Database Connection, Tab Bar Button Overlay, New Bundle ID
+Tasks Completed: Add Game to DB, Add User to DB, Start Game View, Update current_game after creation of game, Update Custom Tab Bar with alternating button and new views
 
-Tasks In Progress: add Game to DB, add user to game in DB, Join Game View, Start Game View,
+Tasks In Progress: In Game view
 
 
 
 Notes:
 
+-
 

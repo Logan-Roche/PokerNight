@@ -21,6 +21,7 @@ struct Dashboard_View: View {
         let newStats = User_Stats(buy_in: 200, buy_out: 300, net: 100)
         VStack {
             Text("Dashboard")
+            Text(auth_view_model.user?.displayName ?? "")
             Button("New Game") {
                 self.view_model.Start_Game(game: temp_game) { gameId in
                     if let gameId = gameId {
