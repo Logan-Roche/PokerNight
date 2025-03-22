@@ -1,10 +1,10 @@
-Title: Completed: Add Game to DB, Start Game View, Add user to DB
+Title: Completed: Game Join and Connection Configuration
 
 Description:
 
-Tasks Completed: Add Game to DB, Add User to DB, Start Game View, Update current_game after creation of game, Update Custom Tab Bar with alternating button and new views
+Tasks Completed: Refactor View Models, Listeners for Live Game Updates and User's Current Game , Game State stays even when shutting off app.
 
-Tasks In Progress: In Game view
+Tasks In Progress: In Game View
 
 
 

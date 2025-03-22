@@ -10,8 +10,8 @@ import FirebaseAuth
 
 struct Dashboard_View: View {
     
-    @ObservedObject private var view_model = Games_View_Model()
-    @ObservedObject private var auth_view_model = Authentication_View_Model()
+    @EnvironmentObject var game_view_model: Games_View_Model  // Use shared instance
+    @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared
     
     
     
@@ -23,7 +23,7 @@ struct Dashboard_View: View {
             Text("Dashboard")
             Text(auth_view_model.user?.displayName ?? "")
             Button("New Game") {
-                self.view_model.Start_Game(game: temp_game) { gameId in
+                self.game_view_model.Start_Game(game: temp_game) { gameId in
                     if let gameId = gameId {
                         print("New game ID: \(gameId)")
                         game_id = gameId
@@ -36,7 +36,7 @@ struct Dashboard_View: View {
             .tint(.green)
             
             Button("Add User") {
-                self.view_model.Add_or_Update_User_To_Game(gameId: game_id, user_id: auth_view_model.user?.uid ?? "", user_stats: newStats) { error in
+                self.game_view_model.Add_or_Update_User_To_Game(gameId: game_id, user_id: auth_view_model.user?.uid ?? "", user_stats: newStats) { error in
                     if let error = error {
                         print("Failed to add user: \(error.localizedDescription)")
                     } else {
@@ -60,8 +60,12 @@ struct Dashboard_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             Dashboard_View()
+                .environmentObject(Authentication_View_Model())
+                .environmentObject(Games_View_Model())
                 .preferredColorScheme(.dark)
             Dashboard_View()
+                .environmentObject(Authentication_View_Model())
+                .environmentObject(Games_View_Model())
         }
     }
 }

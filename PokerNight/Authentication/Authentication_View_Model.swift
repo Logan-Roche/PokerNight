@@ -44,6 +44,8 @@ class Authentication_View_Model: ObservableObject {
     
     private var current_nonce: String?
     
+    private var listener: ListenerRegistration?
+    
     init() {
         registerAuthStateHandler()
         verifySignInWithAppleAuthenticationState()
@@ -115,6 +117,7 @@ class Authentication_View_Model: ObservableObject {
             }
         }
     }
+    
     
     
 

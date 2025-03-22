@@ -11,58 +11,60 @@ struct ContentView: View {
     @State private var isKeyboardVisible = false
     @State private var delayedShowTabBar = true
     
-    
+    @EnvironmentObject var game_view_model: Games_View_Model  // Use shared instance
+    @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared instance
 
-    
-    
     var body: some View {
-        
-        NavigationStack{
-            VStack{
-                
+        NavigationStack {
+            VStack {
                 if selectedTab == .dashboard {
                     Dashboard_View()
+                        .environmentObject(game_view_model)
+                        .environmentObject(auth_view_model)
                 } else if selectedTab == .profile {
                     Profile_View()
-                } else if selectedTab == .start_game{
+                        .environmentObject(game_view_model)
+                        .environmentObject(auth_view_model)
+                } else if selectedTab == .start_game {
                     Start_Game_View(selectedTab: $selectedTab)
-                } else if selectedTab == .in_game{
+                        .environmentObject(auth_view_model)
+                        .environmentObject(game_view_model)
+                } else if selectedTab == .in_game {
                     In_Game_View()
+                        .environmentObject(game_view_model)
+                        .environmentObject(auth_view_model)
                 }
-                
+
                 if !isKeyboardVisible && delayedShowTabBar {
                     Custom_Tab_Bar(selectedTab: $selectedTab, start_game_join_game_sheet: $start_game_join_game_sheet)
-                        .transition(.move(edge: .bottom))   // Add transition animation
+                        .environmentObject(game_view_model)
+                        .environmentObject(auth_view_model)
+                        .transition(.move(edge: .bottom))
                         .animation(.easeInOut, value: isKeyboardVisible)
                         .sheet(isPresented: $start_game_join_game_sheet) {
                         } content: {
                             Tab_Bar_Overlay_View(selectedTab: $selectedTab)
                                 .presentationDetents([.fraction(0.30)])
+                                .environmentObject(game_view_model)  // Inject ViewModel here too
                         }
                 }
-                
-                
             }
             .background(.colorScheme)
         }
         .onAppear {
-                    // Detect keyboard appearance and dismissal
-                    NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { _ in
-                        isKeyboardVisible = true
-                        delayedShowTabBar = false // Hide tab bar immediately when keyboard appears
-                    }
-                    
-                    NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
-                        isKeyboardVisible = false
-                        
-                        // Add a delay before showing the tab bar after the keyboard hides
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            delayedShowTabBar = true
-                        }
-                    }
+            // Detect keyboard appearance and dismissal
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { _ in
+                isKeyboardVisible = true
+                delayedShowTabBar = false
+            }
+            
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+                isKeyboardVisible = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    delayedShowTabBar = true
                 }
-        
-        
+            }
+        }
     }
 }
 
@@ -70,10 +72,13 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             ContentView()
+                .environmentObject(Games_View_Model())
+                .environmentObject(Authentication_View_Model())
                 .preferredColorScheme(.dark)
+            
             ContentView()
+                .environmentObject(Games_View_Model())
+                .environmentObject(Authentication_View_Model())
         }
-        
-        //.environmentObject(Database_Manager())
     }
 }

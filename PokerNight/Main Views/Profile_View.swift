@@ -9,14 +9,16 @@ import SwiftUI
 import FirebaseAuth
 
 struct Profile_View: View {
-    private let auth = Auth.auth()
+    
+    @EnvironmentObject var game_view_model: Games_View_Model  // Use shared instance
+    @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared
     
     
     var body: some View {
         VStack{
             Button("Log Out"){
                 do {
-                    try auth.signOut()
+                    //try auth_view_model.signOut()
                     } catch let sign_our_error {
                         print(sign_our_error)
                     }
@@ -36,8 +38,12 @@ struct Profile_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             Profile_View()
+                .environmentObject(Authentication_View_Model())
+                .environmentObject(Games_View_Model())
                 .preferredColorScheme(.dark)
             Profile_View()
+                .environmentObject(Authentication_View_Model())
+                .environmentObject(Games_View_Model())
         }
     }
 }

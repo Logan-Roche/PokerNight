@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct Join_Game_View: View {
+    
+    @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared instance
+     
+    
     var body: some View {
         VStack {
             Text("Join Game")
@@ -19,7 +23,9 @@ struct Join_Game_View_Previews: PreviewProvider {
         Group {
             Join_Game_View()
                 .preferredColorScheme(.dark)
+                .environmentObject(Authentication_View_Model())
             Join_Game_View()
+                .environmentObject(Authentication_View_Model())
         }
     }
 }

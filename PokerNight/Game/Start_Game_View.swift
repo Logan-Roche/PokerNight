@@ -9,8 +9,9 @@ private enum FocusableField: Hashable {
 
 struct Start_Game_View: View {
     
-    @ObservedObject private var auth_view_model = Authentication_View_Model()
-    @ObservedObject private var game_view_model = Games_View_Model()
+    //@ObservedObject private var auth_view_model = Authentication_View_Model()
+    @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared instance
+    @EnvironmentObject var game_view_model: Games_View_Model  // Use shared instance
     @FocusState private var focus: FocusableField?
     @Environment(\.colorScheme) var colorScheme
     @Binding var selectedTab: Tabs
@@ -105,27 +106,27 @@ struct Start_Game_View: View {
                     .foregroundColor(.gray)
                     .font(.custom("roboto-regular", size: 15))
                     .padding(EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1))
-//                    .toolbar {
-//                        if focus == .sb || focus == .bb {
-//                            ToolbarItemGroup(placement: .keyboard) {
-//                                Spacer()  // Push the button to the right
-//                                if focus == .sb {
-//                                    Button("Next") {
-//                                        self.focus = .bb
-//                                    }
-//                                    .buttonStyle(.bordered)
-//                                    .tint(.blue)
-//                                }
-//                                else {
-//                                    Button("Done") {
-//                                        self.focus = nil
-//                                    }
-//                                    .buttonStyle(.bordered)
-//                                    .tint(.blue)
-//                                }
-//                            }
-//                        }
-//                    }
+                    .toolbar {
+                        if focus == .sb || focus == .bb {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()  // Push the button to the right
+                                if focus == .sb {
+                                    Button("Next") {
+                                        self.focus = .bb
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .tint(.blue)
+                                }
+                                else {
+                                    Button("Done") {
+                                        self.focus = nil
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .tint(.blue)
+                                }
+                            }
+                        }
+                    }
                 
                 Text("Currency")
                     .font(.custom("comfortaa", size: 17))
@@ -152,27 +153,33 @@ struct Start_Game_View: View {
                 
                 game_view_model.Start_Game(game: game_view_model.game) { gameId in
                     if let gameId = gameId {
-                        print("New game ID: \(gameId)")
-                        game_id = gameId
+                        
+                        game_view_model.game.id = gameId
+                        game_view_model.currentGameID = gameId
+                        print("New game ID: \(game_view_model.game.id ?? "No game ID")")
+                        
+                        game_view_model.updateUserCurrentGame(newGameId: game_view_model.game.id ?? "No game ID") { success in
+                            if success {
+                                print("Current game updated successfully")
+                            } else {
+                                print("Failed to update current game")
+                            }
+                            
+                            game_view_model.Add_or_Update_User_To_Game(gameId: game_view_model.game.id ?? " ", user_id: Auth.auth().currentUser!.uid, user_stats: User_Stats(buy_in: 0, buy_out: 0, net: 0)){ error in
+                                if let error = error {
+                                    print("Failed to add user: \(error.localizedDescription)")
+                                } else {
+                                    print("User added/updated successfully!")
+                                }
+                            }
+                        }
                     } else {
                         print("Failed to add game.")
                     }
                 }
-                game_view_model.Add_or_Update_User_To_Game(gameId: game_id ?? " ", user_id: Auth.auth().currentUser!.uid, user_stats: User_Stats(buy_in: 0, buy_out: 0, net: 0)){ error in
-                    if let error = error {
-                        print("Failed to add user: \(error.localizedDescription)")
-                    } else {
-                        print("User added/updated successfully!")
-                    }
-                }
                 
-                game_view_model.updateUserCurrentGame(newGameId: game_id ?? "No game ID") { success in
-                    if success {
-                        print("Current game updated successfully")
-                    } else {
-                        print("Failed to update current game")
-                    }
-                }
+                
+                
                 
                 selectedTab = .in_game
             }) {
@@ -200,8 +207,13 @@ struct Start_Game_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             Start_Game_View(selectedTab: .constant(.dashboard))
+                .environmentObject(Authentication_View_Model())
+                .environmentObject(Games_View_Model())  // Inject ViewModel in
                 .preferredColorScheme(.dark)
+            
             Start_Game_View(selectedTab: .constant(.dashboard))
+                .environmentObject(Games_View_Model())  // Inject ViewModel in
+                .environmentObject(Authentication_View_Model())
         }
     }
 }

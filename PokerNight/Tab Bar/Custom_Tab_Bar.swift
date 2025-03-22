@@ -23,7 +23,8 @@ struct Custom_Tab_Bar: View {
     let gradient = LinearGradient(colors: [.gradientColorLeft, .gradientColorRight], startPoint: .top, endPoint: .topTrailing)
     @Environment(\.colorScheme) var colorScheme
     
-    @ObservedObject private var auth_view_model = Authentication_View_Model()
+    @EnvironmentObject var auth_view_model: Authentication_View_Model
+    @EnvironmentObject var game_view_model: Games_View_Model
     
     @State private var currentUser: User_Model?
     
@@ -43,7 +44,7 @@ struct Custom_Tab_Bar: View {
             }
             .tint(.gray)
             
-            if (currentUser?.current_game == "") {
+            if (game_view_model.currentGameID == "") {
                 Button {
                     start_game_join_game_sheet.toggle()
                     
@@ -121,8 +122,12 @@ struct Custom_Tab_Bar_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             Custom_Tab_Bar(selectedTab: .constant(.profile),start_game_join_game_sheet: .constant(false))
+                .environmentObject(Games_View_Model())
+                .environmentObject(Authentication_View_Model())
                 .preferredColorScheme(.dark)
             Custom_Tab_Bar(selectedTab: .constant(.profile),start_game_join_game_sheet: .constant(false))
+                .environmentObject(Games_View_Model())
+                .environmentObject(Authentication_View_Model())
         }
     }
 }

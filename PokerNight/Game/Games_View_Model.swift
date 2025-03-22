@@ -8,21 +8,83 @@
 import Foundation
 import FirebaseFirestore
 import FirebaseAuth
+import SwiftUICore
 
 class Games_View_Model: ObservableObject {
     @Published var games = [Game]()
     @Published var game: Game = Game(date: Date(), title: "", total_buy_in: 0, total_buy_out: 0, player_count: 0, host_id: "" , sb_bb: "N/A", is_active: false, users: [:], transactions: [])
     
+    @ObservedObject private var auth_view_model = Authentication_View_Model()
+    
+    @Published var currentGameID: String = " "  // Tracks the current game globally
+
+    
     private var db = Firestore.firestore()
-    private var listener: ListenerRegistration?
+    private var gameListener: ListenerRegistration?
+    private var userListener: ListenerRegistration?
+    
+    
+    
+    func startListeningForCurrentGame(userID: String) {
+            // Remove any existing listener to avoid duplicates
+            userListener?.remove()
+
+            userListener = db.collection("Users").document(userID)
+                .addSnapshotListener { [weak self] (document, error) in
+                    guard let doc = document, doc.exists, let data = doc.data() else {
+                        print("No user found or error: \(error?.localizedDescription ?? "Unknown error")")
+                        self?.currentGameID = ""  // Reset if no game
+                        return
+                    }
+
+                    DispatchQueue.main.async {
+                        // Store the current game ID
+                        self?.currentGameID = (data["current_game"] as? String)!
+                        print("Current Game ID Updated: \(self?.currentGameID ?? "None")")
+                    }
+                }
+        }
+    
+    func stopListeningForCurrentGame() {
+            userListener?.remove()
+            userListener = nil
+        }
+    
+    func Fetch_Game(gameId: String, completion: @escaping (Game?, Error?) -> Void) {
+        db.collection("Games").document(gameId).getDocument { snapshot, error in
+            if let error = error {
+                print("Error fetching document: \(error.localizedDescription)")
+                completion(nil, error)
+                return
+            }
+            
+            guard let snapshot = snapshot, snapshot.exists else {
+                print("Document does not exist")
+                completion(nil, nil)
+                return
+            }
+            
+            do {
+                let game = try snapshot.data(as: Game.self)  // Correctly decode into Game model
+                completion(game, nil)  // Pass the decoded Game model to the completion handler
+            } catch {
+                print("Error decoding Game: \(error.localizedDescription)")
+                completion(nil, error)
+            }
+        }
+    }
     
     
     func Start_Game(game: Game, completion: @escaping (String?) -> Void) {
         do {
             let ref = try db.collection("Games").addDocument(from: game)  // Get the DocumentReference
-            let gameId = ref.documentID                                  // Extract the document ID
-            print("Document added with ID: \(gameId)")
-            completion(gameId)
+            let gameId = ref.documentID
+            currentGameID = ref.documentID
+            DispatchQueue.main.async {
+                self.game.id = gameId
+                //self.currentGameID = gameId
+                completion(gameId)  // Fire completion when ID is assigned// Extract the document ID
+            }
         } catch {
             print("Error adding document: \(error.localizedDescription)")
             completion(nil)
@@ -52,41 +114,43 @@ class Games_View_Model: ObservableObject {
     }
     
     func startListening(gameId: String) {
-        // Remove any existing listener to avoid duplicates
-        listener?.remove()
-        
-        listener = db.collection("Games").document(gameId)
-            .addSnapshotListener { [weak self] (document, error) in
-                guard let doc = document, doc.exists, let data = doc.data() else {
-                    print("No game found or error: \(error?.localizedDescription ?? "Unknown error")")
-                    return
+            // Remove any existing listener to avoid duplicates
+            gameListener?.remove()
+            
+            gameListener = db.collection("Games").document(gameId)
+                .addSnapshotListener { [weak self] (document, error) in
+                    guard let doc = document, doc.exists, let data = doc.data() else {
+                        print("No game found or error: \(error?.localizedDescription ?? "Unknown error")")
+                        return
+                    }
+                    
+                    // Map the Firestore data to your `Game` model
+                    DispatchQueue.main.async {
+                        self?.game = Game(
+                            id: doc.documentID,
+                            date: (data["date"] as? Timestamp)?.dateValue() ?? Date(),
+                            title: data["title"] as? String ?? "Unknown",
+                            total_buy_in: data["total_buy_in"] as? Double ?? 0.0,
+                            total_buy_out: data["total_buy_out"] as? Double ?? 0.0,
+                            player_count: data["player_count"] as? Int ?? 0,
+                            host_id: data["host_id"] as? String ?? "",
+                            sb_bb: data["sb_bb"] as? String ?? "",
+                            is_active: data["is_active"] as? Bool ?? false,
+                            users: data["users"] as? [String: Game.User_Stats] ?? [:]
+                        )
+                    }
+                    
+                    print("Game Updated: \(self?.game.title ?? "Unknown")")
                 }
-                
-                // Map the Firestore data to your `Game` model
-                DispatchQueue.main.async {
-                    self?.game = Game(
-                        id: doc.documentID,
-                        date: (data["date"] as? Timestamp)?.dateValue() ?? Date(),
-                        title: data["title"] as? String ?? "Unknown",
-                        total_buy_in: data["total_buy_in"] as? Double ?? 0.0,
-                        total_buy_out: data["total_buy_out"] as? Double ?? 0.0,
-                        player_count: data["player_count"] as? Int ?? 0,
-                        host_id: data["host_id"] as? String ?? "",
-                        sb_bb: data["sb_bb"] as? String ?? "",
-                        is_active: data["is_active"] as? Bool ?? false,
-                        users: data["users"] as? [String: Game.User_Stats] ?? [:]
-                    )
-                }
-                
-                print("Game Updated: \(self?.game.title ?? "Unknown")")
-            }
-    }
+        }
     
     // Stop listening to prevent memory leaks
     func stopListening() {
-        listener?.remove()
-        listener = nil
-    }
+            gameListener?.remove()
+            gameListener = nil
+            userListener?.remove()
+            userListener = nil
+        }
     
     func updateUserCurrentGame(newGameId: String, completion: @escaping (Bool) -> Void) {
         guard let user = Auth.auth().currentUser else {
@@ -98,6 +162,7 @@ class Games_View_Model: ObservableObject {
         let userRef = db.collection("Users").document(user.uid)
         
         // Update the current_game field with the new game ID
+        currentGameID = newGameId
         userRef.updateData([
             "current_game": newGameId
         ]) { error in
