@@ -5,9 +5,9 @@ import FirebaseFirestore
 struct Transaction: Identifiable, Codable {
     @DocumentID var id: String?  // Firestore document ID
     var userId: String
-    var name: String
-    var type: String  // Buy In, Buy Out, Join,
-    var amount: Double
+    var name: String // user's display name
+    var type: Int  //
+    var amount: Double?
     var timestamp: Date
 
 

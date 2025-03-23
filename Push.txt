@@ -1,10 +1,10 @@
-Title: Completed: Game Join and Connection Configuration
+Title: Completed: In Game View UI
 
 Description:
 
-Tasks Completed: Refactor View Models, Listeners for Live Game Updates and User's Current Game , Game State stays even when shutting off app.
+Tasks Completed: In Game View UI, Fix game Listener for User Stats Updates
 
-Tasks In Progress: In Game View
+Tasks In Progress: In Game View Functionality (use real transactions and button functionality)
 
 
 

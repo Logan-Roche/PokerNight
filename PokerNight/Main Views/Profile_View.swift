@@ -18,7 +18,7 @@ struct Profile_View: View {
         VStack{
             Button("Log Out"){
                 do {
-                    //try auth_view_model.signOut()
+                    try auth_view_model.Sign_Out()
                     } catch let sign_our_error {
                         print(sign_our_error)
                     }

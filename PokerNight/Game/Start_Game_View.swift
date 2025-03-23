@@ -25,9 +25,6 @@ struct Start_Game_View: View {
     @State private var transactions: [Transaction] = []
     
     @State private var game_id: String?
-    //@State private var game = Game(date: Date(), title: "", total_buy_in: 0, total_buy_out: 0, player_count: 1, host_id: "", sb_bb: "", is_active: false, users: [:])
-    
-    
     
     let gradient = LinearGradient(colors: [.gradientColorLeft, .gradientColorRight], startPoint: .top, endPoint: .topTrailing)
     
@@ -165,7 +162,7 @@ struct Start_Game_View: View {
                                 print("Failed to update current game")
                             }
                             
-                            game_view_model.Add_or_Update_User_To_Game(gameId: game_view_model.game.id ?? " ", user_id: Auth.auth().currentUser!.uid, user_stats: User_Stats(buy_in: 0, buy_out: 0, net: 0)){ error in
+                            game_view_model.Add_or_Update_User_To_Game(gameId: game_view_model.game.id ?? " ", user_id: Auth.auth().currentUser!.uid, user_stats: User_Stats(name: auth_view_model.user!.displayName! ,buy_in: 0, buy_out: 0, net: 0, photo_url: auth_view_model.user?.photoURL?.absoluteString ?? "" )){ error in
                                 if let error = error {
                                     print("Failed to add user: \(error.localizedDescription)")
                                 } else {
