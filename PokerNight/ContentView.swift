@@ -60,7 +60,7 @@ struct ContentView: View {
             
             NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
                 isKeyboardVisible = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                     delayedShowTabBar = true
                 }
             }

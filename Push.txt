@@ -1,10 +1,10 @@
-Title: Completed: In Game View UI
+Title: Completed: Transaction Creation/Upload/Display
 
 Description:
 
-Tasks Completed: In Game View UI, Fix game Listener for User Stats Updates
+Tasks Completed: Transation Creation, Transaction Upload, Transaction Dispaying
 
-Tasks In Progress: In Game View Functionality (use real transactions and button functionality)
+Tasks In Progress: Buy In Button
 
 
 

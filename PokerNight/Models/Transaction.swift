@@ -6,7 +6,7 @@ struct Transaction: Identifiable, Codable {
     @DocumentID var id: String?  // Firestore document ID
     var userId: String
     var name: String // user's display name
-    var type: Int  //
+    var type: String  //
     var amount: Double?
     var timestamp: Date
 

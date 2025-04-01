@@ -71,7 +71,7 @@ struct Start_Game_View: View {
                     .font(.custom("comfortaa", size: 17))
                     .foregroundColor(colorScheme == .light ? .black : .white)
                 
-                TextField("Enter SB Amount (Number Only)", text: $sb)
+                TextField("Enter SB Amount", text: $sb)
                     .keyboardType(.numberPad)
                     .focused($focus, equals: .sb )
                     .padding()
@@ -89,7 +89,7 @@ struct Start_Game_View: View {
                     .font(.custom("comfortaa", size: 17))
                     .foregroundColor(colorScheme == .light ? .black : .white)
                 
-                TextField("Enter BB Amount (Number Only)", text: $bb)
+                TextField("Enter BB Amount", text: $bb)
                     .keyboardType(.numberPad)
                     .focused($focus, equals: .bb )
                     .submitLabel(.done)

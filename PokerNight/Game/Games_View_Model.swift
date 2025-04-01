@@ -64,15 +64,77 @@ class Games_View_Model: ObservableObject {
                 return
             }
             
-            do {
-                let game = try snapshot.data(as: Game.self)  // Correctly decode into Game model
-                completion(game, nil)  // Pass the decoded Game model to the completion handler
-            } catch {
-                //print("Error decoding Game: \(error.localizedDescription)")
-                completion(nil, error)
+            // Manually extract the data from the Firestore document
+            var usersDict: [String: Game.User_Stats] = [:]
+            var transactionsArray: [Transaction] = []
+            
+            if let data = snapshot.data() {
+                // Process users
+                if let usersData = data["users"] as? [String: [String: Any]] {
+                    for (key, value) in usersData {
+                        if let buyIn = value["buy_in"] as? Double,
+                           let buyOut = value["buy_out"] as? Double,
+                           let net = value["net"] as? Double,
+                           let name = value["name"] as? String,
+                           let photo_url = value["photo_url"] as? String {
+                            usersDict[key] = Game.User_Stats(
+                                name: name,
+                                buy_in: buyIn,
+                                buy_out: buyOut,
+                                net: net,
+                                photo_url: photo_url
+                            )
+                        }
+                    }
+                }
+
+                // Process transactions
+                if let transactionsData = data["transactions"] as? [[String: Any]] {
+                    for transactionDict in transactionsData {
+                        if let userId = transactionDict["userId"] as? String,
+                           let name = transactionDict["name"] as? String,
+                           let type = transactionDict["type"] as? String,
+                           let amount = transactionDict["amount"] as? Double?,
+                           let timestamp = transactionDict["timestamp"] as? Timestamp {
+                            
+                            let transaction = Transaction(
+                                id: transactionDict["id"] as? String ?? UUID().uuidString,
+                                userId: userId,
+                                name: name,
+                                type: type,
+                                amount: amount,
+                                timestamp: timestamp.dateValue()  // ✅ Convert Firestore Timestamp to Date
+                            )
+                            
+                            transactionsArray.append(transaction)
+                        }
+                    }
+                }
+                
+                // Map the Firestore data to your `Game` model
+                do {
+                    let game = Game(
+                        id: snapshot.documentID,
+                        date: (data["date"] as? Timestamp)?.dateValue() ?? Date(),
+                        title: data["title"] as? String ?? "Unknown",
+                        total_buy_in: data["total_buy_in"] as? Double ?? 0.0,
+                        total_buy_out: data["total_buy_out"] as? Double ?? 0.0,
+                        player_count: data["player_count"] as? Int ?? 0,
+                        host_id: data["host_id"] as? String ?? "",
+                        sb_bb: data["sb_bb"] as? String ?? "",
+                        is_active: data["is_active"] as? Bool ?? false,
+                        users: usersDict,
+                        transactions: transactionsArray
+                    )
+                    
+                    completion(game, nil) // Pass the game data back via the completion handler
+                } 
+            } else {
+                completion(nil, NSError(domain: "Fetch_Game", code: -1, userInfo: [NSLocalizedDescriptionKey: "Data not found in document"]))
             }
         }
     }
+
     
     
     func Start_Game(game: Game, completion: @escaping (String?) -> Void) {
@@ -88,7 +150,8 @@ class Games_View_Model: ObservableObject {
         } catch {
             //print("Error adding document: \(error.localizedDescription)")
             completion(nil)
-        }    }
+        }
+    }
     
     
     func Add_or_Update_User_To_Game(gameId: String, user_id: String, user_stats: User_Stats, completion: @escaping (Error?) -> Void) {
@@ -147,6 +210,30 @@ class Games_View_Model: ObservableObject {
                         }
                     }
                 }
+                
+                var transactionsArray: [Transaction] = []
+
+                if let transactionsData = data["transactions"] as? [[String: Any]] {
+                    for transactionDict in transactionsData {
+                        if let userId = transactionDict["userId"] as? String,
+                           let name = transactionDict["name"] as? String,
+                           let type = transactionDict["type"] as? String,
+                           let amount = transactionDict["amount"] as? Double?,
+                           let timestamp = transactionDict["timestamp"] as? Timestamp {
+                            
+                            let transaction = Transaction(
+                                id: transactionDict["id"] as? String ?? UUID().uuidString,
+                                userId: userId,
+                                name: name,
+                                type: type,
+                                amount: amount,
+                                timestamp: timestamp.dateValue()  // ✅ Convert Firestore Timestamp to Date
+                            )
+                            
+                            transactionsArray.append(transaction)
+                        }
+                    }
+                }
 
                 // Map the Firestore data to your `Game` model
                 DispatchQueue.main.async {
@@ -160,7 +247,8 @@ class Games_View_Model: ObservableObject {
                         host_id: data["host_id"] as? String ?? "",
                         sb_bb: data["sb_bb"] as? String ?? "",
                         is_active: data["is_active"] as? Bool ?? false,
-                        users: usersDict
+                        users: usersDict,
+                        transactions: transactionsArray
                     )
                 }
             }
@@ -198,6 +286,83 @@ class Games_View_Model: ObservableObject {
             }
         }
     }
+    
+    
+    func Add_Transaction(gameId: String, user_id: String, type: String, amount: Double?, completion: @escaping (Error?) -> Void) {
+        
+        let new_transaction = Transaction(
+            id: UUID().uuidString,  // Use UUID to create a unique id
+            userId: user_id,
+            name: auth_view_model.display_name,
+            type: type,
+            amount: amount,
+            timestamp: Date()
+        )
+
+        
+        let db = Firestore.firestore()
+        
+        // Append the new transaction to the existing array
+        db.collection("Games").document(gameId).getDocument { (document, error) in
+            if let document = document, document.exists {
+                
+                var transactions: [Transaction] = []
+
+                // Decode existing transactions
+                if let data = document.data(),
+                   let existingTransactions = data["transactions"] as? [[String: Any]] {
+                    
+                    // Convert all `FIRTimestamp` to `Date`
+                    transactions = existingTransactions.compactMap { dict in
+                        guard let userId = dict["userId"] as? String,
+                              let name = dict["name"] as? String,
+                              let type = dict["type"] as? String,
+                              let amount = dict["amount"] as? Double?,
+                              let timestamp = dict["timestamp"] as? Timestamp else {
+                            return nil
+                        }
+                        
+                        return Transaction(
+                            id: nil,
+                            userId: userId,
+                            name: name,
+                            type: type,
+                            amount: amount,
+                            timestamp: timestamp.dateValue()  // Convert to `Date`
+                        )
+                    }
+                }
+                
+                // Append the new transaction
+                transactions.append(new_transaction)
+
+                // Encode the updated array with `Timestamp`
+                let encodedTransactions = transactions.map { transaction -> [String: Any] in
+                    return [
+                        "userId": transaction.userId,
+                        "name": transaction.name,
+                        "type": transaction.type,
+                        "amount": transaction.amount ?? 0.0,
+                        "timestamp": Timestamp(date: transaction.timestamp)  // Use Firestore Timestamp
+                    ]
+                }
+
+                // Save back to Firestore
+                db.collection("Games").document(gameId).updateData([
+                    "transactions": encodedTransactions
+                ]) { error in
+                    if let error = error {
+                        print("Error updating transactions: \(error)")
+                    } else {
+                        print("Transaction added successfully!")
+                    }
+                }
+            } else {
+                print("Game not found")
+            }
+        }
+    }
+    
 
 }
 
