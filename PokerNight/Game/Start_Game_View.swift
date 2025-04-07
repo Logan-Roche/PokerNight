@@ -9,9 +9,9 @@ private enum FocusableField: Hashable {
 
 struct Start_Game_View: View {
     
-    //@ObservedObject private var auth_view_model = Authentication_View_Model()
-    @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared instance
-    @EnvironmentObject var game_view_model: Games_View_Model  // Use shared instance
+    
+    @EnvironmentObject var auth_view_model: Authentication_View_Model
+    @EnvironmentObject var game_view_model: Games_View_Model
     @FocusState private var focus: FocusableField?
     @Environment(\.colorScheme) var colorScheme
     @Binding var selectedTab: Tabs
@@ -26,7 +26,11 @@ struct Start_Game_View: View {
     
     @State private var game_id: String?
     
-    let gradient = LinearGradient(colors: [.gradientColorLeft, .gradientColorRight], startPoint: .top, endPoint: .topTrailing)
+    let gradient = LinearGradient(
+        colors: [.gradientColorLeft, .gradientColorRight],
+        startPoint: .top,
+        endPoint: .topTrailing
+    )
     
     var body: some View {
         VStack {
@@ -61,11 +65,16 @@ struct Start_Game_View: View {
                     .cornerRadius(4)
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
-                            .stroke(colorScheme == .light ? .gray : .black, lineWidth: 1.5)
+                            .stroke(
+                                colorScheme == .light ? .gray : .black,
+                                lineWidth: 1.5
+                            )
                     )
                     .foregroundColor(.gray)
                     .font(.custom("roboto-regular", size: 15))
-                    .padding(EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1))
+                    .padding(
+                        EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1)
+                    )
                 
                 Text("Small Blind")
                     .font(.custom("comfortaa", size: 17))
@@ -79,11 +88,16 @@ struct Start_Game_View: View {
                     .cornerRadius(4)
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
-                            .stroke(colorScheme == .light ? .gray : .black, lineWidth: 1.5)
+                            .stroke(
+                                colorScheme == .light ? .gray : .black,
+                                lineWidth: 1.5
+                            )
                     )
                     .foregroundColor(.gray)
                     .font(.custom("roboto-regular", size: 15))
-                    .padding(EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1))
+                    .padding(
+                        EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1)
+                    )
                 
                 Text("Big Blind")
                     .font(.custom("comfortaa", size: 17))
@@ -98,11 +112,16 @@ struct Start_Game_View: View {
                     .cornerRadius(4)
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
-                            .stroke(colorScheme == .light ? .gray : .black, lineWidth: 1.5)
+                            .stroke(
+                                colorScheme == .light ? .gray : .black,
+                                lineWidth: 1.5
+                            )
                     )
                     .foregroundColor(.gray)
                     .font(.custom("roboto-regular", size: 15))
-                    .padding(EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1))
+                    .padding(
+                        EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1)
+                    )
                     .toolbar {
                         if focus == .sb || focus == .bb {
                             ToolbarItemGroup(placement: .keyboard) {
@@ -141,56 +160,89 @@ struct Start_Game_View: View {
             }
             .padding(.horizontal)
             
-            Button(action: {
+            Button(
+action: {
                 game_view_model.game.host_id = Auth.auth().currentUser!.uid
                 game_view_model.game.is_active = true
                 game_view_model.game.sb_bb = cents ? "\(sb)¢ / \(bb)¢" : "$\(sb) / $\(bb)"
                 game_view_model.game.title = title
                 game_view_model.game.date = Date()
                 
-                game_view_model.Start_Game(game: game_view_model.game) { gameId in
-                    if let gameId = gameId {
+                game_view_model
+                    .Start_Game(game: game_view_model.game) { gameId in
+                        if let gameId = gameId {
                         
-                        game_view_model.game.id = gameId
-                        game_view_model.currentGameID = gameId
-                        print("New game ID: \(game_view_model.game.id ?? "No game ID")")
+                            game_view_model.game.id = gameId
+                            game_view_model.currentGameID = gameId
+                            print(
+                                "New game ID: \(game_view_model.game.id ?? "No game ID")"
+                            )
                         
-                        game_view_model.updateUserCurrentGame(newGameId: game_view_model.game.id ?? "No game ID") { success in
-                            if success {
-                                print("Current game updated successfully")
-                            } else {
-                                print("Failed to update current game")
-                            }
+                            game_view_model
+                                .updateUserCurrentGame(
+                                    newGameId: game_view_model.game.id ?? "No game ID"
+                                ) { success in
+                                    if success {
+                                        print(
+                                            "Current game updated successfully"
+                                        )
+                                    } else {
+                                        print("Failed to update current game")
+                                    }
                             
-                            game_view_model.Add_or_Update_User_To_Game(gameId: game_view_model.game.id ?? " ", user_id: Auth.auth().currentUser!.uid, user_stats: User_Stats(name: auth_view_model.user!.displayName! ,buy_in: 0, buy_out: 0, net: 0, photo_url: auth_view_model.user?.photoURL?.absoluteString ?? "" )){ error in
-                                if let error = error {
-                                    print("Failed to add user: \(error.localizedDescription)")
-                                } else {
-                                    print("User added/updated successfully!")
+                                    game_view_model
+                                        .Add_or_Update_User_To_Game(
+                                            gameId: game_view_model.game.id ?? " ",
+                                            user_id: Auth
+                                                .auth().currentUser!.uid,
+                                            user_stats: User_Stats(
+                                                name: auth_view_model.user!.displayName! ,
+                                                buy_in: 0,
+                                                buy_out: 0,
+                                                net: 0,
+                                                photo_url: auth_view_model.user?.photoURL?.absoluteString ?? ""
+                                            )
+                                        ){ error in
+                                            if let error = error {
+                                                print(
+                                                    "Failed to add user: \(error.localizedDescription)"
+                                                )
+                                            } else {
+                                                print(
+                                                    "User added/updated successfully!"
+                                                )
+                                            }
+                                        }
+                                    game_view_model
+                                        .Add_Transaction(
+                                            gameId: game_view_model.currentGameID,
+                                            user_id: auth_view_model.user?.uid ?? "",
+                                            type: "Joined Game: ",
+                                            amount: 0.001
+                                        ) {_ in
+                                        }
                                 }
-                            }
+                        } else {
+                            print("Failed to add game.")
                         }
-                    } else {
-                        print("Failed to add game.")
                     }
-                }
                 
                 
                 
                 
-                selectedTab = .in_game
-            }) {
-                Text("Start Game")
-                    .font(.custom("Roboto", size: 17))
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(gradient)
-                    .cornerRadius(10)
-                    .shadow(radius: 3)
-            }
-            .padding(EdgeInsets(top: 30, leading: 15, bottom: 15, trailing: 15))
+    selectedTab = .in_game
+}) {
+    Text("Start Game")
+        .font(.custom("Roboto", size: 17))
+        .fontWeight(.bold)
+        .foregroundColor(.white)
+        .padding()
+        .frame(maxWidth: .infinity)
+        .background(gradient)
+        .cornerRadius(10)
+        .shadow(radius: 3)
+}
+.padding(EdgeInsets(top: 30, leading: 15, bottom: 15, trailing: 15))
             
             Spacer()
         }

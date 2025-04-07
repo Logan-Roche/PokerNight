@@ -2,7 +2,11 @@ import SwiftUI
 
 struct Tab_Bar_Overlay_View: View {
     
-    let gradient = LinearGradient(colors: [.gradientColorLeft, .gradientColorRight], startPoint: .top, endPoint: .topTrailing)
+    let gradient = LinearGradient(
+        colors: [.gradientColorLeft, .gradientColorRight],
+        startPoint: .top,
+        endPoint: .topTrailing
+    )
     
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
@@ -24,7 +28,9 @@ struct Tab_Bar_Overlay_View: View {
                         .cornerRadius(10)
                         .shadow(radius: 3)
                 }
-                .padding(EdgeInsets(top: 30, leading: 35, bottom: 0, trailing: 35))
+                .padding(
+                    EdgeInsets(top: 30, leading: 35, bottom: 0, trailing: 35)
+                )
 
                 
                 
@@ -42,7 +48,9 @@ struct Tab_Bar_Overlay_View: View {
                         .cornerRadius(10)
                         .shadow(radius: 3)
                 }
-                .padding(EdgeInsets(top: 10, leading: 35, bottom: 15, trailing: 35))
+                .padding(
+                    EdgeInsets(top: 10, leading: 35, bottom: 15, trailing: 35)
+                )
                 
                 Spacer()
                 
@@ -55,7 +63,9 @@ struct Tab_Bar_Overlay_View: View {
                             .scaledToFit( )
                             .frame(width: 15, height:15)
                             .rotationEffect(.init(degrees: 45))
-                            .foregroundStyle(colorScheme == .light ? Color.black : Color.white)
+                            .foregroundStyle(
+                                colorScheme == .light ? Color.black : Color.white
+                            )
                         
                     }
                     .clipShape(Capsule())

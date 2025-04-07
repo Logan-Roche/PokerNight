@@ -12,7 +12,18 @@ import SwiftUICore
 
 class Games_View_Model: ObservableObject {
     @Published var games = [Game]()
-    @Published var game: Game = Game(date: Date(), title: "", total_buy_in: 0, total_buy_out: 0, player_count: 0, host_id: "" , sb_bb: "N/A", is_active: false, users: [:], transactions: [])
+    @Published var game: Game = Game(
+        date: Date(),
+        title: "",
+        total_buy_in: 0,
+        total_buy_out: 0,
+        player_count: 0,
+        host_id: "" ,
+        sb_bb: "N/A",
+        is_active: false,
+        users: [:],
+        transactions: []
+    )
     
     @ObservedObject private var auth_view_model = Authentication_View_Model()
     
@@ -26,39 +37,45 @@ class Games_View_Model: ObservableObject {
     
     
     func startListeningForCurrentGame(userID: String) {
-            // Remove any existing listener to avoid duplicates
-            userListener?.remove()
+        // Remove any existing listener to avoid duplicates
+        userListener?.remove()
 
-            userListener = db.collection("Users").document(userID)
-                .addSnapshotListener { [weak self] (document, error) in
-                    guard let doc = document, doc.exists, let data = doc.data() else {
-                        //print("No user found or error: \(error?.localizedDescription ?? "Unknown error")")
-                        self?.currentGameID = ""  // Reset if no game
-                        return
-                    }
-
-                    DispatchQueue.main.async {
-                        // Store the current game ID
-                        self?.currentGameID = (data["current_game"] as? String)!
-                        //print("Current Game ID Updated: \(self?.currentGameID ?? "None")")
-                    }
+        userListener = db.collection("Users").document(userID)
+            .addSnapshotListener { [weak self] (document, error) in
+                guard let doc = document, doc.exists, let data = doc.data() else {
+                    //print("No user found or error: \(error?.localizedDescription ?? "Unknown error")")
+                    self?.currentGameID = ""  // Reset if no game
+                    return
                 }
-        }
+
+                DispatchQueue.main.async {
+                    // Store the current game ID
+                    self?.currentGameID = (data["current_game"] as? String)!
+                    //print("Current Game ID Updated: \(self?.currentGameID ?? "None")")
+                }
+            }
+    }
     
     func stopListeningForCurrentGame() {
-            userListener?.remove()
-            userListener = nil
-        }
+        userListener?.remove()
+        userListener = nil
+    }
     
-    func Fetch_Game(gameId: String, completion: @escaping (Game?, Error?) -> Void) {
-        db.collection("Games").document(gameId).getDocument { snapshot, error in
+    func Fetch_Game(
+        gameId: String,
+        completion: @escaping (Game?, Error?) -> Void
+    ) {
+        db.collection("Games").document(gameId).getDocument {
+ snapshot,
+ error in
             if let error = error {
                 //print("Error fetching document: \(error.localizedDescription)")
                 completion(nil, error)
                 return
             }
             
-            guard let snapshot = snapshot, snapshot.exists else {
+            guard let snapshot = snapshot,
+ snapshot.exists else {
                 //print("Document does not exist")
                 completion(nil, nil)
                 return
@@ -103,7 +120,8 @@ class Games_View_Model: ObservableObject {
                                 name: name,
                                 type: type,
                                 amount: amount,
-                                timestamp: timestamp.dateValue()  // ✅ Convert Firestore Timestamp to Date
+                                timestamp: timestamp
+                                    .dateValue()  // ✅ Convert Firestore Timestamp to Date
                             )
                             
                             transactionsArray.append(transaction)
@@ -115,7 +133,8 @@ class Games_View_Model: ObservableObject {
                 do {
                     let game = Game(
                         id: snapshot.documentID,
-                        date: (data["date"] as? Timestamp)?.dateValue() ?? Date(),
+                        date: (data["date"] as? Timestamp)?
+                            .dateValue() ?? Date(),
                         title: data["title"] as? String ?? "Unknown",
                         total_buy_in: data["total_buy_in"] as? Double ?? 0.0,
                         total_buy_out: data["total_buy_out"] as? Double ?? 0.0,
@@ -127,10 +146,20 @@ class Games_View_Model: ObservableObject {
                         transactions: transactionsArray
                     )
                     
-                    completion(game, nil) // Pass the game data back via the completion handler
+                    completion(
+                        game,
+                        nil
+                    ) // Pass the game data back via the completion handler
                 } 
             } else {
-                completion(nil, NSError(domain: "Fetch_Game", code: -1, userInfo: [NSLocalizedDescriptionKey: "Data not found in document"]))
+                completion(
+                    nil,
+                    NSError(
+                        domain: "Fetch_Game",
+                        code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "Data not found in document"]
+                    )
+                )
             }
         }
     }
@@ -139,7 +168,9 @@ class Games_View_Model: ObservableObject {
     
     func Start_Game(game: Game, completion: @escaping (String?) -> Void) {
         do {
-            let ref = try db.collection("Games").addDocument(from: game)  // Get the DocumentReference
+            let ref = try db.collection("Games").addDocument(
+                from: game
+            )  // Get the DocumentReference
             let gameId = ref.documentID
             currentGameID = ref.documentID
             DispatchQueue.main.async {
@@ -154,7 +185,12 @@ class Games_View_Model: ObservableObject {
     }
     
     
-    func Add_or_Update_User_To_Game(gameId: String, user_id: String, user_stats: User_Stats, completion: @escaping (Error?) -> Void) {
+    func Add_or_Update_User_To_Game(
+        gameId: String,
+        user_id: String,
+        user_stats: User_Stats,
+        completion: @escaping (Error?) -> Void
+    ) {
         
         let user_stats: [String: Any] = [
             "name": user_stats.name,
@@ -185,7 +221,9 @@ class Games_View_Model: ObservableObject {
         gameListener = db.collection("Games").document(gameId)
             .addSnapshotListener { [weak self] (document, error) in
                 guard let doc = document, doc.exists, let data = doc.data() else {
-                    print("No game found or error: \(error?.localizedDescription ?? "Unknown error")")
+                    print(
+                        "No game found or error: \(error?.localizedDescription ?? "Unknown error")"
+                    )
                     return
                 }
                 
@@ -227,7 +265,8 @@ class Games_View_Model: ObservableObject {
                                 name: name,
                                 type: type,
                                 amount: amount,
-                                timestamp: timestamp.dateValue()  // ✅ Convert Firestore Timestamp to Date
+                                timestamp: timestamp
+                                    .dateValue()  // ✅ Convert Firestore Timestamp to Date
                             )
                             
                             transactionsArray.append(transaction)
@@ -239,7 +278,8 @@ class Games_View_Model: ObservableObject {
                 DispatchQueue.main.async {
                     self?.game = Game(
                         id: doc.documentID,
-                        date: (data["date"] as? Timestamp)?.dateValue() ?? Date(),
+                        date: (data["date"] as? Timestamp)?
+                            .dateValue() ?? Date(),
                         title: data["title"] as? String ?? "Unknown",
                         total_buy_in: data["total_buy_in"] as? Double ?? 0.0,
                         total_buy_out: data["total_buy_out"] as? Double ?? 0.0,
@@ -257,13 +297,16 @@ class Games_View_Model: ObservableObject {
     
     // Stop listening to prevent memory leaks
     func stopListening() {
-            gameListener?.remove()
-            gameListener = nil
-            userListener?.remove()
-            userListener = nil
-        }
+        gameListener?.remove()
+        gameListener = nil
+        userListener?.remove()
+        userListener = nil
+    }
     
-    func updateUserCurrentGame(newGameId: String, completion: @escaping (Bool) -> Void) {
+    func updateUserCurrentGame(
+        newGameId: String,
+        completion: @escaping (Bool) -> Void
+    ) {
         guard let user = Auth.auth().currentUser else {
             completion(false)  // Return false if no user is logged in
             return
@@ -278,7 +321,9 @@ class Games_View_Model: ObservableObject {
             "current_game": newGameId
         ]) { error in
             if let error = error {
-                print("Error updating current_game: \(error.localizedDescription)")
+                print(
+                    "Error updating current_game: \(error.localizedDescription)"
+                )
                 completion(false)  // Return false if there’s an error
             } else {
                 print("User's current_game updated successfully")
@@ -288,7 +333,13 @@ class Games_View_Model: ObservableObject {
     }
     
     
-    func Add_Transaction(gameId: String, user_id: String, type: String, amount: Double?, completion: @escaping (Error?) -> Void) {
+    func Add_Transaction(
+        gameId: String,
+        user_id: String,
+        type: String,
+        amount: Double?,
+        completion: @escaping (Error?) -> Void
+    ) {
         
         let new_transaction = Transaction(
             id: UUID().uuidString,  // Use UUID to create a unique id
@@ -303,64 +354,70 @@ class Games_View_Model: ObservableObject {
         let db = Firestore.firestore()
         
         // Append the new transaction to the existing array
-        db.collection("Games").document(gameId).getDocument { (document, error) in
-            if let document = document, document.exists {
+        db
+            .collection("Games")
+            .document(gameId)
+            .getDocument { (document, error) in
+                if let document = document, document.exists {
                 
-                var transactions: [Transaction] = []
+                    var transactions: [Transaction] = []
 
-                // Decode existing transactions
-                if let data = document.data(),
-                   let existingTransactions = data["transactions"] as? [[String: Any]] {
+                    // Decode existing transactions
+                    if let data = document.data(),
+                       let existingTransactions = data["transactions"] as? [[String: Any]] {
                     
-                    // Convert all `FIRTimestamp` to `Date`
-                    transactions = existingTransactions.compactMap { dict in
-                        guard let userId = dict["userId"] as? String,
-                              let name = dict["name"] as? String,
-                              let type = dict["type"] as? String,
-                              let amount = dict["amount"] as? Double?,
-                              let timestamp = dict["timestamp"] as? Timestamp else {
-                            return nil
-                        }
+                        // Convert all `FIRTimestamp` to `Date`
+                        transactions = existingTransactions.compactMap { dict in
+                            guard let userId = dict["userId"] as? String,
+                                  let name = dict["name"] as? String,
+                                  let type = dict["type"] as? String,
+                                  let amount = dict["amount"] as? Double?,
+                                  let timestamp = dict["timestamp"] as? Timestamp else {
+                                return nil
+                            }
                         
-                        return Transaction(
-                            id: nil,
-                            userId: userId,
-                            name: name,
-                            type: type,
-                            amount: amount,
-                            timestamp: timestamp.dateValue()  // Convert to `Date`
-                        )
+                            return Transaction(
+                                id: nil,
+                                userId: userId,
+                                name: name,
+                                type: type,
+                                amount: amount,
+                                timestamp: timestamp
+                                    .dateValue()  // Convert to `Date`
+                            )
+                        }
                     }
-                }
                 
-                // Append the new transaction
-                transactions.append(new_transaction)
+                    // Append the new transaction
+                    transactions.append(new_transaction)
 
-                // Encode the updated array with `Timestamp`
-                let encodedTransactions = transactions.map { transaction -> [String: Any] in
-                    return [
-                        "userId": transaction.userId,
-                        "name": transaction.name,
-                        "type": transaction.type,
-                        "amount": transaction.amount ?? 0.0,
-                        "timestamp": Timestamp(date: transaction.timestamp)  // Use Firestore Timestamp
-                    ]
-                }
-
-                // Save back to Firestore
-                db.collection("Games").document(gameId).updateData([
-                    "transactions": encodedTransactions
-                ]) { error in
-                    if let error = error {
-                        print("Error updating transactions: \(error)")
-                    } else {
-                        print("Transaction added successfully!")
+                    // Encode the updated array with `Timestamp`
+                    let encodedTransactions = transactions.map { transaction -> [String: Any] in
+                        return [
+                            "userId": transaction.userId,
+                            "name": transaction.name,
+                            "type": transaction.type,
+                            "amount": transaction.amount ?? 0.0,
+                            "timestamp": Timestamp(
+                                date: transaction.timestamp
+                            )  // Use Firestore Timestamp
+                        ]
                     }
+
+                    // Save back to Firestore
+                    db.collection("Games").document(gameId).updateData([
+                        "transactions": encodedTransactions
+                    ]) { error in
+                        if let error = error {
+                            print("Error updating transactions: \(error)")
+                        } else {
+                            print("Transaction added successfully!")
+                        }
+                    }
+                } else {
+                    print("Game not found")
                 }
-            } else {
-                print("Game not found")
             }
-        }
     }
     
 

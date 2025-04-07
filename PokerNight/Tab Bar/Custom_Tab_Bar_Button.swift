@@ -30,7 +30,9 @@ struct Custom_Tab_Bar_Button: View {
                     .resizable()
                     .scaledToFit( )
                     .frame(width: 24, height:24)
-                    .foregroundStyle(colorScheme == .light ? Color.black : Color.white)
+                    .foregroundStyle(
+                        colorScheme == .light ? Color.black : Color.white
+                    )
                 
             }
             .frame(width: geo.size.width, height: geo.size.height)

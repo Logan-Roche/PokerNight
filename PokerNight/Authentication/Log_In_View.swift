@@ -89,7 +89,9 @@ struct Log_In_View: View {
                 }
                 else {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .progressViewStyle(
+                            CircularProgressViewStyle(tint: .white)
+                        )
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity)
                 }

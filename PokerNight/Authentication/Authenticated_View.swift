@@ -18,17 +18,27 @@ struct Authenticated_View<Content, Unauthenticated>: View where Content: View, U
     var unauthenticated: Unauthenticated?
     @ViewBuilder var content: () -> Content
     
-    public init(unauthenticated: Unauthenticated?, @ViewBuilder content: @escaping () -> Content) {
+    public init(
+        unauthenticated: Unauthenticated?,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
         self.unauthenticated = unauthenticated
         self.content = content
     }
     
-    public init(@ViewBuilder unauthenticated: @escaping () -> Unauthenticated, @ViewBuilder content: @escaping () -> Content) {
+    public init(
+        @ViewBuilder unauthenticated: @escaping () -> Unauthenticated,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
         self.unauthenticated = unauthenticated()
         self.content = content
     }
     
-    let gradient = LinearGradient(colors: [.gradientColorLeft, .gradientColorRight], startPoint: .top, endPoint: .topTrailing)
+    let gradient = LinearGradient(
+        colors: [.gradientColorLeft, .gradientColorRight],
+        startPoint: .top,
+        endPoint: .topTrailing
+    )
     @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
@@ -73,7 +83,14 @@ struct Authenticated_View<Content, Unauthenticated>: View where Content: View, U
                                 .cornerRadius(10)
                                 .shadow(radius: 3)
                         }
-                        .padding(EdgeInsets(top: 30, leading: 35, bottom: 15, trailing: 35))
+                        .padding(
+                            EdgeInsets(
+                                top: 30,
+                                leading: 35,
+                                bottom: 15,
+                                trailing: 35
+                            )
+                        )
                         
                     }
                     .frame(maxWidth: .infinity, alignment: .bottom)
@@ -98,7 +115,12 @@ struct Authenticated_View<Content, Unauthenticated>: View where Content: View, U
                 content()
                     .environmentObject(viewModel)
             }
-            .onReceive(NotificationCenter.default.publisher(for: ASAuthorizationAppleIDProvider.credentialRevokedNotification)) { event in
+            .onReceive(
+                NotificationCenter.default
+                    .publisher(
+                        for: ASAuthorizationAppleIDProvider.credentialRevokedNotification
+                    )
+            ) { event in
                 viewModel.Sign_Out()
                 if let userInfo = event.userInfo, let info = userInfo["info"] {
                     print(info)

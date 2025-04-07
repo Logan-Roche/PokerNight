@@ -19,9 +19,9 @@ struct Profile_View: View {
             Button("Log Out"){
                 do {
                     try auth_view_model.Sign_Out()
-                    } catch let sign_our_error {
-                        print(sign_our_error)
-                    }
+                } catch let sign_our_error {
+                    print(sign_our_error)
+                }
             }
             .padding()
             .buttonStyle(.bordered)

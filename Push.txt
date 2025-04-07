@@ -1,10 +1,10 @@
-Title: Completed: Transaction Creation/Upload/Display
+Title: Completed: Buy Out View + Logic, Updating Standings
 
 Description:
 
-Tasks Completed: Transation Creation, Transaction Upload, Transaction Dispaying
+Tasks Completed: Buy Out View + Logic, Adding Transaction, Updating Standings, Formatted Code
 
-Tasks In Progress: Buy In Button
+Tasks In Progress: Join Game View + Logic, In Game View Buttons
 
 
 

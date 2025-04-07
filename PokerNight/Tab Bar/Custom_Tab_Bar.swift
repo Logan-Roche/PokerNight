@@ -13,6 +13,7 @@ enum Tabs: Int {
     case profile = 1
     case start_game = 2
     case in_game = 3
+    case buy_out = 4
 }
 
 struct Custom_Tab_Bar: View {
@@ -20,7 +21,11 @@ struct Custom_Tab_Bar: View {
     @Binding var selectedTab: Tabs
     @Binding var start_game_join_game_sheet: Bool
     
-    let gradient = LinearGradient(colors: [.gradientColorLeft, .gradientColorRight], startPoint: .top, endPoint: .topTrailing)
+    let gradient = LinearGradient(
+        colors: [.gradientColorLeft, .gradientColorRight],
+        startPoint: .top,
+        endPoint: .topTrailing
+    )
     @Environment(\.colorScheme) var colorScheme
     
     @EnvironmentObject var auth_view_model: Authentication_View_Model
@@ -54,7 +59,9 @@ struct Custom_Tab_Bar: View {
                             .resizable()
                             .scaledToFit( )
                             .frame(width: 15, height:15)
-                            .foregroundStyle(colorScheme == .light ? Color.black : Color.white)
+                            .foregroundStyle(
+                                colorScheme == .light ? Color.black : Color.white
+                            )
                         
                     }
                     .clipShape(Capsule())
@@ -74,7 +81,9 @@ struct Custom_Tab_Bar: View {
                             .resizable()
                             .scaledToFit( )
                             .frame(width: 15, height:15)
-                            .foregroundStyle(colorScheme == .light ? Color.black : Color.white)
+                            .foregroundStyle(
+                                colorScheme == .light ? Color.black : Color.white
+                            )
                         
                     }
                     .clipShape(Capsule())
@@ -121,13 +130,19 @@ struct Custom_Tab_Bar: View {
 struct Custom_Tab_Bar_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            Custom_Tab_Bar(selectedTab: .constant(.profile),start_game_join_game_sheet: .constant(false))
-                .environmentObject(Games_View_Model())
-                .environmentObject(Authentication_View_Model())
-                .preferredColorScheme(.dark)
-            Custom_Tab_Bar(selectedTab: .constant(.profile),start_game_join_game_sheet: .constant(false))
-                .environmentObject(Games_View_Model())
-                .environmentObject(Authentication_View_Model())
+            Custom_Tab_Bar(
+                selectedTab: .constant(.profile),
+                start_game_join_game_sheet: .constant(false)
+            )
+            .environmentObject(Games_View_Model())
+            .environmentObject(Authentication_View_Model())
+            .preferredColorScheme(.dark)
+            Custom_Tab_Bar(
+                selectedTab: .constant(.profile),
+                start_game_join_game_sheet: .constant(false)
+            )
+            .environmentObject(Games_View_Model())
+            .environmentObject(Authentication_View_Model())
         }
     }
 }

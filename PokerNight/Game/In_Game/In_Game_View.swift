@@ -5,8 +5,9 @@ import FirebaseAuth
 struct In_Game_View: View {
     
     @Environment(\.colorScheme) var colorScheme
-    @EnvironmentObject var game_view_model: Games_View_Model  // Use shared instance
-    @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared instance
+    @EnvironmentObject var game_view_model: Games_View_Model
+    @EnvironmentObject var auth_view_model: Authentication_View_Model
+    @Binding var selectedTab: Tabs
     
     @State private var current_user: User_Model?
     @State private var copied_to_clipboard = false
@@ -33,14 +34,14 @@ struct In_Game_View: View {
                             .fill(gradient)
                             .frame(
                                 height: geometry.size.height * 1
-                            )  // 20% of screen height
+                            )
                             .cornerRadius(
                                 geometry.size.width * 0.05
-                            )   // Corner radius relative to width
+                            )
                             .shadow(radius: 5)
                             .offset(
                                 y: -geometry.size.height * 0.44
-                            ) // Apply offset only to Rectangle
+                            )
                         
                         Text(game_view_model.game.title)
                             .foregroundStyle(
@@ -51,7 +52,7 @@ struct In_Game_View: View {
                                     "comfortaa",
                                     size: geometry.size.width * 0.08
                                 )
-                            )  // Font size based on width
+                            )
                             .padding(.top, geometry.size.height * 0.05)
                     }
                     .frame(maxHeight: geometry.size.height * 0.2)
@@ -60,7 +61,7 @@ struct In_Game_View: View {
                     
                     // Copy Button
                     Button(action: {
-                        // Copy to clipboard
+                        
                         UIPasteboard.general.string = game_view_model.currentGameID
                         
                         withAnimation(.smooth(duration: 0.5)) {
@@ -104,7 +105,7 @@ struct In_Game_View: View {
                     }
                     .padding(.bottom, geometry.size.height * 0.03)
                     
-                    //                     //Standings Section
+                    // Standing Section
                     VStack(alignment: .center, spacing: 10) {
                         Text("Standings")
                             .font(
@@ -129,7 +130,7 @@ struct In_Game_View: View {
                                 verticalSpacing: 10
                             ) {
                                 
-                                // Column Headings
+                                
                                 GridRow {
                                     Text("Name")
                                     Text("Buy In")
@@ -174,8 +175,7 @@ struct In_Game_View: View {
                                             .padding(.vertical, 10)
                                             
                                             Text(
- "$\(stats.buy_in,
- specifier: "%.2f")"
+                                                "$\(stats.buy_in,specifier: "%.2f")"
                                             )
                                             .font(
                                                 .custom(
@@ -188,8 +188,7 @@ struct In_Game_View: View {
                                             )
                                             
                                             Text(
- "$\(stats.buy_out,
- specifier: "%.2f")"
+                                                "$\(stats.buy_out,specifier: "%.2f")"
                                             )
                                             .font(
                                                 .custom(
@@ -202,8 +201,7 @@ struct In_Game_View: View {
                                             )
                                             
                                             Text(
- "$\(stats.net,
- specifier: "%.2f")"
+                                                "$\(stats.net,specifier: "%.2f")"
                                             )
                                             .font(
                                                 .custom(
@@ -303,8 +301,8 @@ struct In_Game_View: View {
                             .onChange(
                                 of: game_view_model.game.transactions.count
                             ) {
- _,
- _ in
+                                _,
+                                _ in
                                 if let lastTransaction = game_view_model.game.transactions.last {
                                     withAnimation {
                                         scrollViewProxy
@@ -388,12 +386,12 @@ struct In_Game_View: View {
                                     trailing: geometry.size.width * 0.04
                                 )
                             )
-                            //.background(.orange)
                             
-                            if is_host {
+                            
+                            if is_host || true{
                                 HStack {
                                     Button {
-                                        
+                                        selectedTab = .buy_out
                                     } label:{
                                         Text("Buy Out")
                                             .font(
@@ -422,7 +420,7 @@ struct In_Game_View: View {
                                             trailing: geometry.size.width * 0.01
                                         )
                                     )
-                                    //.background(.blue)
+                                    
                                     
                                     
                                     
@@ -455,7 +453,7 @@ struct In_Game_View: View {
                                             trailing: geometry.size.width * 0.04
                                         )
                                     )
-                                    //.background(.red)
+                                    
                                 }
                                 
                                 Button {
@@ -487,7 +485,7 @@ struct In_Game_View: View {
                                         trailing: geometry.size.width * 0.04
                                     )
                                 )
-                                //.background(.green)
+                                
                                 
                             }
                         }
@@ -505,20 +503,22 @@ struct In_Game_View: View {
             .background(.colorScheme)
             .edgesIgnoringSafeArea(.vertical)
             .onAppear {
-                auth_view_model.fetchUserData { userModel in
-                    current_user = userModel
-                    if game_view_model.game.title == "" {
-                        game_view_model
-                            .Fetch_Game(
-                                gameId: game_view_model.currentGameID
-                            ) { game, _ in
-                                if let game = game {
-                                    game_view_model.game = game
+                if current_user?.id == nil {
+                    auth_view_model.fetchUserData { userModel in
+                        current_user = userModel
+                        if game_view_model.game.title == "" {
+                            game_view_model
+                                .Fetch_Game(
+                                    gameId: game_view_model.currentGameID
+                                ) { game, _ in
+                                    if let game = game {
+                                        game_view_model.game = game
+                                    }
                                 }
-                            }
+                        }
                     }
-                    
                 }
+                
                 game_view_model
                     .startListening(gameId: game_view_model.currentGameID)
                 
@@ -564,12 +564,12 @@ struct In_Game_View: View {
 struct In_Game_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            In_Game_View()
+            In_Game_View(selectedTab: .constant(.dashboard))
                 .environmentObject(Games_View_Model())
                 .environmentObject(Authentication_View_Model())
                 .preferredColorScheme(.dark)
             
-            In_Game_View()
+            In_Game_View(selectedTab: .constant(.dashboard))
                 .environmentObject(Games_View_Model())
                 .environmentObject(Authentication_View_Model())
         }

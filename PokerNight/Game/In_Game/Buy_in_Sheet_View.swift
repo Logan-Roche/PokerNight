@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 struct Buy_in_Sheet_View: View {
     @Environment(\.colorScheme) var colorScheme
@@ -8,7 +9,7 @@ struct Buy_in_Sheet_View: View {
         endPoint: .topTrailing
     )
     
-    @EnvironmentObject var game_view_model: Games_View_Model  
+    @EnvironmentObject var game_view_model: Games_View_Model
     @EnvironmentObject var auth_view_model: Authentication_View_Model
     
     @Environment(\.dismiss) private var dismiss
@@ -62,8 +63,43 @@ struct Buy_in_Sheet_View: View {
                         )
                     
                     Button {
-                        game_view_model.Add_Transaction(gameId: game_view_model.currentGameID, user_id: auth_view_model.user?.uid ?? "", type: "Buy In: ", amount: Double(amount)) {_ in
-                                                        }
+                        game_view_model
+                            .Add_Transaction(
+                                gameId: game_view_model.currentGameID,
+                                user_id: auth_view_model.user?.uid ?? "",
+                                type: game_view_model.game.users[Auth
+                                    .auth().currentUser!.uid]!.buy_in == 0 ? "Buy In: " : "Re-Buy: ",
+                                amount: Double(amount)
+                            ) {_ in
+                            }
+                        
+                        game_view_model
+                            .Add_or_Update_User_To_Game(
+                                gameId: game_view_model.game.id ?? " ",
+                                user_id: Auth
+                                    .auth().currentUser!.uid,
+                                user_stats: User_Stats(
+                                    name: auth_view_model.user!.displayName! ,
+                                    buy_in: game_view_model.game.users[Auth
+                                        .auth().currentUser!.uid]!.buy_in + Double(amount)!,
+                                    buy_out: game_view_model.game.users[Auth
+                                        .auth().currentUser!.uid]!.buy_out,
+                                    net: game_view_model.game.users[Auth
+                                        .auth().currentUser!.uid]!.buy_out,
+                                    photo_url: auth_view_model.user?.photoURL?.absoluteString ?? ""
+                                )
+                            ){ error in
+                                if let error = error {
+                                    print(
+                                        "Failed to add user: \(error.localizedDescription)"
+                                    )
+                                } else {
+                                    print(
+                                        "User added/updated successfully!"
+                                    )
+                                }
+                            }
+
                         dismiss()
                         
                     } label:{
