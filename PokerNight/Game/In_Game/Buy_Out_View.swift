@@ -29,22 +29,6 @@ struct Buy_Out_View: View {
     
     @State private var selectedPlayerID: String? = nil
     
-    let photoURL = "https://lh3.googleusercontent.com/a/ACg8ocJfQuZISYcDaesObey16ljzX2-2BY9s-82558N6I23GjNn0gVzG=s96-c"
-            
-            let users: [String: User_Stats] = [
-                "1": User_Stats(name: "Ava Bailey", buy_in: 100, buy_out: 150, net: 50, photo_url: "https://lh3.googleusercontent.com/a/ACg8ocJfQuZISYcDaesObey16ljzX2-2BY9s-82558N6I23GjNn0gVzG=s96-c"),
-                "2": User_Stats(name: "Evan Goertzen", buy_in: 100, buy_out: 80, net: -20, photo_url: "https://lh3.googleusercontent.com/a/ACg8ocJfQuZISYcDaesObey16ljzX2-2BY9s-82558N6I23GjNn0gVzG=s96-c"),
-                "3": User_Stats(name: "Will McClure", buy_in: 150, buy_out: 200, net: 50, photo_url: "https://lh3.googleusercontent.com/a/ACg8ocJfQuZISYcDaesObey16ljzX2-2BY9s-82558N6I23GjNn0gVzG=s96-c"),
-                "4": User_Stats(name: "Joe Roche", buy_in: 90, buy_out: 60, net: -30, photo_url: "https://lh3.googleusercontent.com/a/ACg8ocJfQuZISYcDaesObey16ljzX2-2BY9s-82558N6I23GjNn0gVzG=s96-c"),
-                "5": User_Stats(name: "David Levintov", buy_in: 110, buy_out: 130, net: 20, photo_url: "https://lh3.googleusercontent.com/a/ACg8ocJfQuZISYcDaesObey16ljzX2-2BY9s-82558N6I23GjNn0gVzG=s96-c"),
-                "6": User_Stats(name: "Dane Baker", buy_in: 120, buy_out: 170, net: 50, photo_url: "https://lh3.googleusercontent.com/a/ACg8ocJfQuZISYcDaesObey16ljzX2-2BY9s-82558N6I23GjNn0gVzG=s96-c"),
-                "7": User_Stats(name: "Kayla Owens", buy_in: 100, buy_out: 100, net: 0, photo_url: "https://lh3.googleusercontent.com/a/ACg8ocJfQuZISYcDaesObey16ljzX2-2BY9s-82558N6I23GjNn0gVzG=s96-c"),
-                "8": User_Stats(name: "Liam Smith", buy_in: 80, buy_out: 50, net: -30, photo_url: "https://lh3.googleusercontent.com/a/ACg8ocJfQuZISYcDaesObey16ljzX2-2BY9s-82558N6I23GjNn0gVzG=s96-c")
-            ]
-    
-    
-    
-    
     var body: some View {
         GeometryReader { geometry in
             VStack {
@@ -140,7 +124,6 @@ struct Buy_Out_View: View {
                         .foregroundColor(.gray)
                         .font(.custom("roboto-regular", size: 15))
                         .padding(.horizontal)
-                        .scrollDismissesKeyboard(.immediately)
                     
                     
                     

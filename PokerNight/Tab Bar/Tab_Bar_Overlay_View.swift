@@ -8,16 +8,20 @@ struct Tab_Bar_Overlay_View: View {
         endPoint: .topTrailing
     )
     
+    @EnvironmentObject var game_view_model: Games_View_Model  // Use shared instance
+    @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared instance
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
+    
+    
     
     @Binding var selectedTab: Tabs
     
     var body: some View {
-        NavigationView {
-            VStack {
-                
-                NavigationLink(destination: Join_Game_View()){
+        GeometryReader { geometry in
+            NavigationView {
+                VStack {
+                    NavigationLink(destination: Join_Game_View(selectedTab: $selectedTab)){
                     Text("Join Game")
                         .font(.custom("Roboto", size: 17))
                         .fontWeight(Font.Weight.bold)
@@ -31,9 +35,9 @@ struct Tab_Bar_Overlay_View: View {
                 .padding(
                     EdgeInsets(top: 30, leading: 35, bottom: 0, trailing: 35)
                 )
-
-                
-                
+            
+            
+            
                 Button {
                     selectedTab = .start_game
                     dismiss()
@@ -51,9 +55,9 @@ struct Tab_Bar_Overlay_View: View {
                 .padding(
                     EdgeInsets(top: 10, leading: 35, bottom: 15, trailing: 35)
                 )
-                
+            
                 Spacer()
-                
+            
                 Button {
                     dismiss()
                 } label: {
@@ -66,7 +70,7 @@ struct Tab_Bar_Overlay_View: View {
                             .foregroundStyle(
                                 colorScheme == .light ? Color.black : Color.white
                             )
-                        
+                    
                     }
                     .clipShape(Capsule())
                 }
@@ -75,21 +79,26 @@ struct Tab_Bar_Overlay_View: View {
                 .background(gradient)
                 .clipShape(Capsule())
                 .padding(.bottom)
-                
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.offBlack)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(.offBlack)
     }
+
+}
 
 }
 
 struct Tab_Bar_Overlay_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            Tab_Bar_Overlay_View(selectedTab: .constant(.profile))
-                .preferredColorScheme(.dark)
-            Tab_Bar_Overlay_View(selectedTab: .constant(.profile))
+            Tab_Bar_Overlay_View(
+                selectedTab: .constant(.profile)
+            )
+            .preferredColorScheme(.dark)
+            Tab_Bar_Overlay_View(
+                selectedTab: .constant(.profile)
+            )
         }
     }
 }

@@ -1,10 +1,10 @@
-Title: Completed: Buy Out View + Logic, Updating Standings
+Title: Completed: Join Game View + Logic
 
 Description:
 
-Tasks Completed: Buy Out View + Logic, Adding Transaction, Updating Standings, Formatted Code
+Tasks Completed: Join Game View + Logic, Tab Bar Join Button
 
-Tasks In Progress: Join Game View + Logic, In Game View Buttons
+Tasks In Progress: Edit Game View + Logic,
 
 
 

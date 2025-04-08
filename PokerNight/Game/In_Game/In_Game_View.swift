@@ -151,7 +151,7 @@ struct In_Game_View: View {
                                 
                                 // Item Rows
                                 ForEach(
-                                    Array(game_view_model.game.users.keys),
+                                    Array(game_view_model.game.users.keys).sorted(),
                                     id: \.self
                                 ) { key in
                                     //ForEach(Array(sampleUsers.keys).sorted(), id: \.self) { key in
@@ -388,7 +388,7 @@ struct In_Game_View: View {
                             )
                             
                             
-                            if is_host || true{
+                            if is_host {
                                 HStack {
                                     Button {
                                         selectedTab = .buy_out
@@ -425,7 +425,7 @@ struct In_Game_View: View {
                                     
                                     
                                     Button {
-                                        
+                                        selectedTab = .edit_game
                                     } label:{
                                         Text("Edit")
                                             .font(

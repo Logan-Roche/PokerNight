@@ -14,6 +14,7 @@ enum Tabs: Int {
     case start_game = 2
     case in_game = 3
     case buy_out = 4
+    case edit_game = 5
 }
 
 struct Custom_Tab_Bar: View {
