@@ -1,14 +1,14 @@
-Title: Completed: Join Game View + Logic
+Title: Tasks In Progress: Edit Game View Logic
 
 Description:
 
-Tasks Completed: Join Game View + Logic, Tab Bar Join Button
+Tasks Completed: Fixed Buy Out Name error
 
-Tasks In Progress: Edit Game View + Logic,
+Tasks In Progress: Edit Game View Logic
 
 
 
 Notes:
 
--
+- 
 

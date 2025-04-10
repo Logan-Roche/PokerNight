@@ -11,13 +11,17 @@ struct Edit_Game_View: View {
     
     
     @State private var title: String = ""
-    @State private var host_id = Auth.auth().currentUser?.uid ?? ""
     @State private var sb: String = ""
     @State private var bb: String = ""
     @State private var buy_in: String = ""
     @State private var cents: Bool = true
     @State private var users: [String: User_Stats] = [:]
     @State private var transactions: [Transaction] = []
+    
+    @State private var old_title: String = ""
+    @State private var old_sb: String = ""
+    @State private var old_bb: String = ""
+    @State private var old_buy_in: String = ""
     
     @State private var selectedPlayerID: String? = nil
     
@@ -183,6 +187,7 @@ struct Edit_Game_View: View {
                                             .onTapGesture {
                                                 selectedPlayerID = userID
                                                 buy_in = String(game_view_model.game.users[userID]!.buy_in)
+                                                old_buy_in = String(game_view_model.game.users[userID]!.buy_in)
                                             }
                                     }
                                 }
@@ -218,8 +223,24 @@ struct Edit_Game_View: View {
                     
                     Button(
                         action: {
+                            game_view_model.game.title = title
+                            game_view_model.game.sb_bb = cents ? "\(sb)¢ / \(bb)¢" : "$\(sb) / $\(bb)"
                             
+                            if selectedPlayerID != nil {
+                                game_view_model.game.users[selectedPlayerID!]!.buy_in = Double(buy_in)!
+                            }
+                            game_view_model.editGame(game: game_view_model.game)
+                            game_view_model
+                                .Add_Transaction(
+                                    gameId: game_view_model.currentGameID,
+                                    user_id: game_view_model.game.host_id,
+                                    display_name: game_view_model.game.users[game_view_model.game.host_id]!.name,
+                                    type: "Game Edit (\(title != old_title ? "Title": "")\((sb != old_sb || bb != old_bb) && title == old_title ? "Blinds": "")\((sb != old_sb || bb != old_bb) && title != old_title ? ", Blinds": "")): ",
+                                    amount: Double(0.001)
+                                ) {_ in
+                                }
                             selectedTab = .in_game
+                            
                         }) {
                             Text("Edit Game")
                                 .font(.custom("Roboto", size: 17))
@@ -253,6 +274,7 @@ struct Edit_Game_View: View {
         .edgesIgnoringSafeArea(.vertical)
         .onAppear() {
             title = game_view_model.game.title
+            old_title = game_view_model.game.title
             let parts = game_view_model.game.sb_bb.components(separatedBy: " / ")
             
             if parts.count == 2 {
@@ -261,7 +283,9 @@ struct Edit_Game_View: View {
                 
                 // Remove the currency symbols
                 sb = rawSB.trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
+                old_sb = rawSB.trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
                 bb = rawBB.trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
+                old_bb = rawBB.trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
             }
             cents = game_view_model.game.sb_bb.contains("¢")
         }

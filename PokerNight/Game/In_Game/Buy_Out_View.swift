@@ -132,6 +132,7 @@ struct Buy_Out_View: View {
                             .Add_Transaction(
                                 gameId: game_view_model.currentGameID,
                                 user_id: selectedPlayerID!,
+                                display_name: game_view_model.game.users[selectedPlayerID!]!.name,
                                 type: "Buy Out: ",
                                 amount: Double(amount)
                             ) {_ in

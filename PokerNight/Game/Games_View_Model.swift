@@ -336,6 +336,7 @@ class Games_View_Model: ObservableObject {
     func Add_Transaction(
         gameId: String,
         user_id: String,
+        display_name: String = "",
         type: String,
         amount: Double?,
         completion: @escaping (Error?) -> Void
@@ -344,7 +345,7 @@ class Games_View_Model: ObservableObject {
         let new_transaction = Transaction(
             id: UUID().uuidString,  // Use UUID to create a unique id
             userId: user_id,
-            name: auth_view_model.display_name,
+            name: display_name == "" ? auth_view_model.display_name : display_name,
             type: type,
             amount: amount,
             timestamp: Date()
@@ -419,6 +420,55 @@ class Games_View_Model: ObservableObject {
                 }
             }
     }
+    
+    func editGame(game: Game, completion: ((Error?) -> Void)? = nil) {
+        let gameRef = db.collection("Games").document(game.id!)
+
+        var usersData: [String: [String: Any]] = [:]
+        for (key, userStats) in game.users {
+            usersData[key] = [
+                "name": userStats.name,
+                "buy_in": userStats.buy_in,
+                "buy_out": userStats.buy_out,
+                "net": userStats.net,
+                "photo_url": userStats.photo_url
+            ]
+        }
+
+        let transactionsData: [[String: Any]] = game.transactions.map { transaction in
+            return [
+                "id": transaction.id!,
+                "userId": transaction.userId,
+                "name": transaction.name,
+                "type": transaction.type,
+                "amount": transaction.amount as Any,
+                "timestamp": Timestamp(date: transaction.timestamp)
+            ]
+        }
+
+        let data: [String: Any] = [
+            "date": Timestamp(date: game.date),
+            "title": game.title,
+            "total_buy_in": game.total_buy_in,
+            "total_buy_out": game.total_buy_out,
+            "player_count": game.player_count,
+            "host_id": game.host_id,
+            "sb_bb": game.sb_bb,
+            "is_active": game.is_active,
+            "users": usersData,
+            "transactions": transactionsData
+        ]
+
+        gameRef.setData(data) { error in
+            if let error = error {
+                print("Error updating game: \(error.localizedDescription)")
+            } else {
+                print("Game successfully updated.")
+            }
+            completion?(error)
+        }
+    }
+
     
 
 }
