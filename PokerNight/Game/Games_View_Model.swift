@@ -13,6 +13,7 @@ import SwiftUICore
 class Games_View_Model: ObservableObject {
     @Published var games = [Game]()
     @Published var game: Game = Game(
+        
         date: Date(),
         title: "",
         total_buy_in: 0,
@@ -65,6 +66,7 @@ class Games_View_Model: ObservableObject {
         gameId: String,
         completion: @escaping (Game?, Error?) -> Void
     ) {
+        print("Fetch Game Function Called")
         db.collection("Games").document(gameId).getDocument {
  snapshot,
  error in
@@ -166,20 +168,45 @@ class Games_View_Model: ObservableObject {
 
     
     
+//    func Start_Game(game: Game, completion: @escaping (String?) -> Void) {
+//        do {
+//            self.game.id = nil
+//
+//            let ref = try db.collection("Games").addDocument(
+//                from: game
+//            )  // Get the DocumentReference
+//            let gameId = ref.documentID
+//            currentGameID = ref.documentID
+//            
+//            DispatchQueue.main.async {
+//                self.game.id = gameId
+//                
+//                completion(gameId)
+//            }
+//        } catch {
+//            //print("Error adding document: \(error.localizedDescription)")
+//            completion(nil)
+//        }
+//    }
+    
     func Start_Game(game: Game, completion: @escaping (String?) -> Void) {
         do {
-            let ref = try db.collection("Games").addDocument(
-                from: game
-            )  // Get the DocumentReference
+            // Create a copy of `game` with a nil ID
+            var gameToSave = game
+            gameToSave.id = nil  // Avoid warning
+
+            let ref = try db.collection("Games").addDocument(from: gameToSave)  // This avoids setting @DocumentID manually
+
             let gameId = ref.documentID
-            currentGameID = ref.documentID
+            currentGameID = gameId
+
             DispatchQueue.main.async {
-                self.game.id = gameId
-                
+                self.game = gameToSave  // Optional: reset your observable game
+                self.game.id = gameId   // Update it manually with Firestore-assigned ID
+
                 completion(gameId)
             }
         } catch {
-            //print("Error adding document: \(error.localizedDescription)")
             completion(nil)
         }
     }
@@ -200,6 +227,7 @@ class Games_View_Model: ObservableObject {
             "photo_url": user_stats.photo_url
         ]
         
+        
         // Use Firestore's dot notation to add/update the user inside the "users" dictionary
         db.collection("Games").document(gameId).updateData([
             "users.\(user_id)": user_stats
@@ -217,6 +245,7 @@ class Games_View_Model: ObservableObject {
     func startListening(gameId: String) {
         // Remove any existing listener to avoid duplicates
         gameListener?.remove()
+        print("Listening to Game Function Called")
         
         gameListener = db.collection("Games").document(gameId)
             .addSnapshotListener { [weak self] (document, error) in
@@ -312,7 +341,6 @@ class Games_View_Model: ObservableObject {
             return
         }
         
-        let db = Firestore.firestore()
         let userRef = db.collection("Users").document(user.uid)
         
         // Update the current_game field with the new game ID
@@ -343,7 +371,7 @@ class Games_View_Model: ObservableObject {
     ) {
         
         let new_transaction = Transaction(
-            id: UUID().uuidString,  // Use UUID to create a unique id
+            id: nil,
             userId: user_id,
             name: display_name == "" ? auth_view_model.display_name : display_name,
             type: type,
@@ -351,8 +379,6 @@ class Games_View_Model: ObservableObject {
             timestamp: Date()
         )
 
-        
-        let db = Firestore.firestore()
         
         // Append the new transaction to the existing array
         db
@@ -406,7 +432,7 @@ class Games_View_Model: ObservableObject {
                     }
 
                     // Save back to Firestore
-                    db.collection("Games").document(gameId).updateData([
+                    self.db.collection("Games").document(gameId).updateData([
                         "transactions": encodedTransactions
                     ]) { error in
                         if let error = error {
@@ -437,7 +463,7 @@ class Games_View_Model: ObservableObject {
 
         let transactionsData: [[String: Any]] = game.transactions.map { transaction in
             return [
-                "id": transaction.id!,
+                //"id": transaction.id!,
                 "userId": transaction.userId,
                 "name": transaction.name,
                 "type": transaction.type,

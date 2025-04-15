@@ -246,7 +246,7 @@ struct In_Game_View: View {
                                     ) { transaction in
                                         HStack {
                                             Text(
-                                                "\(transaction.type)\(transaction.name)\(transaction.amount != 0.001 ? ", $\(String(format: "%.2f", transaction.amount!))" : "")"
+                                                "\(transaction.type)\(transaction.amount != 0.002 ? transaction.name: "")\((transaction.amount != 0.001 && transaction.amount != 0.002) ? ", $\(String(format: "%.2f", transaction.amount!))" : "")"
                                             )
                                             .frame(
                                                 maxWidth: .infinity,
@@ -503,9 +503,7 @@ struct In_Game_View: View {
             .background(.colorScheme)
             .edgesIgnoringSafeArea(.vertical)
             .onAppear {
-                if current_user?.id == nil {
-                    auth_view_model.fetchUserData { userModel in
-                        current_user = userModel
+                
                         if game_view_model.game.title == "" {
                             game_view_model
                                 .Fetch_Game(
@@ -513,14 +511,16 @@ struct In_Game_View: View {
                                 ) { game, _ in
                                     if let game = game {
                                         game_view_model.game = game
+                                        game_view_model.game.id = game_view_model.currentGameID
+                                        game_view_model
+                                            .startListening(gameId: game_view_model.currentGameID)
                                     }
                                 }
-                        }
-                    }
+                        
+                    
                 }
                 
-                game_view_model
-                    .startListening(gameId: game_view_model.currentGameID)
+                
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25){
                     if auth_view_model.user?.uid == game_view_model.game.host_id{

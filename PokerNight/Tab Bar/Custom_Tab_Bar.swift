@@ -113,15 +113,18 @@ struct Custom_Tab_Bar: View {
         .frame(height: 70)
         .background(.offBlack)
         .onAppear {
-            auth_view_model.fetchUserData { userModel in
-                if let user = userModel {
-                    print("User Data: \(user)")
-                    currentUser = user
-                } else {
-                    print("Failed to fetch user data.")
+            if auth_view_model.user?.uid == "" {
+                auth_view_model.fetchUserData { userModel in
+                    if let user = userModel {
+                        print("User Data: \(user)")
+                        currentUser = user
+                    } else {
+                        print("Failed to fetch user data.")
+                    }
+                    
                 }
-                
             }
+            
         }
         
     }

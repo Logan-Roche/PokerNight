@@ -48,7 +48,7 @@ struct Edit_Game_View: View {
                             )
                             .shadow(radius: 5)
                             .offset(
-                                y: -geometry.size.height * 0.44
+                                y: -geometry.size.height * 0.45
                             )
                         
                         Text("Edit Game")
@@ -61,9 +61,10 @@ struct Edit_Game_View: View {
                                     size: geometry.size.width * 0.08
                                 )
                             )
-                            .padding(.top, geometry.size.height * 0.05)
+                            .padding(.top, geometry.size.height * 0.01)
                     }
-                    .frame(maxHeight: geometry.size.height * 0.2)
+                    .frame(maxHeight: geometry.size.height * 0.05)
+                    .padding(.bottom, geometry.size.height * 0.06)
                     
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Game Title")
@@ -202,7 +203,7 @@ struct Edit_Game_View: View {
                     .padding(.vertical, geometry.size.height * 0.03)
                     
                     TextField("Enter Buy In Amount", text: $buy_in)
-                        .keyboardType(.numberPad)
+                        .keyboardType(.decimalPad)
                         .submitLabel(.done)
                         .padding()
                         .background(.offBlack)
@@ -226,38 +227,71 @@ struct Edit_Game_View: View {
                             game_view_model.game.title = title
                             game_view_model.game.sb_bb = cents ? "\(sb)¢ / \(bb)¢" : "$\(sb) / $\(bb)"
                             
-                            if selectedPlayerID != nil {
-                                game_view_model.game.users[selectedPlayerID!]!.buy_in = Double(buy_in)!
+                            if let id = selectedPlayerID, let buyIn = Double(buy_in) {
+                                game_view_model.game.users[id]?.buy_in = buyIn
                             }
+
                             game_view_model.editGame(game: game_view_model.game)
-                            game_view_model
-                                .Add_Transaction(
-                                    gameId: game_view_model.currentGameID,
-                                    user_id: game_view_model.game.host_id,
-                                    display_name: game_view_model.game.users[game_view_model.game.host_id]!.name,
-                                    type: "Game Edit (\(title != old_title ? "Title": "")\((sb != old_sb || bb != old_bb) && title == old_title ? "Blinds": "")\((sb != old_sb || bb != old_bb) && title != old_title ? ", Blinds": "")): ",
-                                    amount: Double(0.001)
-                                ) {_ in
+
+                            // 💡 Define gameEditType HERE
+                            let gameEditType: String = {
+                                var components: [String] = []
+
+                                if title != old_title {
+                                    components.append("Title")
                                 }
+
+                                if sb != old_sb || bb != old_bb {
+                                    components.append("Blinds")
+                                }
+
+                                if let id = selectedPlayerID, buy_in != old_buy_in {
+                                    let name = game_view_model.game.users[id]?.name ?? "Unknown"
+                                    let buyInChange = "Buy-In: \(name), $\(old_buy_in) -> $\(buy_in)"
+                                    
+                                    if title == old_title && sb == old_sb && bb == old_bb {
+                                        components.append("\n\(buyInChange)")
+                                    }
+                                }
+
+                                return "Game Edit: \(components.joined(separator: ", "))"
+                            }()
+
+                            game_view_model.Add_Transaction(
+                                gameId: game_view_model.currentGameID,
+                                user_id: game_view_model.game.host_id,
+                                display_name: game_view_model.game.users[game_view_model.game.host_id]?.name ?? "Unknown",
+                                type: gameEditType,
+                                amount: 0.002
+                            ) { _ in }
+
                             selectedTab = .in_game
-                            
-                        }) {
-                            Text("Edit Game")
-                                .font(.custom("Roboto", size: 17))
-                                .fontWeight(.bold)
+                        }
+                    ){
+                            Text("Buy In")
+                                .font(
+                                    .custom(
+                                        "comfortaa",
+                                        size: geometry.size.width * 0.05
+                                    )
+                                )
+                                .fontWeight(Font.Weight.bold)
                                 .foregroundColor(.white)
-                                .padding()
-                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, geometry.size.height * 0.2)
+                                .frame(
+                                    maxWidth: .infinity,
+                                    maxHeight: geometry.size.height * 0.2
+                                )
                                 .background(gradient)
                                 .cornerRadius(10)
                                 .shadow(radius: 3)
                         }
                         .padding(
                             EdgeInsets(
-                                top: 30,
-                                leading: 15,
-                                bottom: 15,
-                                trailing: 15
+                                top: 0,
+                                leading: geometry.size.width * 0.04,
+                                bottom: geometry.size.width * 0.01,
+                                trailing: geometry.size.width * 0.04
                             )
                         )
                     
@@ -271,7 +305,7 @@ struct Edit_Game_View: View {
             
         }
         .background(.colorScheme)
-        .edgesIgnoringSafeArea(.vertical)
+        //.edgesIgnoringSafeArea(.vertical)
         .onAppear() {
             title = game_view_model.game.title
             old_title = game_view_model.game.title
