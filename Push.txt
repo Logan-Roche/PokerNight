@@ -1,10 +1,10 @@
-Title: Completed: Edit Transaction Message
+Title: In Progress: Game Summary View
 
 Description:
 
-Tasks Completed: Edit Transaction Message, Edit Game View Tweaking, Game View Model Refactoring
+Tasks Completed: Shadow Stuff
 
-Tasks In Progress:
+Tasks In Progress: Game Summary View
 
 
 

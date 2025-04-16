@@ -43,10 +43,10 @@ struct Edit_Game_View: View {
                             .frame(
                                 height: geometry.size.height * 1
                             )
-                            .cornerRadius(
-                                geometry.size.width * 0.05
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: geometry.size.width * 0.05)
                             )
-                            .shadow(radius: 5)
+                            .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 3)
                             .offset(
                                 y: -geometry.size.height * 0.45
                             )
@@ -200,6 +200,8 @@ struct Edit_Game_View: View {
                     }
                     .background(.offBlack)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
+                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
                     .padding(.vertical, geometry.size.height * 0.03)
                     
                     TextField("Enter Buy In Amount", text: $buy_in)
@@ -268,7 +270,7 @@ struct Edit_Game_View: View {
                             selectedTab = .in_game
                         }
                     ){
-                            Text("Buy In")
+                            Text("Edit Game")
                                 .font(
                                     .custom(
                                         "comfortaa",
@@ -286,6 +288,8 @@ struct Edit_Game_View: View {
                                 .cornerRadius(10)
                                 .shadow(radius: 3)
                         }
+                        .shadow(color: .offBlack.opacity(0.5), radius: 1, x: 0, y: 1)
+                        .shadow(color: .offBlack.opacity(0.3), radius: 1, x: 0, y: -1)
                         .padding(
                             EdgeInsets(
                                 top: 0,

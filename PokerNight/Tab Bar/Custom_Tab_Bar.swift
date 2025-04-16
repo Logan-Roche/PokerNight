@@ -15,6 +15,7 @@ enum Tabs: Int {
     case in_game = 3
     case buy_out = 4
     case edit_game = 5
+    case game_summary = 6
 }
 
 struct Custom_Tab_Bar: View {
@@ -71,6 +72,8 @@ struct Custom_Tab_Bar: View {
                 .frame(width: 68, height: 40)
                 .background(gradient)
                 .clipShape(Capsule())
+                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
             }
             else {
                 Button {
@@ -93,6 +96,8 @@ struct Custom_Tab_Bar: View {
                 .frame(width: 68, height: 40)
                 .background(gradient)
                 .clipShape(Capsule())
+                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
                 
             }
             

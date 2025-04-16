@@ -40,6 +40,10 @@ struct ContentView: View {
                     Edit_Game_View(selectedTab: $selectedTab)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
+                } else if selectedTab == .game_summary {
+                    Game_Sumary_View(selectedTab: $selectedTab)
+                        .environmentObject(game_view_model)
+                        .environmentObject(auth_view_model)
                 }
 
                 if !isKeyboardVisible && delayedShowTabBar {

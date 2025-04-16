@@ -35,10 +35,10 @@ struct In_Game_View: View {
                             .frame(
                                 height: geometry.size.height * 1
                             )
-                            .cornerRadius(
-                                geometry.size.width * 0.05
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: geometry.size.width * 0.05)
                             )
-                            .shadow(radius: 5)
+                            .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 3)
                             .offset(
                                 y: -geometry.size.height * 0.44
                             )
@@ -102,6 +102,8 @@ struct In_Game_View: View {
                         )
                         .background(.offBlack)
                         .clipShape(Capsule())
+                        .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
+                        .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1)
                     }
                     .padding(.bottom, geometry.size.height * 0.03)
                     
@@ -222,7 +224,8 @@ struct In_Game_View: View {
                     .padding()
                     .background(.offBlack)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
-                    .shadow(radius: 5)
+                    .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
+                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
                     
                     VStack {
                         Text("Transactions")
@@ -284,6 +287,8 @@ struct In_Game_View: View {
                                     .clipShape(
                                         RoundedRectangle(cornerRadius: 4)
                                     )
+                                    .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
+                                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
                                 }
                                 .padding()
                             }
@@ -338,6 +343,7 @@ struct In_Game_View: View {
                             .fill(.offBlack)
                             .frame(height: geometry.size.height * 0.4)
                             .offset(y: geometry.size.height * 0.30)
+                            .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
                         
                         VStack {
                             Text("Actions")
@@ -386,6 +392,8 @@ struct In_Game_View: View {
                                     trailing: geometry.size.width * 0.04
                                 )
                             )
+                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
                             
                             
                             if is_host {
@@ -420,6 +428,9 @@ struct In_Game_View: View {
                                             trailing: geometry.size.width * 0.01
                                         )
                                     )
+                                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
+                                    
                                     
                                     
                                     
@@ -453,11 +464,14 @@ struct In_Game_View: View {
                                             trailing: geometry.size.width * 0.04
                                         )
                                     )
+                                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
                                     
                                 }
+                            }
                                 
                                 Button {
-                                    
+                                    selectedTab = .game_summary
                                 } label:{
                                     Text("Payout/Summary")
                                         .font(
@@ -475,24 +489,28 @@ struct In_Game_View: View {
                                         )
                                         .background(gradient)
                                         .cornerRadius(10)
-                                        .shadow(radius: 3)
+                                    
                                 }
                                 .padding(
                                     EdgeInsets(
                                         top: 0,
                                         leading: geometry.size.width * 0.04,
-                                        bottom: 0,
+                                        bottom: geometry.size.width * 0.01,
                                         trailing: geometry.size.width * 0.04
                                     )
                                 )
+                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
                                 
-                                
-                            }
+                            
                         }
                         .background(.offBlack)
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                         .padding(.bottom, geometry.size.height * 0.03)
+                        
+                        
                     }
+                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
                         
                         
                     
@@ -542,7 +560,8 @@ struct In_Game_View: View {
                         .padding()
                         .background(gradient)
                         .clipShape(Capsule())
-                        .shadow(radius: 5)
+                        .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                        .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
                         .transition(.move(edge: .bottom))
                         .frame(maxHeight: .infinity, alignment: .bottom)
                         .padding(.bottom, geometry.size.height * 0.05)
