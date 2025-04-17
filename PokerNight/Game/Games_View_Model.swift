@@ -166,28 +166,7 @@ class Games_View_Model: ObservableObject {
         }
     }
 
-    
-    
-//    func Start_Game(game: Game, completion: @escaping (String?) -> Void) {
-//        do {
-//            self.game.id = nil
-//
-//            let ref = try db.collection("Games").addDocument(
-//                from: game
-//            )  // Get the DocumentReference
-//            let gameId = ref.documentID
-//            currentGameID = ref.documentID
-//            
-//            DispatchQueue.main.async {
-//                self.game.id = gameId
-//                
-//                completion(gameId)
-//            }
-//        } catch {
-//            //print("Error adding document: \(error.localizedDescription)")
-//            completion(nil)
-//        }
-//    }
+
     
     func Start_Game(game: Game, completion: @escaping (String?) -> Void) {
         do {
@@ -240,6 +219,33 @@ class Games_View_Model: ObservableObject {
                 completion(nil)
             }
         }
+    }
+    func Leave_Game(
+        userId: String
+    ) {
+        db.collection("Users").document(userId).updateData([
+            "current_game": ""
+            ]) { error in
+            if let error = error {
+                print("Failed to leave game: \(error)")
+            } else {
+                print("User left game successfully!")
+            }
+        }
+        game.id = ""
+        game.date = Date()
+        game.title = ""
+        game.total_buy_in = 0
+        game.total_buy_out = 0
+        game.player_count = 0
+        game.host_id = ""
+        game.sb_bb = "N/A"
+        game.is_active = false
+        game.users = [:]
+        game.transactions = []
+        
+        currentGameID = " "
+    
     }
     
     func startListening(gameId: String) {

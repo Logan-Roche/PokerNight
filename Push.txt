@@ -1,10 +1,10 @@
-Title: In Progress: Game Summary View
+Title: Completed: Game Functionality
 
 Description:
 
-Tasks Completed: Shadow Stuff
+Tasks Completed: Game Functionality, Game Summary View + Logic, Profile Image Uploading/Display,
 
-Tasks In Progress: Game Summary View
+Tasks In Progress: Profile View, Profile Settings View
 
 
 

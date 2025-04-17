@@ -2,6 +2,7 @@ import Foundation
 import FirebaseAuth
 import FirebaseCore
 import FirebaseFirestore
+import FirebaseStorage
 
 // For Sign in with Apple
 import AuthenticationServices
@@ -126,7 +127,7 @@ class Authentication_View_Model: ObservableObject {
     
     
     
-
+    
     private var authStateHandler: AuthStateDidChangeListenerHandle?
     
     func registerAuthStateHandler() {
@@ -163,7 +164,70 @@ class Authentication_View_Model: ObservableObject {
         password = ""
         confirm_password = ""
     }
+    
+    
+    func uploadProfileImage(image: UIImage, userId: String, completion: @escaping (Result<String, Error>) -> Void) {
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            completion(.failure(NSError(domain: "ImageConversion", code: -1, userInfo: [NSLocalizedDescriptionKey: "Image conversion failed."])))
+            return
+        }
+        
+        let storageRef = Storage.storage().reference().child("Profile Photos/\(userId).jpg")
+        
+        storageRef.putData(imageData, metadata: nil) { metadata, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            storageRef.downloadURL { url, error in
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                
+                if let downloadURL = url?.absoluteString {
+                    completion(.success(downloadURL))
+                }
+            }
+        }
+    }
+    
+    func updateUserProfilePic(uid: String, imageURL: String) {
+        let db = Firestore.firestore()
+        db.collection("Users").document(uid).updateData([
+            "photoURL": imageURL
+        ]) { error in
+            if let error = error {
+                print("Failed to update user photo URL:", error)
+            } else {
+                print("Successfully updated user photo URL")
+            }
+        }
+    }
+    
+    func uploadAndSaveProfilePhoto(image: UIImage) {
+        guard let user = Auth.auth().currentUser else { return }
+        
+        uploadProfileImage(image: image, userId: user.uid) { result in
+            switch result {
+            case .success(let imageUrlString):
+                self.updateUserProfilePic(uid: user.uid, imageURL: imageUrlString)
+                
+                // ✅ Update in-memory user model with converted URL
+                DispatchQueue.main.async {
+                    user.photoURL = URL(string: imageUrlString)
+                }
+                
+            case .failure(let error):
+                print("Upload failed:", error)
+                let error_message = error.localizedDescription
+            }
+        }
+    }
 }
+
+
 
 // MARK: - Email and Password Authentication
 

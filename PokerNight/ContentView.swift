@@ -10,6 +10,7 @@ struct ContentView: View {
     @State private var isKeyboardVisible = false
     @State private var delayedShowTabBar = true
     
+    
     @EnvironmentObject var game_view_model: Games_View_Model  // Use shared instance
     @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared instance
 
@@ -17,11 +18,11 @@ struct ContentView: View {
         NavigationStack {
             VStack {
                 if selectedTab == .dashboard {
-                    Dashboard_View()
+                    Dashboard_View(selectedTab: $selectedTab)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
                 } else if selectedTab == .profile {
-                    Profile_View()
+                    Profile_View(selectedTab: $selectedTab)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
                 } else if selectedTab == .start_game {
@@ -44,6 +45,10 @@ struct ContentView: View {
                     Game_Sumary_View(selectedTab: $selectedTab)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
+                } else if selectedTab == .profile_settings {
+                    Profile_Settings_View(selectedTab: $selectedTab)
+                        .environmentObject(game_view_model)
+                        .environmentObject(auth_view_model)
                 }
 
                 if !isKeyboardVisible && delayedShowTabBar {
@@ -63,7 +68,7 @@ struct ContentView: View {
                 }
             .sheet(isPresented: $start_game_join_game_sheet) {
             } content: {
-                Tab_Bar_Overlay_View(selectedTab: $selectedTab)
+                Tab_Bar_Overlay_View(start_game_join_game_sheet: $start_game_join_game_sheet, selectedTab: $selectedTab)
                     .presentationDetents([.fraction(0.30)])
                     .environmentObject(
                         game_view_model

@@ -12,6 +12,7 @@ struct Tab_Bar_Overlay_View: View {
     @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared instance
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
+    @Binding var start_game_join_game_sheet: Bool
     
     
     
@@ -21,7 +22,7 @@ struct Tab_Bar_Overlay_View: View {
         GeometryReader { geometry in
             NavigationView {
                 VStack {
-                    NavigationLink(destination: Join_Game_View(selectedTab: $selectedTab)){
+                    NavigationLink(destination: Join_Game_View(selectedTab: $selectedTab, start_game_join_game_sheet:$start_game_join_game_sheet)){
                     Text("Join Game")
                         .font(.custom("Roboto", size: 17))
                         .fontWeight(Font.Weight.bold)
@@ -93,11 +94,15 @@ struct Tab_Bar_Overlay_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             Tab_Bar_Overlay_View(
+                start_game_join_game_sheet: .constant(false),
                 selectedTab: .constant(.profile)
+                
             )
             .preferredColorScheme(.dark)
             Tab_Bar_Overlay_View(
+                start_game_join_game_sheet: .constant(false),
                 selectedTab: .constant(.profile)
+                
             )
         }
     }

@@ -16,6 +16,7 @@ enum Tabs: Int {
     case buy_out = 4
     case edit_game = 5
     case game_summary = 6
+    case profile_settings = 7
 }
 
 struct Custom_Tab_Bar: View {
@@ -33,7 +34,7 @@ struct Custom_Tab_Bar: View {
     @EnvironmentObject var auth_view_model: Authentication_View_Model
     @EnvironmentObject var game_view_model: Games_View_Model
     
-    @State private var currentUser: User_Model?
+    @State var currentUser: User_Model?
     
     var body: some View {
         

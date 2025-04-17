@@ -11,28 +11,65 @@ import FirebaseAuth
 struct Dashboard_View: View {
     
     @EnvironmentObject var game_view_model: Games_View_Model
-    @EnvironmentObject var auth_view_model: Authentication_View_Model 
+    @EnvironmentObject var auth_view_model: Authentication_View_Model
+    @Environment(\.colorScheme) var colorScheme
+    @Binding var selectedTab: Tabs
     
+    let gradient = LinearGradient(
+        colors: [.gradientColorLeft, .gradientColorRight],
+        startPoint: .top,
+        endPoint: .topTrailing
+    )
     
-    
+
     var body: some View {
-        VStack {
-            Text("Dashboard")
-            Text(auth_view_model.user?.displayName ?? "")
+        GeometryReader { geometry in
+            ScrollView {
+                VStack {
+                    HStack {
+                      Image("Icon")
+                            .resizable()
+                            .frame(width: geometry.size.width * 0.12, height: geometry.size.width * 0.12)
+                            .padding()
+                            .foregroundColor(.white)
+                        Spacer()
+                        
+                        if let url = auth_view_model.user?.photoURL {
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                            } placeholder: {
+                                ProgressView()
+                            }
+                            .frame(width: geometry.size.width * 0.12, height: geometry.size.width * 0.12)
+                            .clipShape(Circle())
+                            .padding()
+                        } else {
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                                .frame(width: geometry.size.width * 0.12, height: geometry.size.width * 0.12)
+                                .foregroundColor(.gray)
+                                .padding()
+                        }
+                    }
+                    .frame(alignment: .leading)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .background(.colorScheme)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.colorScheme)
     }
 }
 
 struct Dashboard_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            Dashboard_View()
+            Dashboard_View(selectedTab: .constant(.dashboard))
                 .environmentObject(Authentication_View_Model())
                 .environmentObject(Games_View_Model())
                 .preferredColorScheme(.dark)
-            Dashboard_View()
+            Dashboard_View(selectedTab: .constant(.dashboard))
                 .environmentObject(Authentication_View_Model())
                 .environmentObject(Games_View_Model())
         }

@@ -198,8 +198,8 @@ action: {
                                             user_stats: User_Stats(
                                                 name: auth_view_model.user!.displayName! ,
                                                 buy_in: 0,
-                                                buy_out: 0,
-                                                net: 0,
+                                                buy_out: 0.00001,
+                                                net: 0.00001,
                                                 photo_url: auth_view_model.user?.photoURL?.absoluteString ?? ""
                                             )
                                         ){ error in
@@ -221,16 +221,27 @@ action: {
                                             amount: 0.001
                                         ) {_ in
                                         }
+                                    game_view_model
+                                        .Fetch_Game(
+                                            gameId: game_view_model.currentGameID
+                                        ) { game, _ in
+                                            if let game = game {
+                                                game_view_model.game = game
+                                                game_view_model.game.id = game_view_model.currentGameID
+                                                game_view_model
+                                                    .startListening(gameId: game_view_model.currentGameID)
+                                                selectedTab = .in_game
+                                            }
+                                        }
+                                    
                                 }
                         } else {
                             print("Failed to add game.")
                         }
                     }
                 
-                
-                
-                
-    selectedTab = .in_game
+        
+    
 }) {
     Text("Start Game")
         .font(.custom("Roboto", size: 17))

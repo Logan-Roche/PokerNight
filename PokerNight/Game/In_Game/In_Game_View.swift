@@ -190,7 +190,9 @@ struct In_Game_View: View {
                                             )
                                             
                                             Text(
-                                                "$\(stats.buy_out,specifier: "%.2f")"
+                                                stats.buy_out != 0.00001
+                                                        ? "$\(String(format: "%.2f", stats.buy_out))"
+                                                        : "N/A"
                                             )
                                             .font(
                                                 .custom(
@@ -203,7 +205,9 @@ struct In_Game_View: View {
                                             )
                                             
                                             Text(
-                                                "$\(stats.net,specifier: "%.2f")"
+                                                stats.net != 0.00001
+                                                        ? "$\(String(format: "%.2f", stats.net))"
+                                                        : "N/A"
                                             )
                                             .font(
                                                 .custom(
@@ -473,7 +477,7 @@ struct In_Game_View: View {
                                 Button {
                                     selectedTab = .game_summary
                                 } label:{
-                                    Text("Payout/Summary")
+                                    Text("Summary/Leave")
                                         .font(
                                             .custom(
                                                 "comfortaa",
@@ -521,8 +525,7 @@ struct In_Game_View: View {
             .background(.colorScheme)
             .edgesIgnoringSafeArea(.vertical)
             .onAppear {
-                
-                        if game_view_model.game.title == "" {
+                        if game_view_model.game.title == ""  {
                             game_view_model
                                 .Fetch_Game(
                                     gameId: game_view_model.currentGameID
