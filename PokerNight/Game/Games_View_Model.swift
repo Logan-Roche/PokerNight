@@ -11,7 +11,7 @@ import FirebaseAuth
 import SwiftUICore
 
 class Games_View_Model: ObservableObject {
-    @Published var games = [Game]()
+    @Published var games: [Game] = []
     @Published var game: Game = Game(
         
         date: Date(),
@@ -23,6 +23,7 @@ class Games_View_Model: ObservableObject {
         sb_bb: "N/A",
         is_active: false,
         users: [:],
+        user_ids: [],
         transactions: []
     )
     
@@ -209,7 +210,8 @@ class Games_View_Model: ObservableObject {
         
         // Use Firestore's dot notation to add/update the user inside the "users" dictionary
         db.collection("Games").document(gameId).updateData([
-            "users.\(user_id)": user_stats
+            "users.\(user_id)": user_stats,
+            "user_ids": FieldValue.arrayUnion([user_id])
         ]) { error in
             if let error = error {
                 //print("Failed to add/update user: \(error)")
@@ -242,6 +244,7 @@ class Games_View_Model: ObservableObject {
         game.sb_bb = "N/A"
         game.is_active = false
         game.users = [:]
+        game.user_ids = []
         game.transactions = []
         
         currentGameID = " "
@@ -501,6 +504,27 @@ class Games_View_Model: ObservableObject {
         }
     }
 
+    
+    
+    func fetchPastGames(for userID: String, completion: @escaping ([Game]) -> Void) {
+        
+
+        db.collection("Games")
+            .whereField("user_ids", arrayContains: userID)
+            .getDocuments { (snapshot, error) in
+                guard let documents = snapshot?.documents, error == nil else {
+                    print("Error fetching past games: \(error?.localizedDescription ?? "Unknown error")")
+                    completion([])
+                    return
+                }
+
+                let games: [Game] = documents.compactMap { doc in
+                    try? doc.data(as: Game.self)
+                }
+
+                completion(games)
+            }
+    }
     
 
 }

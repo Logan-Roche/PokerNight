@@ -14,12 +14,17 @@ struct Dashboard_View: View {
     @EnvironmentObject var auth_view_model: Authentication_View_Model
     @Environment(\.colorScheme) var colorScheme
     @Binding var selectedTab: Tabs
+    @Binding var totalGames: Int
     
     let gradient = LinearGradient(
         colors: [.gradientColorLeft, .gradientColorRight],
         startPoint: .top,
         endPoint: .topTrailing
     )
+    
+    
+    
+    
     
 
     var body: some View {
@@ -54,10 +59,16 @@ struct Dashboard_View: View {
                         }
                     }
                     .frame(alignment: .leading)
+                    
+                    Text("Total Games: \(totalGames)")
+                    
+                    
+                    
                 }
                 .frame(maxWidth: .infinity)
             }
             .background(.colorScheme)
+            
         }
     }
 }
@@ -65,11 +76,11 @@ struct Dashboard_View: View {
 struct Dashboard_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            Dashboard_View(selectedTab: .constant(.dashboard))
+            Dashboard_View(selectedTab: .constant(.dashboard), totalGames: .constant(10))
                 .environmentObject(Authentication_View_Model())
                 .environmentObject(Games_View_Model())
                 .preferredColorScheme(.dark)
-            Dashboard_View(selectedTab: .constant(.dashboard))
+            Dashboard_View(selectedTab: .constant(.dashboard), totalGames: .constant(10))
                 .environmentObject(Authentication_View_Model())
                 .environmentObject(Games_View_Model())
         }

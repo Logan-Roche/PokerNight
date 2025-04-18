@@ -10,6 +10,28 @@ struct ContentView: View {
     @State private var isKeyboardVisible = false
     @State private var delayedShowTabBar = true
     
+    @State var totalGames: Int = 0
+    @State var winRate: Double = 0.0
+    @State var averageROI: Double = 0.0
+    @State var totalProfit: Double = 0.0
+    
+    @State var selected_game: Game = Game(
+        
+        date: Date(),
+        title: "",
+        total_buy_in: 0,
+        total_buy_out: 0,
+        player_count: 0,
+        host_id: "" ,
+        sb_bb: "N/A",
+        is_active: false,
+        users: [:],
+        user_ids: [],
+        transactions: []
+    )
+    
+    
+    
     
     @EnvironmentObject var game_view_model: Games_View_Model  // Use shared instance
     @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared instance
@@ -18,11 +40,11 @@ struct ContentView: View {
         NavigationStack {
             VStack {
                 if selectedTab == .dashboard {
-                    Dashboard_View(selectedTab: $selectedTab)
+                    Dashboard_View(selectedTab: $selectedTab, totalGames: $totalGames)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
                 } else if selectedTab == .profile {
-                    Profile_View(selectedTab: $selectedTab)
+                    Profile_View(selectedTab: $selectedTab, totalGames: $totalGames, winRate: $winRate, averageROI: $averageROI, totalProfit: $totalProfit)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
                 } else if selectedTab == .start_game {
@@ -47,6 +69,14 @@ struct ContentView: View {
                         .environmentObject(auth_view_model)
                 } else if selectedTab == .profile_settings {
                     Profile_Settings_View(selectedTab: $selectedTab)
+                        .environmentObject(game_view_model)
+                        .environmentObject(auth_view_model)
+                } else if selectedTab == .all_game_view {
+                    All_Games_View(selectedTab: $selectedTab, selected_game: $selected_game)
+                        .environmentObject(game_view_model)
+                        .environmentObject(auth_view_model)
+                } else if selectedTab == .single_game_view {
+                    Single_Game_View(selectedTab: $selectedTab, selected_game: $selected_game)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
                 }
@@ -99,6 +129,51 @@ struct ContentView: View {
                         delayedShowTabBar = true
                     }
                 }
+            if game_view_model.games.isEmpty {
+                game_view_model.fetchPastGames(for: auth_view_model.user?.uid ?? "") { games in
+                    DispatchQueue.main.async {
+                        game_view_model.games = games
+                        totalGames = game_view_model.games.count
+                        
+                        var winCount = 0
+                        var totalNet: Double = 0.0
+                        var totalROI: Double = 0.0
+                        
+                        
+                        for game in game_view_model.games {
+                            // Each Game.users is a [String: Any] dictionary of user stats. Get this user's stats:
+                            if let userStats = game.users[auth_view_model.user!.uid] {
+                                let buyIn = userStats.buy_in
+                                let buyOut = userStats.buy_out
+                                let net = userStats.net
+                                
+                                // Win count: increment if net profit is positive
+                                if net > 0 {
+                                    winCount += 1
+                                }
+                                // Accumulate total net profit/loss
+                                totalNet += net
+                                // Calculate ROI for this game if buyIn is not zero
+                                if buyIn > 0 {
+                                    let roi = (buyOut - buyIn) / buyIn  // ROI for this game (e.g., 0.5 = 50%)&#8203;:contentReference[oaicite:6]{index=6}
+                                    totalROI += roi
+                                }
+                            }
+                        }
+
+                        // Compute final metrics
+                        winRate = totalGames > 0 ? Double(winCount) / Double(totalGames) : 0.0    // e.g., 0.6 for 60% win rate
+                        averageROI = totalGames > 0 ? totalROI / Double(totalGames) : 0.0         // average ROI (as a fraction)
+                        totalProfit = totalNet  // total net profit (could be negative for overall loss)
+                        
+                        print("Total Games: \(totalGames)")
+                        print("Win Rate: \(String(format: "%.2f", winRate * 100))%")
+                        print("Average ROI: \(String(format: "%.2f", averageROI * 100))%")
+                        print("Total Net: \(totalProfit)")
+
+                    }
+                }
+            }
         }
     }
 }

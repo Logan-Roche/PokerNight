@@ -16,6 +16,12 @@ struct Profile_View: View {
     @Environment(\.colorScheme) var colorScheme
     @Binding var selectedTab: Tabs
     
+    @Binding var totalGames: Int
+    @Binding var winRate: Double
+    @Binding var averageROI: Double
+    @Binding var totalProfit: Double
+    
+    
     
     @State private var selectedItem: PhotosPickerItem?
         @State private var selectedImage: UIImage?
@@ -70,7 +76,252 @@ struct Profile_View: View {
                         )
                         .padding(.top, geometry.size.height * 0.02)
                     
+                    ZStack {
+                        Rectangle()
+                            .fill(.offBlack)
+                            .frame(
+                                height: geometry.size.height * 1
+                            )
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: geometry.size.width * 0.07)
+                            )
+                            .shadow(color: .black.opacity(1), radius: 1, x: 0, y: 1)
+                            .shadow(color: .black.opacity(1), radius: 1, x: 0, y: -1)
+                            .offset(
+                                y: geometry.size.height * 0.44
+                            )
+                        
+                        Text("Stats")
+                            .foregroundStyle(
+                                colorScheme == .light ? .black : .white
+                            )
+                            .font(
+                                .custom(
+                                    "comfortaa",
+                                    size: geometry.size.width * 0.09
+                                )
+                            )
+                    }
+                    .frame(maxHeight: geometry.size.height * 0.1)
+                    .padding(.top, geometry.size.height * 0.03)
                     
+                    ZStack {
+                        Rectangle()
+                            .fill(gradient)
+                            .frame(
+                                height: geometry.size.height * 0.2
+                            )
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: geometry.size.width * 0.07)
+                            )
+                            .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 3)
+                            .padding(.horizontal, geometry.size.width * 0.03)
+                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1)
+                        
+                        VStack {
+                            Text("Net")
+                                .foregroundStyle(
+                                    colorScheme == .light ? .black : .white
+                                )
+                                .font(
+                                    .custom(
+                                        "Roboto-bold",
+                                        size: geometry.size.width * 0.06
+                                        
+                                    )
+                                )
+                                .padding(.top, geometry.size.height * 0.015)
+
+                            Spacer()
+                            
+                            Text("\(totalProfit < 0 ? "-" : "")$\(String(format: "%.0f", abs(totalProfit)))")
+                                .foregroundStyle(
+                                    colorScheme == .light ? .black : .white
+                                )
+                                .font(
+                                    .custom(
+                                        "comfortaa",
+                                        size: geometry.size.width * 0.14
+                                    )
+                                )
+                                .padding(.bottom, geometry.size.height * 0.04)
+                        }
+                        
+
+
+                    }
+                    .padding(.bottom)
+                    
+                    HStack {
+                        ZStack {
+                            Rectangle()
+                                .fill(gradient)
+                                .frame(
+                                    height: geometry.size.height * 0.2
+                                )
+                                .clipShape(
+                                    RoundedRectangle(cornerRadius: geometry.size.width * 0.07)
+                                )
+                                .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 3)
+                                .padding(.leading, geometry.size.width * 0.03)
+                                .padding(.trailing, geometry.size.width * 0.015)
+                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1)
+                            VStack {
+                                Text("Win Rate")
+                                    .foregroundStyle(
+                                        colorScheme == .light ? .black : .white
+                                    )
+                                    .font(
+                                        .custom(
+                                            "Roboto-bold",
+                                            size: geometry.size.width * 0.05
+                                            
+                                        )
+                                    )
+                                    .padding(.top, geometry.size.height * 0.015)
+
+                                Spacer()
+                                
+                                Text("\(String(format: "%.0f", winRate * 100))%")
+                                    .foregroundStyle(
+                                        colorScheme == .light ? .black : .white
+                                    )
+                                    .font(
+                                        .custom(
+                                            "comfortaa",
+                                            size: geometry.size.width * 0.1
+                                        )
+                                    )
+                                    .padding(.bottom, geometry.size.height * 0.06)
+                            }
+                        }
+                        ZStack {
+                            Rectangle()
+                                .fill(gradient)
+                                .frame(
+                                    height: geometry.size.height * 0.2
+                                )
+                                .clipShape(
+                                    RoundedRectangle(cornerRadius: geometry.size.width * 0.07)
+                                )
+                                .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 3)
+                                .padding(.trailing, geometry.size.width * 0.03)
+                                .padding(.leading, geometry.size.width * 0.015)
+                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1)
+                            VStack {
+                                Text("Avg ROI")
+                                    .foregroundStyle(
+                                        colorScheme == .light ? .black : .white
+                                    )
+                                    .font(
+                                        .custom(
+                                            "Roboto-bold",
+                                            size: geometry.size.width * 0.05
+                                            
+                                        )
+                                    )
+                                    .padding(.top, geometry.size.height * 0.015)
+
+                                Spacer()
+                                
+                                Text("\(String(format: "%.0f", averageROI * 100))%")
+                                    .foregroundStyle(
+                                        colorScheme == .light ? .black : .white
+                                    )
+                                    .font(
+                                        .custom(
+                                            "comfortaa",
+                                            size: geometry.size.width * 0.1
+                                        )
+                                    )
+                                    .padding(.bottom, geometry.size.height * 0.06)
+                            }
+                        }
+                        
+                    }
+                    .padding(.bottom)
+                    
+                    ZStack {
+                        Rectangle()
+                            .fill(gradient)
+                            .frame(
+                                height: geometry.size.height * 0.2
+                            )
+                            .clipShape(
+                                RoundedRectangle(cornerRadius: geometry.size.width * 0.07)
+                            )
+                            .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 3)
+                            .padding(.horizontal, geometry.size.width * 0.03)
+                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1)
+                        
+                        VStack {
+                            Text("Total Games")
+                                .foregroundStyle(
+                                    colorScheme == .light ? .black : .white
+                                )
+                                .font(
+                                    .custom(
+                                        "Roboto-bold",
+                                        size: geometry.size.width * 0.06
+                                        
+                                    )
+                                )
+                                .padding(.top, geometry.size.height * 0.015)
+
+                            Spacer()
+                            
+                            Text("\(totalGames)")
+                                .foregroundStyle(
+                                    colorScheme == .light ? .black : .white
+                                )
+                                .font(
+                                    .custom(
+                                        "comfortaa",
+                                        size: geometry.size.width * 0.14
+                                    )
+                                )
+                                .padding(.bottom, geometry.size.height * 0.04)
+                        }
+                    }
+                    .padding(.bottom, geometry.size.height * 0.03)
+                    
+                    
+                    Button {
+                        selectedTab = .all_game_view
+                    } label:{
+                        Text("All Games")
+                            .font(
+                                .custom(
+                                    "comfortaa",
+                                    size: geometry.size.width * 0.05
+                                )
+                            )
+                            .fontWeight(Font.Weight.bold)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(
+                                maxWidth: .infinity,
+                                maxHeight: geometry.size.height * 0.2
+                            )
+                            .background(.colorScheme)
+                            .cornerRadius(10)
+                            .shadow(radius: 3)
+                    }
+                    .padding(
+                        EdgeInsets(
+                            top: 0,
+                            leading: geometry.size.width * 0.04,
+                            bottom: geometry.size.width * 0.01,
+                            trailing: geometry.size.width * 0.04
+                        )
+                    )
+                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
+                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1)
+                    .padding(.bottom)
                     
                     
                 }
@@ -84,11 +335,11 @@ struct Profile_View: View {
 struct Profile_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            Profile_View(selectedTab: .constant(.buy_out))
+            Profile_View(selectedTab: .constant(.buy_out), totalGames: .constant(10),winRate: .constant(10),averageROI: .constant(20), totalProfit: .constant(10))
                 .environmentObject(Authentication_View_Model())
                 .environmentObject(Games_View_Model())
                 .preferredColorScheme(.dark)
-            Profile_View(selectedTab: .constant(.buy_out))
+            Profile_View(selectedTab: .constant(.buy_out), totalGames: .constant(10),winRate: .constant(10),averageROI: .constant(20), totalProfit: .constant(10))
                 .environmentObject(Authentication_View_Model())
                 .environmentObject(Games_View_Model())
         }

@@ -1,10 +1,10 @@
-Title: Completed: Game Functionality
+Title: Completed: Fetching Past Games, Profile View, Past Games View, Individual Game View
 
 Description:
 
-Tasks Completed: Game Functionality, Game Summary View + Logic, Profile Image Uploading/Display,
+Tasks Completed: Fetching Past Games, Profile Screen + Logic (Net, Avg ROI, ...), Past Games Screen + Logic, Individual Game Screen + Logic, Fixed Profile Picture Glitch
 
-Tasks In Progress: Profile View, Profile Settings View
+Tasks In Progress: Dashboard View
 
 
 

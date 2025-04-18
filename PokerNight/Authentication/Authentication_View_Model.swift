@@ -204,6 +204,18 @@ class Authentication_View_Model: ObservableObject {
                 print("Successfully updated user photo URL")
             }
         }
+        
+        if let user = Auth.auth().currentUser {
+            let changeRequest = user.createProfileChangeRequest()
+            changeRequest.photoURL = URL(string: imageURL)
+            changeRequest.commitChanges { error in
+                if let error = error {
+                    print("Failed to update photoURL in Auth: \(error.localizedDescription)")
+                } else {
+                    print("Auth photoURL updated successfully")
+                }
+            }
+        }
     }
     
     func uploadAndSaveProfilePhoto(image: UIImage) {

@@ -1,18 +1,12 @@
-//
-//  Game_Sumary_View.swift
-//  PokerNight
-//
-//  Created by Logan Roche on 4/15/25.
-//
-
 import SwiftUI
 
-struct Game_Sumary_View: View {
+struct Single_Game_View: View {
     
-    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var game_view_model: Games_View_Model
     @EnvironmentObject var auth_view_model: Authentication_View_Model
+    @Environment(\.colorScheme) var colorScheme
     @Binding var selectedTab: Tabs
+    @Binding var selected_game: Game
     
     @State var total_buy_in = 0.0
     @State var total_buy_out = 0.0
@@ -35,7 +29,7 @@ struct Game_Sumary_View: View {
             ScrollView {
                 ZStack {
                     Rectangle()
-                        .fill(.offBlack)
+                        .fill(gradient)
                         .frame(
                             height: geometry.size.height * 1
                         )
@@ -47,7 +41,7 @@ struct Game_Sumary_View: View {
                             y: -geometry.size.height * 0.45
                         )
                     
-                    Text("Game Summary")
+                    Text(selected_game.title)
                         .foregroundStyle(
                             colorScheme == .light ? .black : .white
                         )
@@ -116,12 +110,12 @@ struct Game_Sumary_View: View {
                                 
                                 // Item Rows
                                 ForEach(
-                                    Array(game_view_model.game.users.keys).sorted(),
+                                    Array(selected_game.users.keys).sorted(),
                                     id: \.self
                                 ) { key in
                                     //ForEach(Array(sampleUsers.keys).sorted(), id: \.self) { key in
                                     
-                                    if let stats = game_view_model.game.users[key] {
+                                    if let stats = selected_game.users[key] {
                                         //if let stats = sampleUsers[key] {
                                         
                                         GridRow {
@@ -177,42 +171,111 @@ struct Game_Sumary_View: View {
                     .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
                     .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
                     
-                    Button {
-                        // function that calls the are you sure sheet
-                            // function that make users current game id = "", wipe the game_view_model.game so if they join another game it will not add the transactions, rerender the query of past game stats
-                        game_view_model.Leave_Game(userId: auth_view_model.user!.uid)
-                        selectedTab = .dashboard
-                        
-                                                
-                    } label:{
-                        Text("Leave Game")
+                    VStack {
+                        Text("Transactions")
                             .font(
                                 .custom(
                                     "comfortaa",
-                                    size: geometry.size.width * 0.05
+                                    size: geometry.size.width * 0.073
                                 )
                             )
-                            .fontWeight(Font.Weight.bold)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(
-                                maxWidth: .infinity,
-                                maxHeight: geometry.size.height * 0.2
-                            )
-                            .background(gradient)
-                            .cornerRadius(10)
-                            .shadow(radius: 3)
+                            .padding(.bottom ,geometry.size.height * 0.02)
+                            
+                        ScrollViewReader { scrollViewProxy in
+                            ScrollView {
+                                LazyVGrid(
+                                    columns: [GridItem(alignment:.leading) ],
+                                    spacing: 10
+                                ) {
+                                    ForEach(selected_game.transactions.indices, id: \.self) { index in
+                                        let transaction = selected_game.transactions[index]
+                                        HStack {
+                                            Text(
+                                                "\(transaction.type)\(transaction.amount != 0.002 ? transaction.name: "")\((transaction.amount != 0.001 && transaction.amount != 0.002) ? ", $\(String(format: "%.2f", transaction.amount!))" : "")"
+                                            )
+                                            .frame(
+                                                maxWidth: .infinity,
+                                                alignment: .leading
+                                            )
+                                            .font(
+                                                .custom(
+                                                    "comfortaa",
+                                                    size: geometry.size.width * 0.035
+                                                )
+                                            )
+                                            .padding(
+                                                .leading,
+                                                geometry.size.width * 0.02
+                                            )
+                                                
+                                            Text(
+                                                "\(transaction.timestamp.formatted(date: .omitted, time: .shortened))"
+                                            )
+                                            .font(
+                                                .custom(
+                                                    "comfortaa",
+                                                    size: geometry.size.width * 0.035
+                                                )
+                                            )
+                                            .padding(
+                                                .trailing,
+                                                geometry.size.width * 0.02
+                                            )
+                                            .foregroundStyle(.gray)
+                                        }
+                                    }
+                                    .frame(height: geometry.size.width * 0.08)
+                                    .background(.offBlack)
+                                    .clipShape(
+                                        RoundedRectangle(cornerRadius: 4)
+                                    )
+                                    .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
+                                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
+                                }
+                                .padding()
+                            }
+                            .onAppear {
+                                if let lastTransaction = selected_game.transactions.last {
+                                    withAnimation {
+                                        scrollViewProxy
+                                            .scrollTo(
+                                                lastTransaction.id,
+                                                anchor: .bottom
+                                            )
+                                    }
+                                }
+                            }
+                            .onChange(
+                                of: selected_game.transactions.count
+                            ) {
+                                _,
+                                _ in
+                                if let lastTransaction = selected_game.transactions.last {
+                                    withAnimation {
+                                        scrollViewProxy
+                                            .scrollTo(
+                                                lastTransaction.id,
+                                                anchor: .bottom
+                                            )
+                                    }
+                                }
+                            }
+                                
+                                
+                        }
                     }
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: geometry.size.height * 0.5
+                    )
                     .padding(
                         EdgeInsets(
-                            top: geometry.size.width * 0.04,
-                            leading: geometry.size.width * 0.04,
-                            bottom: geometry.size.width * 0.01,
-                            trailing: geometry.size.width * 0.04
+                            top: geometry.size.height * 0.02,
+                            leading: 0,
+                            bottom: geometry.size.width * 0.02,
+                            trailing: 0
                         )
                     )
-                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
 
                     
                 }
@@ -221,72 +284,31 @@ struct Game_Sumary_View: View {
         }
         .background(.colorScheme)
         .onAppear() {
-            total_buy_in = game_view_model.game.users.values.reduce(0.0) { partialSum, userStats in
+            total_buy_in = selected_game.users.values.reduce(0.0) { partialSum, userStats in
                 partialSum + userStats.buy_in
             }
-            total_buy_out = game_view_model.game.users.values.reduce(0.0) { partialSum, userStats in
+            total_buy_out = selected_game.users.values.reduce(0.0) { partialSum, userStats in
                 partialSum + userStats.buy_out
             }
             chip_error = total_buy_in - total_buy_out
-            chip_error_divided = chip_error / (Double(game_view_model.game.users.values.filter { $0.buy_out > 0.001 }.count) != 0 ? Double(game_view_model.game.users.values.filter { $0.buy_out > 0.001 }.count) : 1.0)
+            chip_error_divided = chip_error / (Double(selected_game.users.values.filter { $0.buy_out > 0.001 }.count) != 0 ? Double(selected_game.users.values.filter { $0.buy_out > 0.001 }.count) : 1.0)
             
             
         }
     }
 }
     
-    struct StatCard: View {
-        var title: String
-        var value: String
-        
-        var body: some View {
-            GeometryReader { geometry in
-                VStack(spacing: 8) {
-                    Text(title)
-                        .font(
-                            .custom(
-                                "comfortaa",
-                                size: geometry.size.width * 0.07
-                            )
-                        )
-                        .foregroundColor(.white.opacity(0.7))
-                        .multilineTextAlignment(.center)
-                    
-                    Text(value)
-                        .font(
-                            .custom(
-                                "comfortaa",
-                                size: geometry.size.width * 0.2
-                            )
-                        )
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .padding(.top, geometry.size.width * 0.17)
-                    
-                    Spacer()
-                }
-                .padding()
-                .frame(minWidth: geometry.size.width * 0.95, minHeight: geometry.size.width * 0.95)
-                .background(Color(.offBlack))
-                .clipShape(RoundedRectangle(cornerRadius: geometry.size.width * 0.05))
-                .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 4)
-                .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
-            }
-        }
-    }
     
-    struct Game_Sumary_ViewPreviews: PreviewProvider {
-        static var previews: some View {
-            Group {
-                Game_Sumary_View(selectedTab: .constant(.dashboard))
-                    .environmentObject(Games_View_Model())
-                    .environmentObject(Authentication_View_Model())
-                    .preferredColorScheme(.dark)
-                
-                Game_Sumary_View(selectedTab: .constant(.dashboard))
-                    .environmentObject(Games_View_Model())
-                    .environmentObject(Authentication_View_Model())
-            }
+struct Single_Game_View_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            Single_Game_View(selectedTab: .constant(.buy_out), selected_game: .constant(Game(date: Date(), title: "hello", total_buy_in: 0, total_buy_out: 0, player_count: 0, host_id: "", sb_bb: "", is_active: false, users: [:])))
+                .environmentObject(Authentication_View_Model())
+                .environmentObject(Games_View_Model())
+                .preferredColorScheme(.dark)
+            Single_Game_View(selectedTab: .constant(.buy_out), selected_game: .constant(Game(date: Date(), title: "", total_buy_in: 0, total_buy_out: 0, player_count: 0, host_id: "", sb_bb: "", is_active: false, users: [:])))
+                .environmentObject(Authentication_View_Model())
+                .environmentObject(Games_View_Model())
         }
     }
-
+}

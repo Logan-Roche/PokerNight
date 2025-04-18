@@ -13,6 +13,7 @@ struct Game: Identifiable, Codable {
     var sb_bb: String
     var is_active: Bool
     var users: [String: User_Stats]  // Dictionary of user stats
+    var user_ids: [String] = []
     var transactions: [Transaction] = []  // List of transaction objects
 
     // Nested struct for user stats
@@ -36,6 +37,7 @@ struct Game: Identifiable, Codable {
         case sb_bb
         case is_active
         case users
+        case user_ids
         case transactions
     }
 }
