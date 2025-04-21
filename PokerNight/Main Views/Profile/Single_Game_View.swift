@@ -302,11 +302,11 @@ struct Single_Game_View: View {
 struct Single_Game_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            Single_Game_View(selectedTab: .constant(.buy_out), selected_game: .constant(Game(date: Date(), title: "hello", total_buy_in: 0, total_buy_out: 0, player_count: 0, host_id: "", sb_bb: "", is_active: false, users: [:])))
+            Single_Game_View(selectedTab: .constant(.buy_out), selected_game: .constant(Game(date: Date(), title: "hello", host_id: "", sb_bb: "", is_active: false, chip_error_divided: 0.0, users: [:])))
                 .environmentObject(Authentication_View_Model())
                 .environmentObject(Games_View_Model())
                 .preferredColorScheme(.dark)
-            Single_Game_View(selectedTab: .constant(.buy_out), selected_game: .constant(Game(date: Date(), title: "", total_buy_in: 0, total_buy_out: 0, player_count: 0, host_id: "", sb_bb: "", is_active: false, users: [:])))
+            Single_Game_View(selectedTab: .constant(.buy_out), selected_game: .constant(Game(date: Date(), title: "", host_id: "", sb_bb: "", is_active: false, chip_error_divided: 0.0, users: [:])))
                 .environmentObject(Authentication_View_Model())
                 .environmentObject(Games_View_Model())
         }

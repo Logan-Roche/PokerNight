@@ -22,13 +22,32 @@ struct Profile_Settings_View: View {
     
     var body: some View {
         GeometryReader { geometry in
-            ScrollView {
                 VStack {
                     
-                    PhotosPicker(selection: $selectedItem, matching: .images) {
-                        Label("Change Profile Picture", systemImage: "photo")
+                    PhotosPicker(
+                        selection: $selectedItem,
+                        matching: .images,
+                        photoLibrary: .shared()
+                    ) {
+                        HStack {
+                            Image(systemName: "photo.on.rectangle")
+                                .font(.system(size: 18, weight: .semibold))
+                            Text("Change Profile Photo")
+                                .font(.custom("comfortaa", size: 14))
+                        }
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(LinearGradient(
+                                    colors: [.gradientColorLeft, .gradientColorRight],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ))
+                        )
+                        .shadow(radius: 3)
                     }
-                    .onChange(of: selectedItem, ){ olditem, newItem in
+                    .onChange(of: selectedItem) { oldItem, newItem in
                         Task {
                             if let data = try? await newItem?.loadTransferable(type: Data.self),
                                let image = UIImage(data: data) {
@@ -38,7 +57,6 @@ struct Profile_Settings_View: View {
                         }
                     }
 
-                    
                     Button("Log Out"){
                         auth_view_model.Sign_Out()
                     }
@@ -46,9 +64,9 @@ struct Profile_Settings_View: View {
                     .buttonStyle(.bordered)
                     .tint(.red)
                     
-                }
-                .frame(maxWidth: .infinity)
+                
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.colorScheme)
         }
     }

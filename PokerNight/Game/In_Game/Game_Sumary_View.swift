@@ -178,9 +178,9 @@ struct Game_Sumary_View: View {
                     .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
                     
                     Button {
-                        // function that calls the are you sure sheet
-                            // function that make users current game id = "", wipe the game_view_model.game so if they join another game it will not add the transactions, rerender the query of past game stats
-                        game_view_model.Leave_Game(userId: auth_view_model.user!.uid)
+                    
+                        game_view_model.fetchAndCalculateUserStats(for: auth_view_model.user!.uid)
+                        game_view_model.Leave_Game(userId: auth_view_model.user!.uid, chip_error_divided: chip_error_divided)
                         selectedTab = .dashboard
                         
                                                 

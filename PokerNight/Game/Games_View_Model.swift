@@ -16,16 +16,20 @@ class Games_View_Model: ObservableObject {
         
         date: Date(),
         title: "",
-        total_buy_in: 0,
-        total_buy_out: 0,
-        player_count: 0,
         host_id: "" ,
         sb_bb: "N/A",
         is_active: false,
+        chip_error_divided: 0,
         users: [:],
         user_ids: [],
         transactions: []
     )
+    
+    @Published var totalGames: Int = 0
+    @Published var winRate: Double = 0.0
+    @Published var averageROI: Double = 0.0
+    @Published var totalProfit: Double = 0.0
+
     
     @ObservedObject private var auth_view_model = Authentication_View_Model()
     
@@ -139,12 +143,10 @@ class Games_View_Model: ObservableObject {
                         date: (data["date"] as? Timestamp)?
                             .dateValue() ?? Date(),
                         title: data["title"] as? String ?? "Unknown",
-                        total_buy_in: data["total_buy_in"] as? Double ?? 0.0,
-                        total_buy_out: data["total_buy_out"] as? Double ?? 0.0,
-                        player_count: data["player_count"] as? Int ?? 0,
                         host_id: data["host_id"] as? String ?? "",
                         sb_bb: data["sb_bb"] as? String ?? "",
                         is_active: data["is_active"] as? Bool ?? false,
+                        chip_error_divided: data["chip_error_divided"] as? Double ?? 0,
                         users: usersDict,
                         transactions: transactionsArray
                     )
@@ -223,7 +225,8 @@ class Games_View_Model: ObservableObject {
         }
     }
     func Leave_Game(
-        userId: String
+        userId: String,
+        chip_error_divided: Double
     ) {
         db.collection("Users").document(userId).updateData([
             "current_game": ""
@@ -234,15 +237,20 @@ class Games_View_Model: ObservableObject {
                 print("User left game successfully!")
             }
         }
+        if game.host_id == userId {
+            db.collection("Games").document(game.id!).updateData([
+                "chip_error_divided": chip_error_divided,
+                "is_active": false
+            ]) { error in
+            }
+        }
         game.id = ""
         game.date = Date()
         game.title = ""
-        game.total_buy_in = 0
-        game.total_buy_out = 0
-        game.player_count = 0
         game.host_id = ""
         game.sb_bb = "N/A"
         game.is_active = false
+        game.chip_error_divided = 0
         game.users = [:]
         game.user_ids = []
         game.transactions = []
@@ -319,12 +327,10 @@ class Games_View_Model: ObservableObject {
                         date: (data["date"] as? Timestamp)?
                             .dateValue() ?? Date(),
                         title: data["title"] as? String ?? "Unknown",
-                        total_buy_in: data["total_buy_in"] as? Double ?? 0.0,
-                        total_buy_out: data["total_buy_out"] as? Double ?? 0.0,
-                        player_count: data["player_count"] as? Int ?? 0,
                         host_id: data["host_id"] as? String ?? "",
                         sb_bb: data["sb_bb"] as? String ?? "",
                         is_active: data["is_active"] as? Bool ?? false,
+                        chip_error_divided: data["chip_error_divided"] as? Double ?? 0,
                         users: usersDict,
                         transactions: transactionsArray
                     )
@@ -484,12 +490,10 @@ class Games_View_Model: ObservableObject {
         let data: [String: Any] = [
             "date": Timestamp(date: game.date),
             "title": game.title,
-            "total_buy_in": game.total_buy_in,
-            "total_buy_out": game.total_buy_out,
-            "player_count": game.player_count,
             "host_id": game.host_id,
             "sb_bb": game.sb_bb,
             "is_active": game.is_active,
+            "chip_error_divided": game.chip_error_divided,
             "users": usersData,
             "transactions": transactionsData
         ]
@@ -511,6 +515,7 @@ class Games_View_Model: ObservableObject {
 
         db.collection("Games")
             .whereField("user_ids", arrayContains: userID)
+            .whereField("is_active", isEqualTo: false)
             .getDocuments { (snapshot, error) in
                 guard let documents = snapshot?.documents, error == nil else {
                     print("Error fetching past games: \(error?.localizedDescription ?? "Unknown error")")
@@ -525,6 +530,44 @@ class Games_View_Model: ObservableObject {
                 completion(games)
             }
     }
+    
+    func fetchAndCalculateUserStats(for userID: String) {
+        fetchPastGames(for: userID) { games in
+            DispatchQueue.main.async {
+                self.games = games
+                self.totalGames = games.count
+                
+                var winCount = 0
+                var totalNet: Double = 0.0
+                var totalROI: Double = 0.0
+                
+                for game in games {
+                    if let userStats = game.users[userID] {
+                        let buyIn = userStats.buy_in
+                        let buyOut = userStats.buy_out
+                        let net = userStats.net + game.chip_error_divided
+                        print(net)
+                        
+                        if net > 0 {
+                            winCount += 1
+                        }
+                        
+                        totalNet += net
+                        
+                        if buyIn > 0 {
+                            let roi = ((buyOut + game.chip_error_divided) - buyIn) / buyIn
+                            totalROI += roi
+                        }
+                    }
+                }
+                
+                self.winRate = games.count > 0 ? Double(winCount) / Double(games.count) : 0.0
+                self.averageROI = games.count > 0 ? totalROI / Double(games.count) : 0.0
+                self.totalProfit = totalNet
+            }
+        }
+    }
+
     
 
 }

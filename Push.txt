@@ -1,14 +1,12 @@
-Title: Completed: Fetching Past Games, Profile View, Past Games View, Individual Game View
+Title: Completed: Dashboard View + Logic, Fetch/Aggregrate Past Game Stats
 
 Description:
 
-Tasks Completed: Fetching Past Games, Profile Screen + Logic (Net, Avg ROI, ...), Past Games Screen + Logic, Individual Game Screen + Logic, Fixed Profile Picture Glitch
+Tasks Completed: Fixed Query Net Calculations, Fetch/Aggregrate Past Game Stats, Dashboard View + Logic,
 
-Tasks In Progress: Dashboard View
+Tasks In Progress: Ads
 
 
 
 Notes:
-
-- work on summary view next
 

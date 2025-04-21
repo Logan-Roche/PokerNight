@@ -15,84 +15,11 @@ struct All_Games_View: View {
     @Binding var selectedTab: Tabs
     @Binding var selected_game: Game
     
-    
     let gradient = LinearGradient(
         colors: [.gradientColorLeft, .gradientColorRight],
         startPoint: .top,
         endPoint: .topTrailing
     )
-    
-
-    let sampleGames: [Game] = [
-        Game(
-            id: "G1",
-            date: Calendar.current.date(byAdding: .day, value: -2, to: Date())!,
-            title: "ROCHE POKER CLUB",
-            total_buy_in: 60,
-            total_buy_out: 90,
-            player_count: 5,
-            host_id: "host1",
-            sb_bb: "25¢ / 50¢",
-            is_active: false,
-            users: [
-                "user123": Game.User_Stats(
-                    name: "Logan",
-                    buy_in: 60,
-                    buy_out: 90,
-                    net: 30,
-                    photo_url: ""
-                )
-            ],
-            user_ids: ["user123"],
-            transactions: []
-        ),
-        Game(
-            id: "G2",
-            date: Calendar.current.date(byAdding: .day, value: -5, to: Date())!,
-            title: "AVA'S POKER ROOM",
-            total_buy_in: 100,
-            total_buy_out: 95,
-            player_count: 6,
-            host_id: "host2",
-            sb_bb: "50¢ / $1",
-            is_active: false,
-            users: [
-                "user123": Game.User_Stats(
-                    name: "Logan",
-                    buy_in: 100,
-                    buy_out: 95,
-                    net: -5,
-                    photo_url: ""
-                )
-            ],
-            user_ids: ["user123"],
-            transactions: []
-        ),
-        Game(
-            id: "G3",
-            date: Calendar.current
-                .date(byAdding: .day, value: -10, to: Date())!,
-            title: "FRIDAY NIGHT POKER",
-            total_buy_in: 40,
-            total_buy_out: 40,
-            player_count: 4,
-            host_id: "host3",
-            sb_bb: "$1 / $2",
-            is_active: false,
-            users: [
-                "user123": Game.User_Stats(
-                    name: "Logan",
-                    buy_in: 40,
-                    buy_out: 40,
-                    net: 0,
-                    photo_url: ""
-                )
-            ],
-            user_ids: ["user123"],
-            transactions: []
-        )
-    ]
-
     
     var body: some View {
         GeometryReader { geometry in
@@ -211,7 +138,7 @@ struct All_Games_View: View {
                                             )
                                         
                                         Text(
-                                            "\(userStats.net >= 0 ? "+" : "-")$\(String(format: "%.0f", abs(userStats.net)))"
+                                            "\(userStats.net + game.chip_error_divided >= 0 ? "+" : "-")$\(String(format: "%.0f", abs(userStats.net + game.chip_error_divided)))"
                                         )
                                         .font(
                                             .custom(
@@ -230,7 +157,7 @@ struct All_Games_View: View {
                                     
                                 }
 
-                                Text("Title: ")
+                                Text("Sb / Bb: ")
                                     .font(
                                         .custom(
                                             "comfortaa",
@@ -283,12 +210,10 @@ struct All_Games_View_Previews: PreviewProvider {
                             Game(
                                 date: Date(),
                                 title: "",
-                                total_buy_in: 0,
-                                total_buy_out: 0,
-                                player_count: 0,
                                 host_id: "",
                                 sb_bb: "",
                                 is_active: false,
+                                chip_error_divided: 0,
                                 users: [:]
                             )
                         )
@@ -303,12 +228,10 @@ struct All_Games_View_Previews: PreviewProvider {
                             Game(
                                 date: Date(),
                                 title: "",
-                                total_buy_in: 0,
-                                total_buy_out: 0,
-                                player_count: 0,
                                 host_id: "",
                                 sb_bb: "",
                                 is_active: false,
+                                chip_error_divided: 0,
                                 users: [:]
                             )
                         )

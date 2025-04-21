@@ -16,11 +16,6 @@ struct Profile_View: View {
     @Environment(\.colorScheme) var colorScheme
     @Binding var selectedTab: Tabs
     
-    @Binding var totalGames: Int
-    @Binding var winRate: Double
-    @Binding var averageROI: Double
-    @Binding var totalProfit: Double
-    
     
     
     @State private var selectedItem: PhotosPickerItem?
@@ -135,7 +130,7 @@ struct Profile_View: View {
 
                             Spacer()
                             
-                            Text("\(totalProfit < 0 ? "-" : "")$\(String(format: "%.0f", abs(totalProfit)))")
+                            Text("\(game_view_model.totalProfit < 0 ? "-" : "")$\(String(format: "%.0f", abs(game_view_model.totalProfit)))")
                                 .foregroundStyle(
                                     colorScheme == .light ? .black : .white
                                 )
@@ -184,7 +179,7 @@ struct Profile_View: View {
 
                                 Spacer()
                                 
-                                Text("\(String(format: "%.0f", winRate * 100))%")
+                                Text("\(String(format: "%.0f", game_view_model.winRate * 100))%")
                                     .foregroundStyle(
                                         colorScheme == .light ? .black : .white
                                     )
@@ -227,7 +222,7 @@ struct Profile_View: View {
 
                                 Spacer()
                                 
-                                Text("\(String(format: "%.0f", averageROI * 100))%")
+                                Text("\(String(format: "%.0f", game_view_model.averageROI * 100))%")
                                     .foregroundStyle(
                                         colorScheme == .light ? .black : .white
                                     )
@@ -274,7 +269,7 @@ struct Profile_View: View {
 
                             Spacer()
                             
-                            Text("\(totalGames)")
+                            Text("\(game_view_model.totalGames)")
                                 .foregroundStyle(
                                     colorScheme == .light ? .black : .white
                                 )
@@ -335,11 +330,11 @@ struct Profile_View: View {
 struct Profile_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            Profile_View(selectedTab: .constant(.buy_out), totalGames: .constant(10),winRate: .constant(10),averageROI: .constant(20), totalProfit: .constant(10))
+            Profile_View(selectedTab: .constant(.buy_out))
                 .environmentObject(Authentication_View_Model())
                 .environmentObject(Games_View_Model())
                 .preferredColorScheme(.dark)
-            Profile_View(selectedTab: .constant(.buy_out), totalGames: .constant(10),winRate: .constant(10),averageROI: .constant(20), totalProfit: .constant(10))
+            Profile_View(selectedTab: .constant(.buy_out))
                 .environmentObject(Authentication_View_Model())
                 .environmentObject(Games_View_Model())
         }

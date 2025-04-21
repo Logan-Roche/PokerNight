@@ -1,10 +1,3 @@
-//
-//  Buy_Out_View.swift
-//  PokerNight
-//
-//  Created by Logan Roche on 4/6/25.
-//
-
 import SwiftUI
 import FirebaseAuth
 
@@ -80,7 +73,7 @@ struct Buy_Out_View: View {
                             )
                         ScrollView(.horizontal) {
                             LazyHGrid(rows: [GridItem(.fixed(geometry.size.width * 0.3)), GridItem(.fixed(geometry.size.width * 0.3))], spacing: 24) {
-                                ForEach(Array(game_view_model.game.users.keys), id: \.self) { userID in
+                                ForEach(Array(game_view_model.game.users.keys).sorted(), id: \.self) { userID in
                                     //ForEach(Array(users.keys).sorted(), id: \.self) { userID in
                                     if let user = game_view_model.game.users[userID] {
                                         //if let user = users[userID] {
