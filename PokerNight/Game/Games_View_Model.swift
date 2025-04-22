@@ -73,8 +73,8 @@ class Games_View_Model: ObservableObject {
     ) {
         print("Fetch Game Function Called")
         db.collection("Games").document(gameId).getDocument {
- snapshot,
- error in
+            snapshot,
+            error in
             if let error = error {
                 //print("Error fetching document: \(error.localizedDescription)")
                 completion(nil, error)
@@ -82,7 +82,7 @@ class Games_View_Model: ObservableObject {
             }
             
             guard let snapshot = snapshot,
- snapshot.exists else {
+                  snapshot.exists else {
                 //print("Document does not exist")
                 completion(nil, nil)
                 return
@@ -177,7 +177,9 @@ class Games_View_Model: ObservableObject {
             var gameToSave = game
             gameToSave.id = nil  // Avoid warning
 
-            let ref = try db.collection("Games").addDocument(from: gameToSave)  // This avoids setting @DocumentID manually
+            let ref = try db.collection("Games").addDocument(
+                from: gameToSave
+            )  // This avoids setting @DocumentID manually
 
             let gameId = ref.documentID
             currentGameID = gameId
@@ -230,7 +232,7 @@ class Games_View_Model: ObservableObject {
     ) {
         db.collection("Users").document(userId).updateData([
             "current_game": ""
-            ]) { error in
+        ]) { error in
             if let error = error {
                 print("Failed to leave game: \(error)")
             } else {
@@ -510,7 +512,10 @@ class Games_View_Model: ObservableObject {
 
     
     
-    func fetchPastGames(for userID: String, completion: @escaping ([Game]) -> Void) {
+    func fetchPastGames(
+        for userID: String,
+        completion: @escaping ([Game]) -> Void
+    ) {
         
 
         db.collection("Games")
@@ -518,7 +523,9 @@ class Games_View_Model: ObservableObject {
             .whereField("is_active", isEqualTo: false)
             .getDocuments { (snapshot, error) in
                 guard let documents = snapshot?.documents, error == nil else {
-                    print("Error fetching past games: \(error?.localizedDescription ?? "Unknown error")")
+                    print(
+                        "Error fetching past games: \(error?.localizedDescription ?? "Unknown error")"
+                    )
                     completion([])
                     return
                 }
@@ -555,14 +562,20 @@ class Games_View_Model: ObservableObject {
                         totalNet += net
                         
                         if buyIn > 0 {
-                            let roi = ((buyOut + game.chip_error_divided) - buyIn) / buyIn
+                            let roi = (
+                                (buyOut + game.chip_error_divided) - buyIn
+                            ) / buyIn
                             totalROI += roi
                         }
                     }
                 }
                 
-                self.winRate = games.count > 0 ? Double(winCount) / Double(games.count) : 0.0
-                self.averageROI = games.count > 0 ? totalROI / Double(games.count) : 0.0
+                self.winRate = games.count > 0 ? Double(winCount) / Double(
+                    games.count
+                ) : 0.0
+                self.averageROI = games.count > 0 ? totalROI / Double(
+                    games.count
+                ) : 0.0
                 self.totalProfit = totalNet
             }
         }

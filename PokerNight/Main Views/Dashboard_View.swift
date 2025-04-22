@@ -191,14 +191,20 @@ struct Dashboard_View: View {
                                 .foregroundStyle(
                                     LinearGradient(
                                         gradient: Gradient(
-stops: [
-    .init(
-        color: .gradientColorLeft,
-        location: 0.0
-    ),
-    .init(color: .offBlack, location: adjustedZeroPosition),
-    .init(color: .gradientColorRight, location: 1.0)
-]
+                                            stops: [
+                                                .init(
+                                                    color: .gradientColorLeft,
+                                                    location: 0.0
+                                                ),
+                                                .init(
+                                                    color: .offBlack,
+                                                    location: adjustedZeroPosition
+                                                ),
+                                                .init(
+                                                    color: .gradientColorRight,
+                                                    location: 1.0
+                                                )
+                                            ]
                                         ),
                                         startPoint: .top,
                                         endPoint: .bottom
@@ -342,10 +348,25 @@ stops: [
                             )
                         if let last_game = game_view_model.games.last {
                             ScrollView(.horizontal) {
-                                LazyHGrid(rows: [GridItem(.fixed(geometry.size.width * 0.3)), GridItem(.fixed(geometry.size.width * 0.3))], spacing: 24) {
-                                    ForEach(Array(last_game.users.keys).sorted(), id: \.self) { userID in
+                                LazyHGrid(
+                                    rows: [
+                                        GridItem(
+                                            .fixed(geometry.size.width * 0.3)
+                                        ),
+                                        GridItem(
+                                            .fixed(geometry.size.width * 0.3)
+                                        )
+                                    ],
+                                    spacing: 24
+                                ) {
+                                    ForEach(
+                                        Array(last_game.users.keys).sorted(),
+                                        id: \.self
+                                    ) { userID in
                                         if let user = last_game.users[userID] {
-                                            PlayerCard(user: user)
+                                            if userID != auth_view_model.user!.uid {
+                                                PlayerCard(user: user)
+                                            }
                                         }
                                     }
                                 }

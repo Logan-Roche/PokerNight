@@ -61,7 +61,9 @@ struct All_Games_View: View {
                     .frame(maxHeight: geometry.size.height * 0.05)
                     .padding(.bottom, geometry.size.height * 0.06)
 
-                    ForEach(game_view_model.games.sorted(by: { $0.date > $1.date })) { game in
+                    ForEach(
+                        game_view_model.games.sorted(by: { $0.date > $1.date })
+                    ) { game in
                         if let userStats = game.users[auth_view_model.user!.uid] {
                             //if let userStats = game.users["user123"] {
                             VStack(

@@ -11,7 +11,7 @@ struct Profile_Settings_View: View {
     @Binding var selectedTab: Tabs
     
     @State private var selectedItem: PhotosPickerItem?
-        @State private var selectedImage: UIImage?
+    @State private var selectedImage: UIImage?
     
     let gradient = LinearGradient(
         colors: [.gradientColorLeft, .gradientColorRight],
@@ -22,47 +22,57 @@ struct Profile_Settings_View: View {
     
     var body: some View {
         GeometryReader { geometry in
-                VStack {
+            VStack {
                     
-                    PhotosPicker(
-                        selection: $selectedItem,
-                        matching: .images,
-                        photoLibrary: .shared()
-                    ) {
-                        HStack {
-                            Image(systemName: "photo.on.rectangle")
-                                .font(.system(size: 18, weight: .semibold))
-                            Text("Change Profile Photo")
-                                .font(.custom("comfortaa", size: 14))
-                        }
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(LinearGradient(
-                                    colors: [.gradientColorLeft, .gradientColorRight],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ))
-                        )
-                        .shadow(radius: 3)
+                PhotosPicker(
+                    selection: $selectedItem,
+                    matching: .images,
+                    photoLibrary: .shared()
+                ) {
+                    HStack {
+                        Image(systemName: "photo.on.rectangle")
+                            .font(.system(size: 18, weight: .semibold))
+                        Text("Change Profile Photo")
+                            .font(.custom("comfortaa", size: 14))
                     }
-                    .onChange(of: selectedItem) { oldItem, newItem in
-                        Task {
-                            if let data = try? await newItem?.loadTransferable(type: Data.self),
-                               let image = UIImage(data: data) {
-                                selectedImage = image
-                                auth_view_model.uploadAndSaveProfilePhoto(image: image)
-                            }
-                        }
-                    }
-
-                    Button("Log Out"){
-                        auth_view_model.Sign_Out()
-                    }
+                    .foregroundColor(colorScheme == .light ? .black : .white)
                     .padding()
-                    .buttonStyle(.bordered)
-                    .tint(.red)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+LinearGradient(
+    colors: [
+        .gradientColorLeft,
+        .gradientColorRight
+    ],
+    startPoint: .topLeading,
+    endPoint: .bottomTrailing
+)
+                            )
+                    )
+                    .shadow(radius: 3)
+                }
+                .onChange(of: selectedItem) {
+ oldItem,
+ newItem in
+                    Task {
+                        if let data = try? await newItem?.loadTransferable(
+                            type: Data.self
+                        ),
+                           let image = UIImage(data: data) {
+                            selectedImage = image
+                            auth_view_model
+                                .uploadAndSaveProfilePhoto(image: image)
+                        }
+                    }
+                }
+
+                Button("Log Out"){
+                    auth_view_model.Sign_Out()
+                }
+                .padding()
+                .buttonStyle(.bordered)
+                .tint(.red)
                     
                 
             }

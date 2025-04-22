@@ -76,7 +76,12 @@ struct Custom_Tab_Bar: View {
                 .background(gradient)
                 .clipShape(Capsule())
                 .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
+                .shadow(
+                    color: .black.opacity(0.5),
+                    radius: 1,
+                    x: 0,
+                    y: -1
+                ) // subtle top glow
             }
             else {
                 Button {
@@ -100,7 +105,12 @@ struct Custom_Tab_Bar: View {
                 .background(gradient)
                 .clipShape(Capsule())
                 .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
+                .shadow(
+                    color: .black.opacity(0.5),
+                    radius: 1,
+                    x: 0,
+                    y: -1
+                ) // subtle top glow
                 
             }
             

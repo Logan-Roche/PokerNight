@@ -33,6 +33,7 @@ struct ContentView: View {
     
     @EnvironmentObject var game_view_model: Games_View_Model  // Use shared instance
     @EnvironmentObject var auth_view_model: Authentication_View_Model  // Use shared instance
+    @EnvironmentObject var interstital_ads_manager: InterstitialAdsManager
 
     var body: some View {
         NavigationStack {
@@ -45,14 +46,17 @@ struct ContentView: View {
                     Profile_View(selectedTab: $selectedTab)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
+                        .environmentObject(interstital_ads_manager)
                 } else if selectedTab == .start_game {
                     Start_Game_View(selectedTab: $selectedTab)
                         .environmentObject(auth_view_model)
                         .environmentObject(game_view_model)
+                        .environmentObject(interstital_ads_manager)
                 } else if selectedTab == .in_game {
                     In_Game_View(selectedTab: $selectedTab)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
+                        .environmentObject(interstital_ads_manager)
                 } else if selectedTab == .buy_out {
                     Buy_Out_View(selectedTab: $selectedTab)
                         .environmentObject(game_view_model)
@@ -65,18 +69,25 @@ struct ContentView: View {
                     Game_Sumary_View(selectedTab: $selectedTab)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
+                        .environmentObject(interstital_ads_manager)
                 } else if selectedTab == .profile_settings {
                     Profile_Settings_View(selectedTab: $selectedTab)
                         .environmentObject(game_view_model)
                         .environmentObject(auth_view_model)
                 } else if selectedTab == .all_game_view {
-                    All_Games_View(selectedTab: $selectedTab, selected_game: $selected_game)
-                        .environmentObject(game_view_model)
-                        .environmentObject(auth_view_model)
+                    All_Games_View(
+                        selectedTab: $selectedTab,
+                        selected_game: $selected_game
+                    )
+                    .environmentObject(game_view_model)
+                    .environmentObject(auth_view_model)
                 } else if selectedTab == .single_game_view {
-                    Single_Game_View(selectedTab: $selectedTab, selected_game: $selected_game)
-                        .environmentObject(game_view_model)
-                        .environmentObject(auth_view_model)
+                    Single_Game_View(
+                        selectedTab: $selectedTab,
+                        selected_game: $selected_game
+                    )
+                    .environmentObject(game_view_model)
+                    .environmentObject(auth_view_model)
                 }
 
                 if !isKeyboardVisible && delayedShowTabBar {
@@ -92,15 +103,18 @@ struct ContentView: View {
         
                                         
                                                  
-                    }
                 }
+            }
             .sheet(isPresented: $start_game_join_game_sheet) {
             } content: {
-                Tab_Bar_Overlay_View(start_game_join_game_sheet: $start_game_join_game_sheet, selectedTab: $selectedTab)
-                    .presentationDetents([.fraction(0.30)])
-                    .environmentObject(
-                        game_view_model
-                    )
+                Tab_Bar_Overlay_View(
+                    start_game_join_game_sheet: $start_game_join_game_sheet,
+                    selectedTab: $selectedTab
+                )
+                .presentationDetents([.fraction(0.30)])
+                .environmentObject(
+                    game_view_model
+                )
             }
             .background(.colorScheme)
         }
@@ -127,8 +141,9 @@ struct ContentView: View {
                         delayedShowTabBar = true
                     }
                 }
-            if game_view_model.games.isEmpty {
-                game_view_model.fetchAndCalculateUserStats(for: auth_view_model.user!.uid)
+            if game_view_model.games.isEmpty && auth_view_model.user != nil {
+                game_view_model
+                    .fetchAndCalculateUserStats(for: auth_view_model.user!.uid)
             }
         }
     }

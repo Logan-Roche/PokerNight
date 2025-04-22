@@ -13,13 +13,14 @@ struct Profile_View: View {
     
     @EnvironmentObject var game_view_model: Games_View_Model
     @EnvironmentObject var auth_view_model: Authentication_View_Model
+    @EnvironmentObject var interstital_ads_manager: InterstitialAdsManager
     @Environment(\.colorScheme) var colorScheme
     @Binding var selectedTab: Tabs
     
     
     
     @State private var selectedItem: PhotosPickerItem?
-        @State private var selectedImage: UIImage?
+    @State private var selectedImage: UIImage?
     
     let gradient = LinearGradient(
         colors: [.gradientColorLeft, .gradientColorRight],
@@ -50,12 +51,18 @@ struct Profile_View: View {
                         } placeholder: {
                             ProgressView()
                         }
-                        .frame(width: geometry.size.width * 0.4, height: geometry.size.width * 0.4)
+                        .frame(
+                            width: geometry.size.width * 0.4,
+                            height: geometry.size.width * 0.4
+                        )
                         .clipShape(Circle())
                     } else {
                         Image(systemName: "person.crop.circle.fill")
                             .resizable()
-                            .frame(width: geometry.size.width * 0.4, height: geometry.size.width * 0.4)
+                            .frame(
+                                width: geometry.size.width * 0.4,
+                                height: geometry.size.width * 0.4
+                            )
                             .foregroundColor(.gray)
                     }
                     
@@ -78,10 +85,22 @@ struct Profile_View: View {
                                 height: geometry.size.height * 1
                             )
                             .clipShape(
-                                RoundedRectangle(cornerRadius: geometry.size.width * 0.07)
+                                RoundedRectangle(
+                                    cornerRadius: geometry.size.width * 0.07
+                                )
                             )
-                            .shadow(color: .black.opacity(1), radius: 1, x: 0, y: 1)
-                            .shadow(color: .black.opacity(1), radius: 1, x: 0, y: -1)
+                            .shadow(
+                                color: .black.opacity(1),
+                                radius: 1,
+                                x: 0,
+                                y: 1
+                            )
+                            .shadow(
+                                color: .black.opacity(1),
+                                radius: 1,
+                                x: 0,
+                                y: -1
+                            )
                             .offset(
                                 y: geometry.size.height * 0.44
                             )
@@ -107,12 +126,29 @@ struct Profile_View: View {
                                 height: geometry.size.height * 0.2
                             )
                             .clipShape(
-                                RoundedRectangle(cornerRadius: geometry.size.width * 0.07)
+                                RoundedRectangle(
+                                    cornerRadius: geometry.size.width * 0.07
+                                )
                             )
-                            .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 3)
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 3,
+                                x: 0,
+                                y: 3
+                            )
                             .padding(.horizontal, geometry.size.width * 0.03)
-                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1)
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 1,
+                                x: 0,
+                                y: 1
+                            )
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 1,
+                                x: 0,
+                                y: -1
+                            )
                         
                         VStack {
                             Text("Net")
@@ -130,17 +166,19 @@ struct Profile_View: View {
 
                             Spacer()
                             
-                            Text("\(game_view_model.totalProfit < 0 ? "-" : "")$\(String(format: "%.0f", abs(game_view_model.totalProfit)))")
-                                .foregroundStyle(
-                                    colorScheme == .light ? .black : .white
+                            Text(
+                                "\(game_view_model.totalProfit < 0 ? "-" : "")$\(String(format: "%.0f", abs(game_view_model.totalProfit)))"
+                            )
+                            .foregroundStyle(
+                                colorScheme == .light ? .black : .white
+                            )
+                            .font(
+                                .custom(
+                                    "comfortaa",
+                                    size: geometry.size.width * 0.14
                                 )
-                                .font(
-                                    .custom(
-                                        "comfortaa",
-                                        size: geometry.size.width * 0.14
-                                    )
-                                )
-                                .padding(.bottom, geometry.size.height * 0.04)
+                            )
+                            .padding(.bottom, geometry.size.height * 0.04)
                         }
                         
 
@@ -156,13 +194,30 @@ struct Profile_View: View {
                                     height: geometry.size.height * 0.2
                                 )
                                 .clipShape(
-                                    RoundedRectangle(cornerRadius: geometry.size.width * 0.07)
+                                    RoundedRectangle(
+                                        cornerRadius: geometry.size.width * 0.07
+                                    )
                                 )
-                                .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 3)
+                                .shadow(
+                                    color: .black.opacity(0.5),
+                                    radius: 3,
+                                    x: 0,
+                                    y: 3
+                                )
                                 .padding(.leading, geometry.size.width * 0.03)
                                 .padding(.trailing, geometry.size.width * 0.015)
-                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1)
+                                .shadow(
+                                    color: .black.opacity(0.5),
+                                    radius: 1,
+                                    x: 0,
+                                    y: 1
+                                )
+                                .shadow(
+                                    color: .black.opacity(0.5),
+                                    radius: 1,
+                                    x: 0,
+                                    y: -1
+                                )
                             VStack {
                                 Text("Win Rate")
                                     .foregroundStyle(
@@ -179,17 +234,19 @@ struct Profile_View: View {
 
                                 Spacer()
                                 
-                                Text("\(String(format: "%.0f", game_view_model.winRate * 100))%")
-                                    .foregroundStyle(
-                                        colorScheme == .light ? .black : .white
+                                Text(
+                                    "\(String(format: "%.0f", game_view_model.winRate * 100))%"
+                                )
+                                .foregroundStyle(
+                                    colorScheme == .light ? .black : .white
+                                )
+                                .font(
+                                    .custom(
+                                        "comfortaa",
+                                        size: geometry.size.width * 0.1
                                     )
-                                    .font(
-                                        .custom(
-                                            "comfortaa",
-                                            size: geometry.size.width * 0.1
-                                        )
-                                    )
-                                    .padding(.bottom, geometry.size.height * 0.06)
+                                )
+                                .padding(.bottom, geometry.size.height * 0.06)
                             }
                         }
                         ZStack {
@@ -199,13 +256,30 @@ struct Profile_View: View {
                                     height: geometry.size.height * 0.2
                                 )
                                 .clipShape(
-                                    RoundedRectangle(cornerRadius: geometry.size.width * 0.07)
+                                    RoundedRectangle(
+                                        cornerRadius: geometry.size.width * 0.07
+                                    )
                                 )
-                                .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 3)
+                                .shadow(
+                                    color: .black.opacity(0.5),
+                                    radius: 3,
+                                    x: 0,
+                                    y: 3
+                                )
                                 .padding(.trailing, geometry.size.width * 0.03)
                                 .padding(.leading, geometry.size.width * 0.015)
-                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1)
+                                .shadow(
+                                    color: .black.opacity(0.5),
+                                    radius: 1,
+                                    x: 0,
+                                    y: 1
+                                )
+                                .shadow(
+                                    color: .black.opacity(0.5),
+                                    radius: 1,
+                                    x: 0,
+                                    y: -1
+                                )
                             VStack {
                                 Text("Avg ROI")
                                     .foregroundStyle(
@@ -222,17 +296,19 @@ struct Profile_View: View {
 
                                 Spacer()
                                 
-                                Text("\(String(format: "%.0f", game_view_model.averageROI * 100))%")
-                                    .foregroundStyle(
-                                        colorScheme == .light ? .black : .white
+                                Text(
+                                    "\(String(format: "%.0f", game_view_model.averageROI * 100))%"
+                                )
+                                .foregroundStyle(
+                                    colorScheme == .light ? .black : .white
+                                )
+                                .font(
+                                    .custom(
+                                        "comfortaa",
+                                        size: geometry.size.width * 0.1
                                     )
-                                    .font(
-                                        .custom(
-                                            "comfortaa",
-                                            size: geometry.size.width * 0.1
-                                        )
-                                    )
-                                    .padding(.bottom, geometry.size.height * 0.06)
+                                )
+                                .padding(.bottom, geometry.size.height * 0.06)
                             }
                         }
                         
@@ -246,12 +322,29 @@ struct Profile_View: View {
                                 height: geometry.size.height * 0.2
                             )
                             .clipShape(
-                                RoundedRectangle(cornerRadius: geometry.size.width * 0.07)
+                                RoundedRectangle(
+                                    cornerRadius: geometry.size.width * 0.07
+                                )
                             )
-                            .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 3)
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 3,
+                                x: 0,
+                                y: 3
+                            )
                             .padding(.horizontal, geometry.size.width * 0.03)
-                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1)
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 1,
+                                x: 0,
+                                y: 1
+                            )
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 1,
+                                x: 0,
+                                y: -1
+                            )
                         
                         VStack {
                             Text("Total Games")
@@ -286,6 +379,9 @@ struct Profile_View: View {
                     
                     
                     Button {
+                        if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" {
+                            interstital_ads_manager.displayInterstitialAd()
+                        }
                         selectedTab = .all_game_view
                     } label:{
                         Text("All Games")
@@ -296,7 +392,9 @@ struct Profile_View: View {
                                 )
                             )
                             .fontWeight(Font.Weight.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(
+                                colorScheme == .light ? .black : .white
+                            )
                             .padding()
                             .frame(
                                 maxWidth: .infinity,

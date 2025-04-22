@@ -44,9 +44,16 @@ struct Edit_Game_View: View {
                                 height: geometry.size.height * 1
                             )
                             .clipShape(
-                                RoundedRectangle(cornerRadius: geometry.size.width * 0.05)
+                                RoundedRectangle(
+                                    cornerRadius: geometry.size.width * 0.05
+                                )
                             )
-                            .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 3)
+                            .shadow(
+                                color: .black.opacity(0.8),
+                                radius: 3,
+                                x: 0,
+                                y: 3
+                            )
                             .offset(
                                 y: -geometry.size.height * 0.45
                             )
@@ -179,17 +186,35 @@ struct Edit_Game_View: View {
                                 )
                             )
                         ScrollView(.horizontal) {
-                            LazyHGrid(rows: [GridItem(.fixed(geometry.size.width * 0.3)), GridItem(.fixed(geometry.size.width * 0.3))], spacing: 24) {
-                                ForEach(Array(game_view_model.game.users.keys), id: \.self) { userID in
+                            LazyHGrid(
+                                rows: [
+                                    GridItem(.fixed(geometry.size.width * 0.3)),
+                                    GridItem(.fixed(geometry.size.width * 0.3))
+                                ],
+                                spacing: 24
+                            ) {
+                                ForEach(
+                                    Array(game_view_model.game.users.keys),
+                                    id: \.self
+                                ) { userID in
                                     //ForEach(Array(users.keys).sorted(), id: \.self) { userID in
                                     if let user = game_view_model.game.users[userID] {
                                         //if let user = users[userID] {
-                                        PlayerCard(user: user, isSelected: selectedPlayerID == userID)
-                                            .onTapGesture {
-                                                selectedPlayerID = userID
-                                                buy_in = String(game_view_model.game.users[userID]!.buy_in)
-                                                old_buy_in = String(game_view_model.game.users[userID]!.buy_in)
-                                            }
+                                        PlayerCard(
+                                            user: user,
+                                            isSelected: selectedPlayerID == userID
+                                        )
+                                        .onTapGesture {
+                                            selectedPlayerID = userID
+                                            buy_in = String(
+                                                game_view_model.game
+                                                    .users[userID]!.buy_in
+                                            )
+                                            old_buy_in = String(
+                                                game_view_model.game
+                                                    .users[userID]!.buy_in
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -201,7 +226,12 @@ struct Edit_Game_View: View {
                     .background(.offBlack)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
-                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
+                    .shadow(
+                        color: .black.opacity(0.9),
+                        radius: 1,
+                        x: 0,
+                        y: -1
+                    ) // subtle top glow
                     .padding(.vertical, geometry.size.height * 0.03)
                     
                     TextField("Enter Buy In Amount", text: $buy_in)
@@ -229,7 +259,10 @@ struct Edit_Game_View: View {
                             game_view_model.game.title = title
                             game_view_model.game.sb_bb = cents ? "\(sb)¢ / \(bb)¢" : "$\(sb) / $\(bb)"
                             
-                            if let id = selectedPlayerID, let buyIn = Double(buy_in) {
+                            if let id = selectedPlayerID,
+                               let buyIn = Double(
+                                buy_in
+                               ) {
                                 game_view_model.game.users[id]?.buy_in = buyIn
                             }
 
@@ -247,7 +280,8 @@ struct Edit_Game_View: View {
                                     components.append("Blinds")
                                 }
 
-                                if let id = selectedPlayerID, buy_in != old_buy_in {
+                                if let id = selectedPlayerID,
+                                   buy_in != old_buy_in {
                                     let name = game_view_model.game.users[id]?.name ?? "Unknown"
                                     let buyInChange = "Buy-In: \(name), $\(old_buy_in) -> $\(buy_in)"
                                     
@@ -262,7 +296,8 @@ struct Edit_Game_View: View {
                             game_view_model.Add_Transaction(
                                 gameId: game_view_model.currentGameID,
                                 user_id: game_view_model.game.host_id,
-                                display_name: game_view_model.game.users[game_view_model.game.host_id]?.name ?? "Unknown",
+                                display_name: game_view_model.game
+                                    .users[game_view_model.game.host_id]?.name ?? "Unknown",
                                 type: gameEditType,
                                 amount: 0.002
                             ) { _ in }
@@ -270,34 +305,46 @@ struct Edit_Game_View: View {
                             selectedTab = .in_game
                         }
                     ){
-                            Text("Edit Game")
-                                .font(
-                                    .custom(
-                                        "comfortaa",
-                                        size: geometry.size.width * 0.05
-                                    )
+                        Text("Edit Game")
+                            .font(
+                                .custom(
+                                    "comfortaa",
+                                    size: geometry.size.width * 0.05
                                 )
-                                .fontWeight(Font.Weight.bold)
-                                .foregroundColor(.white)
-                                .padding(.vertical, geometry.size.height * 0.2)
-                                .frame(
-                                    maxWidth: .infinity,
-                                    maxHeight: geometry.size.height * 0.2
-                                )
-                                .background(gradient)
-                                .cornerRadius(10)
-                                .shadow(radius: 3)
-                        }
-                        .shadow(color: .offBlack.opacity(0.5), radius: 1, x: 0, y: 1)
-                        .shadow(color: .offBlack.opacity(0.3), radius: 1, x: 0, y: -1)
-                        .padding(
-                            EdgeInsets(
-                                top: 0,
-                                leading: geometry.size.width * 0.04,
-                                bottom: geometry.size.width * 0.01,
-                                trailing: geometry.size.width * 0.04
                             )
+                            .fontWeight(Font.Weight.bold)
+                            .foregroundColor(
+                                colorScheme == .light ? .black : .white
+                            )
+                            .padding(.vertical, geometry.size.height * 0.2)
+                            .frame(
+                                maxWidth: .infinity,
+                                maxHeight: geometry.size.height * 0.2
+                            )
+                            .background(gradient)
+                            .cornerRadius(10)
+                            .shadow(radius: 3)
+                    }
+                    .shadow(
+                        color: .offBlack.opacity(0.5),
+                        radius: 1,
+                        x: 0,
+                        y: 1
+                    )
+                    .shadow(
+                        color: .offBlack.opacity(0.3),
+                        radius: 1,
+                        x: 0,
+                        y: -1
+                    )
+                    .padding(
+                        EdgeInsets(
+                            top: 0,
+                            leading: geometry.size.width * 0.04,
+                            bottom: geometry.size.width * 0.01,
+                            trailing: geometry.size.width * 0.04
                         )
+                    )
                     
                     
                     
@@ -313,17 +360,23 @@ struct Edit_Game_View: View {
         .onAppear() {
             title = game_view_model.game.title
             old_title = game_view_model.game.title
-            let parts = game_view_model.game.sb_bb.components(separatedBy: " / ")
+            let parts = game_view_model.game.sb_bb.components(
+                separatedBy: " / "
+            )
             
             if parts.count == 2 {
                 let rawSB = parts[0]
                 let rawBB = parts[1]
                 
                 // Remove the currency symbols
-                sb = rawSB.trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
-                old_sb = rawSB.trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
-                bb = rawBB.trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
-                old_bb = rawBB.trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
+                sb = rawSB
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
+                old_sb = rawSB
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
+                bb = rawBB
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
+                old_bb = rawBB
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "$¢"))
             }
             cents = game_view_model.game.sb_bb.contains("¢")
         }
@@ -346,7 +399,11 @@ struct Edit_Game_View: View {
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(isSelected ? Color.gradientColorLeft.opacity(0.8) : Color.clear, lineWidth: 5)
+                        .stroke(
+                            isSelected ? Color.gradientColorLeft
+                                .opacity(0.8) : Color.clear,
+                            lineWidth: 5
+                        )
                 )
                 
                 Text(user.name)
@@ -362,18 +419,18 @@ struct Edit_Game_View: View {
     }
 }
     
-    struct Edit_Game_View_Previews: PreviewProvider {
-        static var previews: some View {
-            Group {
-                Edit_Game_View(selectedTab: .constant(.dashboard))
-                    .preferredColorScheme(.dark)
-                    .environmentObject(Games_View_Model())
-                    .environmentObject(Authentication_View_Model())
+struct Edit_Game_View_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            Edit_Game_View(selectedTab: .constant(.dashboard))
+                .preferredColorScheme(.dark)
+                .environmentObject(Games_View_Model())
+                .environmentObject(Authentication_View_Model())
                 
-                Edit_Game_View(selectedTab: .constant(.dashboard))
-                    .environmentObject(Games_View_Model())
-                    .environmentObject(Authentication_View_Model())
-            }
+            Edit_Game_View(selectedTab: .constant(.dashboard))
+                .environmentObject(Games_View_Model())
+                .environmentObject(Authentication_View_Model())
         }
     }
+}
 

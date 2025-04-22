@@ -7,6 +7,7 @@ struct In_Game_View: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var game_view_model: Games_View_Model
     @EnvironmentObject var auth_view_model: Authentication_View_Model
+    @EnvironmentObject var interstital_ads_manager: InterstitialAdsManager
     @Binding var selectedTab: Tabs
     
     @State private var current_user: User_Model?
@@ -36,9 +37,16 @@ struct In_Game_View: View {
                                 height: geometry.size.height * 1
                             )
                             .clipShape(
-                                RoundedRectangle(cornerRadius: geometry.size.width * 0.05)
+                                RoundedRectangle(
+                                    cornerRadius: geometry.size.width * 0.05
+                                )
                             )
-                            .shadow(color: .black.opacity(0.5), radius: 3, x: 0, y: 3)
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 3,
+                                x: 0,
+                                y: 3
+                            )
                             .offset(
                                 y: -geometry.size.height * 0.44
                             )
@@ -102,8 +110,18 @@ struct In_Game_View: View {
                         )
                         .background(.offBlack)
                         .clipShape(Capsule())
-                        .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
-                        .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1)
+                        .shadow(
+                            color: .black.opacity(0.8),
+                            radius: 1,
+                            x: 0,
+                            y: 1
+                        )
+                        .shadow(
+                            color: .black.opacity(0.9),
+                            radius: 1,
+                            x: 0,
+                            y: -1
+                        )
                     }
                     .padding(.bottom, geometry.size.height * 0.03)
                     
@@ -153,7 +171,8 @@ struct In_Game_View: View {
                                 
                                 // Item Rows
                                 ForEach(
-                                    Array(game_view_model.game.users.keys).sorted(),
+                                    Array(game_view_model.game.users.keys)
+                                        .sorted(),
                                     id: \.self
                                 ) { key in
                                     //ForEach(Array(sampleUsers.keys).sorted(), id: \.self) { key in
@@ -191,8 +210,8 @@ struct In_Game_View: View {
                                             
                                             Text(
                                                 stats.buy_out != 0.00001
-                                                        ? "$\(String(format: "%.2f", stats.buy_out))"
-                                                        : "N/A"
+                                                ? "$\(String(format: "%.2f", stats.buy_out))"
+                                                : "N/A"
                                             )
                                             .font(
                                                 .custom(
@@ -206,8 +225,8 @@ struct In_Game_View: View {
                                             
                                             Text(
                                                 stats.net != 0.00001
-                                                        ? "$\(String(format: "%.2f", stats.net))"
-                                                        : "N/A"
+                                                ? "$\(String(format: "%.2f", stats.net))"
+                                                : "N/A"
                                             )
                                             .font(
                                                 .custom(
@@ -229,7 +248,12 @@ struct In_Game_View: View {
                     .background(.offBlack)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
-                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
+                    .shadow(
+                        color: .black.opacity(0.9),
+                        radius: 1,
+                        x: 0,
+                        y: -1
+                    ) // subtle top glow
                     
                     VStack {
                         Text("Transactions")
@@ -291,8 +315,18 @@ struct In_Game_View: View {
                                     .clipShape(
                                         RoundedRectangle(cornerRadius: 4)
                                     )
-                                    .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
-                                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
+                                    .shadow(
+                                        color: .black.opacity(0.8),
+                                        radius: 1,
+                                        x: 0,
+                                        y: 1
+                                    )
+                                    .shadow(
+                                        color: .black.opacity(0.9),
+                                        radius: 1,
+                                        x: 0,
+                                        y: -1
+                                    ) // subtle top glow
                                 }
                                 .padding()
                             }
@@ -347,7 +381,12 @@ struct In_Game_View: View {
                             .fill(.offBlack)
                             .frame(height: geometry.size.height * 0.4)
                             .offset(y: geometry.size.height * 0.30)
-                            .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
+                            .shadow(
+                                color: .black.opacity(0.9),
+                                radius: 1,
+                                x: 0,
+                                y: -1
+                            ) // subtle top glow
                         
                         VStack {
                             Text("Actions")
@@ -367,6 +406,7 @@ struct In_Game_View: View {
                                 )
                             
                             Button {
+                                
                                 show_buy_in_sheet.toggle()
                                                         
                             } label:{
@@ -378,7 +418,9 @@ struct In_Game_View: View {
                                         )
                                     )
                                     .fontWeight(Font.Weight.bold)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(
+                                        colorScheme == .light ? .black : .white
+                                    )
                                     .padding()
                                     .frame(
                                         maxWidth: .infinity,
@@ -396,9 +438,18 @@ struct In_Game_View: View {
                                     trailing: geometry.size.width * 0.04
                                 )
                             )
-                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                            .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
-                            
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 1,
+                                x: 0,
+                                y: 1
+                            )
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 1,
+                                x: 0,
+                                y: -1
+                            ) // subtle top glow
                             
                             if is_host {
                                 HStack {
@@ -413,7 +464,9 @@ struct In_Game_View: View {
                                                 )
                                             )
                                             .fontWeight(Font.Weight.bold)
-                                            .foregroundColor(.white)
+                                            .foregroundColor(
+                                                colorScheme == .light ? .black : .white
+                                            )
                                             .padding()
                                             .frame(
                                                 maxWidth: .infinity,
@@ -432,8 +485,18 @@ struct In_Game_View: View {
                                             trailing: geometry.size.width * 0.01
                                         )
                                     )
-                                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
+                                    .shadow(
+                                        color: .black.opacity(0.5),
+                                        radius: 1,
+                                        x: 0,
+                                        y: 1
+                                    )
+                                    .shadow(
+                                        color: .black.opacity(0.5),
+                                        radius: 1,
+                                        x: 0,
+                                        y: -1
+                                    ) // subtle top glow
                                     
                                     
                                     
@@ -450,7 +513,9 @@ struct In_Game_View: View {
                                                 )
                                             )
                                             .fontWeight(Font.Weight.bold)
-                                            .foregroundColor(.white)
+                                            .foregroundColor(
+                                                colorScheme == .light ? .black : .white
+                                            )
                                             .padding()
                                             .frame(
                                                 maxWidth: .infinity,
@@ -468,43 +533,65 @@ struct In_Game_View: View {
                                             trailing: geometry.size.width * 0.04
                                         )
                                     )
-                                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
+                                    .shadow(
+                                        color: .black.opacity(0.5),
+                                        radius: 1,
+                                        x: 0,
+                                        y: 1
+                                    )
+                                    .shadow(
+                                        color: .black.opacity(0.5),
+                                        radius: 1,
+                                        x: 0,
+                                        y: -1
+                                    ) // subtle top glow
                                     
                                 }
                             }
                                 
-                                Button {
-                                    selectedTab = .game_summary
-                                } label:{
-                                    Text("Summary/Leave")
-                                        .font(
-                                            .custom(
-                                                "comfortaa",
-                                                size: geometry.size.width * 0.05
-                                            )
+                            Button {
+                                selectedTab = .game_summary
+                            } label:{
+                                Text("Summary/Leave")
+                                    .font(
+                                        .custom(
+                                            "comfortaa",
+                                            size: geometry.size.width * 0.05
                                         )
-                                        .fontWeight(Font.Weight.bold)
-                                        .foregroundColor(.white)
-                                        .padding()
-                                        .frame(
-                                            maxWidth: .infinity,
-                                            maxHeight: geometry.size.height * 0.2
-                                        )
-                                        .background(gradient)
-                                        .cornerRadius(10)
-                                    
-                                }
-                                .padding(
-                                    EdgeInsets(
-                                        top: 0,
-                                        leading: geometry.size.width * 0.04,
-                                        bottom: geometry.size.width * 0.01,
-                                        trailing: geometry.size.width * 0.04
                                     )
+                                    .fontWeight(Font.Weight.bold)
+                                    .foregroundColor(
+                                        colorScheme == .light ? .black : .white
+                                    )
+                                    .padding()
+                                    .frame(
+                                        maxWidth: .infinity,
+                                        maxHeight: geometry.size.height * 0.2
+                                    )
+                                    .background(gradient)
+                                    .cornerRadius(10)
+                                    
+                            }
+                            .padding(
+                                EdgeInsets(
+                                    top: 0,
+                                    leading: geometry.size.width * 0.04,
+                                    bottom: geometry.size.width * 0.01,
+                                    trailing: geometry.size.width * 0.04
                                 )
-                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                                .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
+                            )
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 1,
+                                x: 0,
+                                y: 1
+                            )
+                            .shadow(
+                                color: .black.opacity(0.5),
+                                radius: 1,
+                                x: 0,
+                                y: -1
+                            ) // subtle top glow
                                 
                             
                         }
@@ -514,7 +601,12 @@ struct In_Game_View: View {
                         
                         
                     }
-                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
+                    .shadow(
+                        color: .black.opacity(0.9),
+                        radius: 1,
+                        x: 0,
+                        y: -1
+                    ) // subtle top glow
                         
                         
                     
@@ -524,19 +616,31 @@ struct In_Game_View: View {
             }
             .background(.colorScheme)
             .edgesIgnoringSafeArea(.vertical)
+            .onChange(of: show_buy_in_sheet) { old, new in
+                if !show_buy_in_sheet && auth_view_model.user?.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        interstital_ads_manager.displayInterstitialAd()
+                    }
+                    
+                }
+            }
             .onAppear {
-                        if game_view_model.game.title == ""  {
-                            game_view_model
-                                .Fetch_Game(
-                                    gameId: game_view_model.currentGameID
-                                ) { game, _ in
-                                    if let game = game {
-                                        game_view_model.game = game
-                                        game_view_model.game.id = game_view_model.currentGameID
-                                        game_view_model
-                                            .startListening(gameId: game_view_model.currentGameID)
-                                    }
-                                }
+                if game_view_model.game.title == ""  {
+                    game_view_model
+                        .Fetch_Game(
+                            gameId: game_view_model.currentGameID
+                        ) {
+ game,
+ _ in
+                            if let game = game {
+                                game_view_model.game = game
+                                game_view_model.game.id = game_view_model.currentGameID
+                                game_view_model
+                                    .startListening(
+                                        gameId: game_view_model.currentGameID
+                                    )
+                            }
+                        }
                         
                     
                 }
@@ -559,12 +663,24 @@ struct In_Game_View: View {
                                 size: geometry.size.width * 0.04
                             )
                         )  // Dynamic font size
-                        .foregroundStyle(.white)
+                        .foregroundStyle(
+                            colorScheme == .light ? .black : .white
+                        )
                         .padding()
                         .background(gradient)
                         .clipShape(Capsule())
-                        .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                        .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
+                        .shadow(
+                            color: .black.opacity(0.5),
+                            radius: 1,
+                            x: 0,
+                            y: 1
+                        )
+                        .shadow(
+                            color: .black.opacity(0.5),
+                            radius: 1,
+                            x: 0,
+                            y: -1
+                        ) // subtle top glow
                         .transition(.move(edge: .bottom))
                         .frame(maxHeight: .infinity, alignment: .bottom)
                         .padding(.bottom, geometry.size.height * 0.05)
@@ -576,6 +692,7 @@ struct In_Game_View: View {
             Buy_in_Sheet_View()
                 .environmentObject(game_view_model)
                 .environmentObject(auth_view_model)
+                .environmentObject(interstital_ads_manager)
                 .presentationDetents([.fraction(0.35)])
                     
         }

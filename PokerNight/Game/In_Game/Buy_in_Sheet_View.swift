@@ -9,8 +9,14 @@ struct Buy_in_Sheet_View: View {
         endPoint: .topTrailing
     )
     
+    var isFormValid: Bool {
+        !amount.isEmpty
+    }
+    
     @EnvironmentObject var game_view_model: Games_View_Model
     @EnvironmentObject var auth_view_model: Authentication_View_Model
+    @EnvironmentObject var interstital_ads_manager: InterstitialAdsManager
+
     
     @Environment(\.dismiss) private var dismiss
     
@@ -63,6 +69,7 @@ struct Buy_in_Sheet_View: View {
                         )
                     
                     Button {
+                        
                         game_view_model
                             .Add_Transaction(
                                 gameId: game_view_model.currentGameID,
@@ -81,7 +88,9 @@ struct Buy_in_Sheet_View: View {
                                 user_stats: User_Stats(
                                     name: auth_view_model.user!.displayName! ,
                                     buy_in: game_view_model.game.users[Auth
-                                        .auth().currentUser!.uid]!.buy_in + Double(amount)!,
+                                        .auth().currentUser!.uid]!.buy_in + Double(
+                                            amount
+                                        )!,
                                     buy_out: game_view_model.game.users[Auth
                                         .auth().currentUser!.uid]!.buy_out,
                                     net: game_view_model.game.users[Auth
@@ -96,10 +105,11 @@ struct Buy_in_Sheet_View: View {
                                 } else {
                                     print(
                                         "User added/updated successfully!"
+                                        
                                     )
                                 }
                             }
-
+                        
                         dismiss()
                         
                     } label:{
@@ -111,7 +121,9 @@ struct Buy_in_Sheet_View: View {
                                 )
                             )
                             .fontWeight(Font.Weight.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(
+                                colorScheme == .light ? .black : .white
+                            )
                             .padding()
                             .frame(
                                 maxWidth: .infinity,
@@ -120,6 +132,7 @@ struct Buy_in_Sheet_View: View {
                             .background(gradient)
                             .cornerRadius(10)
                             .shadow(radius: 3)
+                            .opacity(isFormValid ? 1 : 0.5)
                     }
                     .padding(
                         EdgeInsets(
@@ -129,6 +142,7 @@ struct Buy_in_Sheet_View: View {
                             trailing: geometry.size.width * 0.04
                         )
                     )
+                    .disabled(!isFormValid)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -19,6 +19,10 @@ struct Buy_Out_View: View {
         endPoint: .topTrailing
     )
     
+    var isFormValid: Bool {
+        (selectedPlayerID == nil) == false && !amount.isEmpty
+    }
+    
     
     @State private var selectedPlayerID: String? = nil
     
@@ -72,15 +76,28 @@ struct Buy_Out_View: View {
                                 )
                             )
                         ScrollView(.horizontal) {
-                            LazyHGrid(rows: [GridItem(.fixed(geometry.size.width * 0.3)), GridItem(.fixed(geometry.size.width * 0.3))], spacing: 24) {
-                                ForEach(Array(game_view_model.game.users.keys).sorted(), id: \.self) { userID in
+                            LazyHGrid(
+                                rows: [
+                                    GridItem(.fixed(geometry.size.width * 0.3)),
+                                    GridItem(.fixed(geometry.size.width * 0.3))
+                                ],
+                                spacing: 24
+                            ) {
+                                ForEach(
+                                    Array(game_view_model.game.users.keys)
+                                        .sorted(),
+                                    id: \.self
+                                ) { userID in
                                     //ForEach(Array(users.keys).sorted(), id: \.self) { userID in
                                     if let user = game_view_model.game.users[userID] {
                                         //if let user = users[userID] {
-                                        PlayerCard(user: user, isSelected: selectedPlayerID == userID)
-                                            .onTapGesture {
-                                                selectedPlayerID = userID
-                                            }
+                                        PlayerCard(
+                                            user: user,
+                                            isSelected: selectedPlayerID == userID
+                                        )
+                                        .onTapGesture {
+                                            selectedPlayerID = userID
+                                        }
                                     }
                                 }
                             }
@@ -125,7 +142,8 @@ struct Buy_Out_View: View {
                             .Add_Transaction(
                                 gameId: game_view_model.currentGameID,
                                 user_id: selectedPlayerID!,
-                                display_name: game_view_model.game.users[selectedPlayerID!]!.name,
+                                display_name: game_view_model.game
+                                    .users[selectedPlayerID!]!.name,
                                 type: "Buy Out: ",
                                 amount: Double(amount)
                             ) {_ in
@@ -136,11 +154,15 @@ struct Buy_Out_View: View {
                                 gameId: game_view_model.game.id ?? " ",
                                 user_id: selectedPlayerID!,
                                 user_stats: User_Stats(
-                                    name: game_view_model.game.users[selectedPlayerID!]!.name ,
-                                    buy_in: game_view_model.game.users[selectedPlayerID!]!.buy_in,
+                                    name: game_view_model.game
+                                        .users[selectedPlayerID!]!.name ,
+                                    buy_in: game_view_model.game
+                                        .users[selectedPlayerID!]!.buy_in,
                                     buy_out: Double(amount)!,
-                                    net: Double(amount)! - game_view_model.game.users[selectedPlayerID!]!.buy_in,
-                                    photo_url: game_view_model.game.users[selectedPlayerID!]?.photo_url ?? ""
+                                    net: Double(amount)! - game_view_model.game
+                                        .users[selectedPlayerID!]!.buy_in,
+                                    photo_url: game_view_model.game
+                                        .users[selectedPlayerID!]?.photo_url ?? ""
                                 )
                             ){ error in
                                 if let error = error {
@@ -164,7 +186,9 @@ struct Buy_Out_View: View {
                                 )
                             )
                             .fontWeight(Font.Weight.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(
+                                colorScheme == .light ? .black : .white
+                            )
                             .padding()
                             .frame(
                                 maxWidth: .infinity,
@@ -173,6 +197,8 @@ struct Buy_Out_View: View {
                             .background(gradient)
                             .cornerRadius(10)
                             .shadow(radius: 3)
+                            .opacity(isFormValid ? 1 : 0.5)
+                        
                     }
                     .padding(
                         EdgeInsets(
@@ -182,6 +208,7 @@ struct Buy_Out_View: View {
                             trailing: geometry.size.width * 0.04
                         )
                     )
+                    .disabled(!isFormValid)
                     
                     
                     
@@ -215,7 +242,11 @@ struct Buy_Out_View: View {
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(isSelected ? Color.gradientColorLeft.opacity(0.8) : Color.clear, lineWidth: 5)
+                        .stroke(
+                            isSelected ? Color.gradientColorLeft
+                                .opacity(0.8) : Color.clear,
+                            lineWidth: 5
+                        )
                 )
                 
                 Text(user.name)

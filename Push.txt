@@ -1,10 +1,10 @@
-Title: Completed: Dashboard View + Logic, Fetch/Aggregrate Past Game Stats
+Title: Completed: Ads, Random Fixes
 
 Description:
 
-Tasks Completed: Fixed Query Net Calculations, Fetch/Aggregrate Past Game Stats, Dashboard View + Logic,
+Tasks Completed: Ads, Button Disable, Lightmode Adjusting, Code Formatting, Random Fixes'
 
-Tasks In Progress: Ads
+Tasks In Progress:
 
 
 

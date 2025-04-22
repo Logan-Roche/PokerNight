@@ -166,13 +166,27 @@ class Authentication_View_Model: ObservableObject {
     }
     
     
-    func uploadProfileImage(image: UIImage, userId: String, completion: @escaping (Result<String, Error>) -> Void) {
+    func uploadProfileImage(
+        image: UIImage,
+        userId: String,
+        completion: @escaping (Result<String, Error>) -> Void
+    ) {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-            completion(.failure(NSError(domain: "ImageConversion", code: -1, userInfo: [NSLocalizedDescriptionKey: "Image conversion failed."])))
+            completion(
+                .failure(
+                    NSError(
+                        domain: "ImageConversion",
+                        code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "Image conversion failed."]
+                    )
+                )
+            )
             return
         }
         
-        let storageRef = Storage.storage().reference().child("Profile Photos/\(userId).jpg")
+        let storageRef = Storage.storage().reference().child(
+            "Profile Photos/\(userId).jpg"
+        )
         
         storageRef.putData(imageData, metadata: nil) { metadata, error in
             if let error = error {
@@ -210,7 +224,9 @@ class Authentication_View_Model: ObservableObject {
             changeRequest.photoURL = URL(string: imageURL)
             changeRequest.commitChanges { error in
                 if let error = error {
-                    print("Failed to update photoURL in Auth: \(error.localizedDescription)")
+                    print(
+                        "Failed to update photoURL in Auth: \(error.localizedDescription)"
+                    )
                 } else {
                     print("Auth photoURL updated successfully")
                 }
@@ -224,7 +240,10 @@ class Authentication_View_Model: ObservableObject {
         uploadProfileImage(image: image, userId: user.uid) { result in
             switch result {
             case .success(let imageUrlString):
-                self.updateUserProfilePic(uid: user.uid, imageURL: imageUrlString)
+                self.updateUserProfilePic(
+                    uid: user.uid,
+                    imageURL: imageUrlString
+                )
                 
                 // ✅ Update in-memory user model with converted URL
                 DispatchQueue.main.async {

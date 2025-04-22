@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		34153CA02DB70F5D0050A765 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 34153C9F2DB70F5D0050A765 /* GoogleMobileAds */; };
 		34577D082D6C47720013F2C1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 34577D072D6C47720013F2C1 /* FirebaseAnalytics */; };
 		34577D0A2D6C47720013F2C1 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = 34577D092D6C47720013F2C1 /* FirebaseAnalyticsOnDeviceConversion */; };
 		34577D0C2D6C47720013F2C1 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 34577D0B2D6C47720013F2C1 /* FirebaseAppCheck */; };
@@ -122,6 +123,7 @@
 				34577D222D6C47720013F2C1 /* FirebaseStorage in Frameworks */,
 				34577D142D6C47720013F2C1 /* FirebaseDatabase in Frameworks */,
 				34577D0E2D6C47720013F2C1 /* FirebaseAuth in Frameworks */,
+				34153CA02DB70F5D0050A765 /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,6 +199,7 @@
 				34577D212D6C47720013F2C1 /* FirebaseStorage */,
 				34C22C072D77A8F300EDACBF /* GoogleSignIn */,
 				34C22C092D77A8F300EDACBF /* GoogleSignInSwift */,
+				34153C9F2DB70F5D0050A765 /* GoogleMobileAds */,
 			);
 			productName = PokerNight;
 			productReference = 34577CD62D6C3B1B0013F2C1 /* PokerNight.app */;
@@ -216,8 +219,6 @@
 				34577CE92D6C3B1D0013F2C1 /* PBXTargetDependency */,
 			);
 			name = PokerNightTests;
-			packageProductDependencies = (
-			);
 			productName = PokerNightTests;
 			productReference = 34577CE72D6C3B1D0013F2C1 /* PokerNightTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -236,8 +237,6 @@
 				34577CF32D6C3B1D0013F2C1 /* PBXTargetDependency */,
 			);
 			name = PokerNightUITests;
-			packageProductDependencies = (
-			);
 			productName = PokerNightUITests;
 			productReference = 34577CF12D6C3B1D0013F2C1 /* PokerNightUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -277,6 +276,7 @@
 			packageReferences = (
 				34577D062D6C40AA0013F2C1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				34C22C062D77A8F300EDACBF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				34153C9E2DB70F5D0050A765 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 34577CD72D6C3B1B0013F2C1 /* Products */;
@@ -478,6 +478,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"PokerNight/Preview Content\"";
 				DEVELOPMENT_TEAM = V6FY7GRAS6;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PokerNight/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PokerNight;
@@ -520,6 +521,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"PokerNight/Preview Content\"";
 				DEVELOPMENT_TEAM = V6FY7GRAS6;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PokerNight/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PokerNight;
@@ -679,6 +681,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		34153C9E2DB70F5D0050A765 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.3.0;
+			};
+		};
 		34577D062D6C40AA0013F2C1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -698,6 +708,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		34153C9F2DB70F5D0050A765 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 34153C9E2DB70F5D0050A765 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
 		34577D072D6C47720013F2C1 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 34577D062D6C40AA0013F2C1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

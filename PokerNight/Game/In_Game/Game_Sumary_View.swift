@@ -1,10 +1,3 @@
-//
-//  Game_Sumary_View.swift
-//  PokerNight
-//
-//  Created by Logan Roche on 4/15/25.
-//
-
 import SwiftUI
 
 struct Game_Sumary_View: View {
@@ -12,6 +5,7 @@ struct Game_Sumary_View: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var game_view_model: Games_View_Model
     @EnvironmentObject var auth_view_model: Authentication_View_Model
+    @EnvironmentObject var interstital_ads_manager: InterstitialAdsManager
     @Binding var selectedTab: Tabs
     
     @State var total_buy_in = 0.0
@@ -30,6 +24,13 @@ struct Game_Sumary_View: View {
         GridItem(.flexible())
     ]
     
+    var isFormValid: Bool {
+        !game_view_model.game.users.values
+            .contains(where: { $0.buy_out == 0.00001 })
+    }
+
+    
+    
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
@@ -40,7 +41,9 @@ struct Game_Sumary_View: View {
                             height: geometry.size.height * 1
                         )
                         .clipShape(
-                            RoundedRectangle(cornerRadius: geometry.size.width * 0.05)
+                            RoundedRectangle(
+                                cornerRadius: geometry.size.width * 0.05
+                            )
                         )
                         .shadow(radius: 5)
                         .offset(
@@ -63,11 +66,26 @@ struct Game_Sumary_View: View {
                 .padding(.bottom, geometry.size.height * 0.06)
                 
                 VStack {
-                    LazyVGrid(columns: columns, spacing: geometry.size.width * 0.5) {
-                        StatCard(title: "TOTAL BUY-IN", value: "\(total_buy_in < 0 ? "-" : "")$\(String(format: "%.2f", abs(total_buy_in)))")
-                        StatCard(title: "TOTAL BUY-OUT", value: "\(total_buy_out < 0 ? "-" : "")$\(String(format: "%.2f", abs(total_buy_out)))")
-                        StatCard(title: "CHIP ERROR", value:"\(chip_error < 0 ? "-" : "")$\(String(format: "%.2f", abs(chip_error)))")
-                        StatCard(title: "CHIP ERROR DIVIDED", value: "\(chip_error_divided < 0 ? "-" : "")$\(String(format: "%.2f", abs(chip_error_divided)))")
+                    LazyVGrid(
+                        columns: columns,
+                        spacing: geometry.size.width * 0.5
+                    ) {
+                        StatCard(
+                            title: "TOTAL BUY-IN",
+                            value: "\(total_buy_in < 0 ? "-" : "")$\(String(format: "%.2f", abs(total_buy_in)))"
+                        )
+                        StatCard(
+                            title: "TOTAL BUY-OUT",
+                            value: "\(total_buy_out < 0 ? "-" : "")$\(String(format: "%.2f", abs(total_buy_out)))"
+                        )
+                        StatCard(
+                            title: "CHIP ERROR",
+                            value:"\(chip_error < 0 ? "-" : "")$\(String(format: "%.2f", abs(chip_error)))"
+                        )
+                        StatCard(
+                            title: "CHIP ERROR DIVIDED",
+                            value: "\(chip_error_divided < 0 ? "-" : "")$\(String(format: "%.2f", abs(chip_error_divided)))"
+                        )
                     }
                     .padding()
                     .padding(.bottom, geometry.size.height * 0.24)
@@ -116,7 +134,8 @@ struct Game_Sumary_View: View {
                                 
                                 // Item Rows
                                 ForEach(
-                                    Array(game_view_model.game.users.keys).sorted(),
+                                    Array(game_view_model.game.users.keys)
+                                        .sorted(),
                                     id: \.self
                                 ) { key in
                                     //ForEach(Array(sampleUsers.keys).sorted(), id: \.self) { key in
@@ -140,8 +159,11 @@ struct Game_Sumary_View: View {
                                             .padding(.vertical, 10)
                                             
                                             Text(
-                                                "$\(stats.buy_out,specifier: "%.2f")"
+                                                stats.buy_out == 0.00001
+                                                ? "N/A"
+                                                : "\((stats.buy_out < 0 ? "-" : ""))$\(String(format: "%.2f", abs(stats.buy_out)))"
                                             )
+
                                             .font(
                                                 .custom(
                                                     "comfortaa",
@@ -153,8 +175,11 @@ struct Game_Sumary_View: View {
                                             )
                                             
                                             
-                                            Text("\(((stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out) < 0 ? "-" : ""))$\(String(format: "%.2f", abs(stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out)))")
-
+                                            Text(
+                                                stats.buy_out == 0.00001
+                                                ? "N/A"
+                                                : "\(((stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out) < 0 ? "-" : ""))$\(String(format: "%.2f", abs(stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out)))"
+                                            )
                                             .font(
                                                 .custom(
                                                     "comfortaa",
@@ -175,44 +200,137 @@ struct Game_Sumary_View: View {
                     .background(.offBlack)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
-                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
+                    .shadow(
+                        color: .black.opacity(0.9),
+                        radius: 1,
+                        x: 0,
+                        y: -1
+                    ) // subtle top glow
                     
-                    Button {
-                    
-                        game_view_model.fetchAndCalculateUserStats(for: auth_view_model.user!.uid)
-                        game_view_model.Leave_Game(userId: auth_view_model.user!.uid, chip_error_divided: chip_error_divided)
-                        selectedTab = .dashboard
+                    if auth_view_model.user!.uid == game_view_model.game.host_id {
+                        Button {
+                            if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" {
+                                interstital_ads_manager.displayInterstitialAd()
+                            }
                         
-                                                
-                    } label:{
-                        Text("Leave Game")
-                            .font(
-                                .custom(
-                                    "comfortaa",
-                                    size: geometry.size.width * 0.05
+                            game_view_model
+                                .fetchAndCalculateUserStats(
+                                    for: auth_view_model.user!.uid
                                 )
+                            game_view_model
+                                .Leave_Game(
+                                    userId: auth_view_model.user!.uid,
+                                    chip_error_divided: chip_error_divided
+                                )
+                            selectedTab = .dashboard
+                            
+                                                    
+                        } label:{
+                            Text("Leave Game")
+                                .font(
+                                    .custom(
+                                        "comfortaa",
+                                        size: geometry.size.width * 0.05
+                                    )
+                                )
+                                .fontWeight(Font.Weight.bold)
+                                .foregroundColor(
+                                    colorScheme == .light ? .black : .white
+                                )
+                                .padding()
+                                .frame(
+                                    maxWidth: .infinity,
+                                    maxHeight: geometry.size.height * 0.2
+                                )
+                                .background(gradient)
+                                .cornerRadius(10)
+                                .shadow(radius: 3)
+                                .opacity(isFormValid ? 1 : 0.5)
+                        }
+                        .padding(
+                            EdgeInsets(
+                                top: geometry.size.width * 0.04,
+                                leading: geometry.size.width * 0.04,
+                                bottom: geometry.size.width * 0.01,
+                                trailing: geometry.size.width * 0.04
                             )
-                            .fontWeight(Font.Weight.bold)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(
-                                maxWidth: .infinity,
-                                maxHeight: geometry.size.height * 0.2
-                            )
-                            .background(gradient)
-                            .cornerRadius(10)
-                            .shadow(radius: 3)
-                    }
-                    .padding(
-                        EdgeInsets(
-                            top: geometry.size.width * 0.04,
-                            leading: geometry.size.width * 0.04,
-                            bottom: geometry.size.width * 0.01,
-                            trailing: geometry.size.width * 0.04
                         )
-                    )
-                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
-                    .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: -1) // subtle top glow
+                        .shadow(
+                            color: .black.opacity(0.5),
+                            radius: 1,
+                            x: 0,
+                            y: 1
+                        )
+                        .shadow(
+                            color: .black.opacity(0.5),
+                            radius: 1,
+                            x: 0,
+                            y: -1
+                        ) // subtle top glow
+                        .disabled(!isFormValid)
+                    }
+                    else {
+                        Button {
+                            if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" {
+                                interstital_ads_manager.displayInterstitialAd()
+                            }
+                        
+                            game_view_model
+                                .fetchAndCalculateUserStats(
+                                    for: auth_view_model.user!.uid
+                                )
+                            game_view_model
+                                .Leave_Game(
+                                    userId: auth_view_model.user!.uid,
+                                    chip_error_divided: chip_error_divided
+                                )
+                            selectedTab = .dashboard
+                            
+                                                    
+                        } label:{
+                            Text("Leave Game")
+                                .font(
+                                    .custom(
+                                        "comfortaa",
+                                        size: geometry.size.width * 0.05
+                                    )
+                                )
+                                .fontWeight(Font.Weight.bold)
+                                .foregroundColor(
+                                    colorScheme == .light ? .black : .white
+                                )
+                                .padding()
+                                .frame(
+                                    maxWidth: .infinity,
+                                    maxHeight: geometry.size.height * 0.2
+                                )
+                                .background(gradient)
+                                .cornerRadius(10)
+                                .shadow(radius: 3)
+                        }
+                        .padding(
+                            EdgeInsets(
+                                top: geometry.size.width * 0.04,
+                                leading: geometry.size.width * 0.04,
+                                bottom: geometry.size.width * 0.01,
+                                trailing: geometry.size.width * 0.04
+                            )
+                        )
+                        .shadow(
+                            color: .black.opacity(0.5),
+                            radius: 1,
+                            x: 0,
+                            y: 1
+                        )
+                        .shadow(
+                            color: .black.opacity(0.5),
+                            radius: 1,
+                            x: 0,
+                            y: -1
+                        ) // subtle top glow
+                        
+                    }
+                    
 
                     
                 }
@@ -221,72 +339,91 @@ struct Game_Sumary_View: View {
         }
         .background(.colorScheme)
         .onAppear() {
-            total_buy_in = game_view_model.game.users.values.reduce(0.0) { partialSum, userStats in
-                partialSum + userStats.buy_in
-            }
-            total_buy_out = game_view_model.game.users.values.reduce(0.0) { partialSum, userStats in
-                partialSum + userStats.buy_out
-            }
+            total_buy_in = game_view_model.game.users.values
+                .reduce(0.0) { partialSum, userStats in
+                    partialSum + userStats.buy_in
+                }
+            total_buy_out = game_view_model.game.users.values
+                .reduce(0.0) { partialSum, userStats in
+                    partialSum + userStats.buy_out
+                }
             chip_error = total_buy_in - total_buy_out
-            chip_error_divided = chip_error / (Double(game_view_model.game.users.values.filter { $0.buy_out > 0.001 }.count) != 0 ? Double(game_view_model.game.users.values.filter { $0.buy_out > 0.001 }.count) : 1.0)
+            chip_error_divided = chip_error / (
+                Double(game_view_model.game.users.values.filter { $0.buy_out > 0.001 }.count) != 0 ? Double(
+                    game_view_model.game.users.values
+                        .filter { $0.buy_out > 0.001
+                        }.count) : 1.0
+            )
             
             
         }
     }
 }
     
-    struct StatCard: View {
-        var title: String
-        var value: String
+struct StatCard: View {
         
-        var body: some View {
-            GeometryReader { geometry in
-                VStack(spacing: 8) {
-                    Text(title)
-                        .font(
-                            .custom(
-                                "comfortaa",
-                                size: geometry.size.width * 0.07
-                            )
+    var title: String
+    @Environment(\.colorScheme) var colorScheme
+    var value: String
+        
+    var body: some View {
+        GeometryReader { geometry in
+            VStack(spacing: 8) {
+                Text(title)
+                    .font(
+                        .custom(
+                            "comfortaa",
+                            size: geometry.size.width * 0.07
                         )
-                        .foregroundColor(.white.opacity(0.7))
-                        .multilineTextAlignment(.center)
+                    )
+                    .foregroundStyle(colorScheme == .light ? .black : .white)
+                    .multilineTextAlignment(.center)
                     
-                    Text(value)
-                        .font(
-                            .custom(
-                                "comfortaa",
-                                size: geometry.size.width * 0.2
-                            )
+                Text(value)
+                    .font(
+                        .custom(
+                            "comfortaa",
+                            size: geometry.size.width * 0.2
                         )
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .padding(.top, geometry.size.width * 0.17)
+                    )
+                    .fontWeight(.semibold)
+                    .foregroundStyle(colorScheme == .light ? .black : .white)
+                    .padding(.top, geometry.size.width * 0.17)
                     
-                    Spacer()
-                }
-                .padding()
-                .frame(minWidth: geometry.size.width * 0.95, minHeight: geometry.size.width * 0.95)
-                .background(Color(.offBlack))
-                .clipShape(RoundedRectangle(cornerRadius: geometry.size.width * 0.05))
-                .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 4)
-                .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
+                Spacer()
             }
+            .padding()
+            .frame(
+                minWidth: geometry.size.width * 0.95,
+                minHeight: geometry.size.width * 0.95
+            )
+            .background(Color(.offBlack))
+            .clipShape(
+                RoundedRectangle(cornerRadius: geometry.size.width * 0.05)
+            )
+            .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 4)
+            .shadow(
+                color: .black.opacity(0.9),
+                radius: 1,
+                x: 0,
+                y: -1
+            ) // subtle top glow
         }
     }
+}
     
-    struct Game_Sumary_ViewPreviews: PreviewProvider {
-        static var previews: some View {
-            Group {
-                Game_Sumary_View(selectedTab: .constant(.dashboard))
-                    .environmentObject(Games_View_Model())
-                    .environmentObject(Authentication_View_Model())
-                    .preferredColorScheme(.dark)
+struct Game_Sumary_ViewPreviews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            Game_Sumary_View(selectedTab: .constant(.dashboard))
+                .environmentObject(Games_View_Model())
+                .environmentObject(Authentication_View_Model())
+                .preferredColorScheme(.dark)
                 
-                Game_Sumary_View(selectedTab: .constant(.dashboard))
-                    .environmentObject(Games_View_Model())
-                    .environmentObject(Authentication_View_Model())
-            }
+            Game_Sumary_View(selectedTab: .constant(.dashboard))
+                .environmentObject(Games_View_Model())
+                .environmentObject(Authentication_View_Model())
         }
     }
+}
 

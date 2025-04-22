@@ -34,34 +34,63 @@ struct Single_Game_View: View {
                             height: geometry.size.height * 1
                         )
                         .clipShape(
-                            RoundedRectangle(cornerRadius: geometry.size.width * 0.05)
+                            RoundedRectangle(
+                                cornerRadius: geometry.size.width * 0.05
+                            )
                         )
                         .shadow(radius: 5)
                         .offset(
                             y: -geometry.size.height * 0.45
                         )
-                    
-                    Text(selected_game.title)
-                        .foregroundStyle(
-                            colorScheme == .light ? .black : .white
-                        )
-                        .font(
-                            .custom(
-                                "comfortaa",
-                                size: geometry.size.width * 0.08
+                    VStack {
+                        HStack {
+                            Image(systemName: "arrow.backward")
+                                .frame(width: geometry.size.width * 0.13)
+                                .font(.system(size: geometry.size.width * 0.06))
+                                .onTapGesture {pGesture in
+                                    selectedTab = .all_game_view
+                                }
+                            Spacer()
+                        }
+                        Text(selected_game.title)
+                            .foregroundStyle(
+                                colorScheme == .light ? .black : .white
                             )
-                        )
-                        .padding(.top, geometry.size.height * 0.01)
+                            .font(
+                                .custom(
+                                    "comfortaa",
+                                    size: geometry.size.width * 0.08
+                                )
+                            )
+                            .offset(y: -geometry.size.height * 0.01)
+                            
+                    }
+                    
                 }
                 .frame(maxHeight: geometry.size.height * 0.05)
                 .padding(.bottom, geometry.size.height * 0.06)
                 
                 VStack {
-                    LazyVGrid(columns: columns, spacing: geometry.size.width * 0.5) {
-                        StatCard(title: "TOTAL BUY-IN", value: "\(total_buy_in < 0 ? "-" : "")$\(String(format: "%.2f", abs(total_buy_in)))")
-                        StatCard(title: "TOTAL BUY-OUT", value: "\(total_buy_out < 0 ? "-" : "")$\(String(format: "%.2f", abs(total_buy_out)))")
-                        StatCard(title: "CHIP ERROR", value:"\(chip_error < 0 ? "-" : "")$\(String(format: "%.2f", abs(chip_error)))")
-                        StatCard(title: "CHIP ERROR DIVIDED", value: "\(chip_error_divided < 0 ? "-" : "")$\(String(format: "%.2f", abs(chip_error_divided)))")
+                    LazyVGrid(
+                        columns: columns,
+                        spacing: geometry.size.width * 0.5
+                    ) {
+                        StatCard(
+                            title: "TOTAL BUY-IN",
+                            value: "\(total_buy_in < 0 ? "-" : "")$\(String(format: "%.2f", abs(total_buy_in)))"
+                        )
+                        StatCard(
+                            title: "TOTAL BUY-OUT",
+                            value: "\(total_buy_out < 0 ? "-" : "")$\(String(format: "%.2f", abs(total_buy_out)))"
+                        )
+                        StatCard(
+                            title: "CHIP ERROR",
+                            value:"\(chip_error < 0 ? "-" : "")$\(String(format: "%.2f", abs(chip_error)))"
+                        )
+                        StatCard(
+                            title: "CHIP ERROR DIVIDED",
+                            value: "\(chip_error_divided < 0 ? "-" : "")$\(String(format: "%.2f", abs(chip_error_divided)))"
+                        )
                     }
                     .padding()
                     .padding(.bottom, geometry.size.height * 0.24)
@@ -147,7 +176,9 @@ struct Single_Game_View: View {
                                             )
                                             
                                             
-                                            Text("\(((stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out) < 0 ? "-" : ""))$\(String(format: "%.2f", abs(stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out)))")
+                                            Text(
+                                                "\(((stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out) < 0 ? "-" : ""))$\(String(format: "%.2f", abs(stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out)))"
+                                            )
 
                                             .font(
                                                 .custom(
@@ -169,7 +200,12 @@ struct Single_Game_View: View {
                     .background(.offBlack)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
-                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
+                    .shadow(
+                        color: .black.opacity(0.9),
+                        radius: 1,
+                        x: 0,
+                        y: -1
+                    ) // subtle top glow
                     
                     VStack {
                         Text("Transactions")
@@ -187,7 +223,10 @@ struct Single_Game_View: View {
                                     columns: [GridItem(alignment:.leading) ],
                                     spacing: 10
                                 ) {
-                                    ForEach(selected_game.transactions.indices, id: \.self) { index in
+                                    ForEach(
+                                        selected_game.transactions.indices,
+                                        id: \.self
+                                    ) { index in
                                         let transaction = selected_game.transactions[index]
                                         HStack {
                                             Text(
@@ -229,8 +268,18 @@ struct Single_Game_View: View {
                                     .clipShape(
                                         RoundedRectangle(cornerRadius: 4)
                                     )
-                                    .shadow(color: .black.opacity(0.8), radius: 1, x: 0, y: 1)
-                                    .shadow(color: .black.opacity(0.9), radius: 1, x: 0, y: -1) // subtle top glow
+                                    .shadow(
+                                        color: .black.opacity(0.8),
+                                        radius: 1,
+                                        x: 0,
+                                        y: 1
+                                    )
+                                    .shadow(
+                                        color: .black.opacity(0.9),
+                                        radius: 1,
+                                        x: 0,
+                                        y: -1
+                                    ) // subtle top glow
                                 }
                                 .padding()
                             }
@@ -284,14 +333,20 @@ struct Single_Game_View: View {
         }
         .background(.colorScheme)
         .onAppear() {
-            total_buy_in = selected_game.users.values.reduce(0.0) { partialSum, userStats in
-                partialSum + userStats.buy_in
-            }
-            total_buy_out = selected_game.users.values.reduce(0.0) { partialSum, userStats in
-                partialSum + userStats.buy_out
-            }
+            total_buy_in = selected_game.users.values
+                .reduce(0.0) { partialSum, userStats in
+                    partialSum + userStats.buy_in
+                }
+            total_buy_out = selected_game.users.values
+                .reduce(0.0) { partialSum, userStats in
+                    partialSum + userStats.buy_out
+                }
             chip_error = total_buy_in - total_buy_out
-            chip_error_divided = chip_error / (Double(selected_game.users.values.filter { $0.buy_out > 0.001 }.count) != 0 ? Double(selected_game.users.values.filter { $0.buy_out > 0.001 }.count) : 1.0)
+            chip_error_divided = chip_error / (
+                Double(selected_game.users.values.filter { $0.buy_out > 0.001 }.count) != 0 ? Double(
+                    selected_game.users.values.filter { $0.buy_out > 0.001
+                    }.count) : 1.0
+            )
             
             
         }
@@ -302,13 +357,41 @@ struct Single_Game_View: View {
 struct Single_Game_View_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            Single_Game_View(selectedTab: .constant(.buy_out), selected_game: .constant(Game(date: Date(), title: "hello", host_id: "", sb_bb: "", is_active: false, chip_error_divided: 0.0, users: [:])))
-                .environmentObject(Authentication_View_Model())
-                .environmentObject(Games_View_Model())
-                .preferredColorScheme(.dark)
-            Single_Game_View(selectedTab: .constant(.buy_out), selected_game: .constant(Game(date: Date(), title: "", host_id: "", sb_bb: "", is_active: false, chip_error_divided: 0.0, users: [:])))
-                .environmentObject(Authentication_View_Model())
-                .environmentObject(Games_View_Model())
+            Single_Game_View(
+                selectedTab: .constant(.buy_out),
+                selected_game: 
+                        .constant(
+                            Game(
+                                date: Date(),
+                                title: "hello",
+                                host_id: "",
+                                sb_bb: "",
+                                is_active: false,
+                                chip_error_divided: 0.0,
+                                users: [:]
+                            )
+                        )
+            )
+            .environmentObject(Authentication_View_Model())
+            .environmentObject(Games_View_Model())
+            .preferredColorScheme(.dark)
+            Single_Game_View(
+                selectedTab: .constant(.buy_out),
+                selected_game: 
+                        .constant(
+                            Game(
+                                date: Date(),
+                                title: "",
+                                host_id: "",
+                                sb_bb: "",
+                                is_active: false,
+                                chip_error_divided: 0.0,
+                                users: [:]
+                            )
+                        )
+            )
+            .environmentObject(Authentication_View_Model())
+            .environmentObject(Games_View_Model())
         }
     }
 }
