@@ -346,7 +346,8 @@ struct Dashboard_View: View {
                                     trailing: 0
                                 )
                             )
-                        if let last_game = game_view_model.games.last {
+                        if let last_game = game_view_model.games.sorted(by: { $0.date < $1.date }).last {
+                            
                             ScrollView(.horizontal) {
                                 LazyHGrid(
                                     rows: [
@@ -363,6 +364,7 @@ struct Dashboard_View: View {
                                         Array(last_game.users.keys).sorted(),
                                         id: \.self
                                     ) { userID in
+                                        
                                         if let user = last_game.users[userID] {
                                             if userID != auth_view_model.user!.uid {
                                                 PlayerCard(user: user)
