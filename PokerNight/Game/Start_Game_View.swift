@@ -172,7 +172,7 @@ struct Start_Game_View: View {
                     game_view_model.game.title = title
                     game_view_model.game.date = Date()
     
-                    if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" {
+                    if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" && auth_view_model.isTrackingAccessAvailable(){
                         interstital_ads_manager.displayInterstitialAd()
                     }
                 
@@ -206,7 +206,7 @@ struct Start_Game_View: View {
                                                 user_id: Auth
                                                     .auth().currentUser!.uid,
                                                 user_stats: User_Stats(
-                                                    name: auth_view_model.user!.displayName! ,
+                                                    name: auth_view_model.user!.displayName ?? "Unknown" ,
                                                     buy_in: 0,
                                                     buy_out: 0.00001,
                                                     net: 0.00001,

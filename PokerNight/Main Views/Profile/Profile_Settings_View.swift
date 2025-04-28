@@ -9,6 +9,7 @@ struct Profile_Settings_View: View {
     @EnvironmentObject var auth_view_model: Authentication_View_Model
     @Environment(\.colorScheme) var colorScheme
     @Binding var selectedTab: Tabs
+    @State private var show_confirmation_sheet: Bool = false
     
     @State private var selectedItem: PhotosPickerItem?
     @State private var selectedImage: UIImage?
@@ -40,21 +41,21 @@ struct Profile_Settings_View: View {
                     .background(
                         RoundedRectangle(cornerRadius: 12)
                             .fill(
-LinearGradient(
-    colors: [
-        .gradientColorLeft,
-        .gradientColorRight
-    ],
-    startPoint: .topLeading,
-    endPoint: .bottomTrailing
-)
+                                LinearGradient(
+                                    colors: [
+                                        .gradientColorLeft,
+                                        .gradientColorRight
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
                     )
                     .shadow(radius: 3)
                 }
                 .onChange(of: selectedItem) {
- oldItem,
- newItem in
+                    oldItem,
+                    newItem in
                     Task {
                         if let data = try? await newItem?.loadTransferable(
                             type: Data.self
@@ -64,11 +65,24 @@ LinearGradient(
                             auth_view_model
                                 .uploadAndSaveProfilePhoto(image: image)
                         }
+                        selectedTab = .dashboard
                     }
                 }
 
                 Button("Log Out"){
+                    
+                    game_view_model.saveLocalGames([])
+                    game_view_model.games = []
                     auth_view_model.Sign_Out()
+                    
+                }
+                .padding()
+                .buttonStyle(.bordered)
+                .tint(.yellow)
+                
+                Button("Delete Account"){
+                    show_confirmation_sheet.toggle()
+                    
                 }
                 .padding()
                 .buttonStyle(.bordered)
@@ -78,6 +92,12 @@ LinearGradient(
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.colorScheme)
+        }
+        .sheet(isPresented: $show_confirmation_sheet) {
+            Account_Deletion_Confirmation_View()
+                .environmentObject(auth_view_model)
+                .presentationDetents([.fraction(0.35)])
+                    
         }
     }
 }

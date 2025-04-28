@@ -65,6 +65,9 @@ struct All_Games_View: View {
                         game_view_model.games.sorted(by: { $0.date > $1.date })
                     ) { game in
                         if let userStats = game.users[auth_view_model.user!.uid] {
+                            if game.is_active == false {
+                            
+                            
                             //if let userStats = game.users["user123"] {
                             VStack(
                                 alignment: .leading,
@@ -80,8 +83,8 @@ struct All_Games_View: View {
                                     .foregroundStyle(
                                         Color.gray
                                     )
-                                                
-                                                
+                                
+                                
                                 Text(game.title)
                                     .font(
                                         .custom(
@@ -92,9 +95,9 @@ struct All_Games_View: View {
                                     .foregroundStyle(
                                         colorScheme == .light ? .black : .white
                                     )
-                                                
-                                                    
-                                                
+                                
+                                
+                                
                                 HStack {
                                     VStack {
                                         Text("Date:              ")
@@ -140,7 +143,8 @@ struct All_Games_View: View {
                                             )
                                         
                                         Text(
-                                            "\(userStats.net + game.chip_error_divided >= 0 ? "+" : "-")$\(String(format: "%.0f", abs(userStats.net + game.chip_error_divided)))"
+                                            //                                            "\(userStats.net + game.chip_error_divided >= 0 ? "+" : "-")$\(String(format: "%.0f", abs(userStats.net + game.chip_error_divided)))"
+                                            "\(((userStats.buy_out == 0 ? userStats.net : userStats.net + game.chip_error_divided) < 0 ? "-" : ""))$\(String(format: "%.2f", abs(userStats.buy_out == 0 ? userStats.net : userStats.net + game.chip_error_divided)))"
                                         )
                                         .font(
                                             .custom(
@@ -158,7 +162,7 @@ struct All_Games_View: View {
                                     )
                                     
                                 }
-
+                                
                                 Text("Sb / Bb: ")
                                     .font(
                                         .custom(
@@ -179,7 +183,7 @@ struct All_Games_View: View {
                                     .foregroundStyle(
                                         colorScheme == .light ? .black : .white
                                     )
-                                                
+                                
                             }
                             .padding()
                             .background(.offBlack)
@@ -188,6 +192,7 @@ struct All_Games_View: View {
                                 selected_game = game
                                 selectedTab = .single_game_view
                             }
+                        }
                         }
                             
                     }

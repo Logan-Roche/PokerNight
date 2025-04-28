@@ -4,6 +4,9 @@ import FirebaseCore
 import FirebaseFirestore
 import FirebaseStorage
 
+import AppTrackingTransparency
+import AdSupport
+
 // For Sign in with Apple
 import AuthenticationServices
 import CryptoKit
@@ -60,6 +63,40 @@ class Authentication_View_Model: ObservableObject {
             .assign(to: &$is_valid)
     }
     
+    func requestPrivacyAuthorization() {
+        ATTrackingManager.requestTrackingAuthorization { status in
+            switch status {
+            case .authorized:
+                print("Log: ATTrackingManager request successful")
+            case .denied,
+                 .notDetermined,
+                 .restricted:
+                break
+            @unknown default:
+                break
+            }
+        }
+    }
+    
+    func isTrackingAccessAvailable() -> Bool {
+        switch ATTrackingManager.trackingAuthorizationStatus {
+            case .authorized:
+                return true
+            case .notDetermined,.restricted,.denied:
+                return false
+            @unknown default:
+                return false
+        }
+    }
+    
+    func getTrackingIdentifier() -> UUID? {
+        if(self.isTrackingAccessAvailable())
+        {
+            return ASIdentifierManager.shared().advertisingIdentifier
+        }
+        return nil
+    }
+    
     func fetchUserData(completion: @escaping (User_Model?) -> Void) {
         guard let user = Auth.auth().currentUser else {
             completion(nil)
@@ -80,8 +117,8 @@ class Authentication_View_Model: ObservableObject {
                         email: user.email ?? "No Email",
                         displayName: user.displayName,
                         photoURL: user.photoURL?.absoluteString,
-                        totalBuyIns: data["totalBuyIns"] as? Double ?? 0.0,
-                        gamesPlayed: data["gamesPlayed"] as? Int ?? 0,
+                        //totalBuyIns: data["totalBuyIns"] as? Double ?? 0.0,
+                        //gamesPlayed: data["gamesPlayed"] as? Int ?? 0,
                         current_game: data["current_game"] as? String ?? ""
                     )
                     print("Fetched User: \(model)")
@@ -95,8 +132,8 @@ class Authentication_View_Model: ObservableObject {
                     "email": user.email ?? "No Email",
                     "displayName": user.displayName ?? "No Name",
                     "photoURL": user.photoURL?.absoluteString ?? "",
-                    "totalBuyIns": 0.0,
-                    "gamesPlayed": 0,
+                    //"totalBuyIns": 0.0,
+                    //"gamesPlayed": 0,
                     "current_game": ""
                 ] as [String: Any]
                 
@@ -114,8 +151,8 @@ class Authentication_View_Model: ObservableObject {
                             email: user.email ?? "No Email",
                             displayName: user.displayName,
                             photoURL: user.photoURL?.absoluteString,
-                            totalBuyIns: 0.0,
-                            gamesPlayed: 0,
+                            //totalBuyIns: 0.0,
+                            //gamesPlayed: 0,
                             current_game: ""
                         )
                         completion(newUserModel)
@@ -253,10 +290,47 @@ class Authentication_View_Model: ObservableObject {
             case .failure(let error):
                 print("Upload failed:", error)
                 let error_message = error.localizedDescription
+                print(error_message)
+            }
+        }
+    }
+    
+    func deleteProfileImage(
+        userId: String,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        let storageRef = Storage.storage().reference().child("Profile Photos/\(userId).jpg")
+
+        storageRef.delete { error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(()))
+            }
+        }
+    }
+    
+    
+    func deleteUserAccount() {
+        if let user = Auth.auth().currentUser {
+            
+            deleteProfileImage(userId: user.uid) { _ in }
+            
+            let db = Firestore.firestore()
+            db.collection("Users").document(user.uid).delete { error in
+                }
+            
+            user.delete { error in
+                if let error = error {
+                    print("User was not deleted \(error)")
+                } else {
+                    print("User was deleted sucessfully ")
+                }
             }
         }
     }
 }
+
 
 
 

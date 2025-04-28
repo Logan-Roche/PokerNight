@@ -66,7 +66,7 @@ struct Profile_View: View {
                             .foregroundColor(.gray)
                     }
                     
-                    Text(auth_view_model.user?.displayName ?? "Logan Roche")
+                    Text(auth_view_model.user?.displayName ?? "Unknown")
                         .foregroundStyle(
                             colorScheme == .light ? .black : .white
                         )
@@ -379,7 +379,7 @@ struct Profile_View: View {
                     
                     
                     Button {
-                        if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" {
+                        if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" && auth_view_model.isTrackingAccessAvailable(){
                             interstital_ads_manager.displayInterstitialAd()
                         }
                         selectedTab = .all_game_view

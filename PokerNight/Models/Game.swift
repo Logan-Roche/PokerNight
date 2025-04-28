@@ -6,9 +6,6 @@ struct Game: Identifiable, Codable {
     @DocumentID var id: String?  // Firestore document ID
     var date: Date
     var title: String
-    //var total_buy_in: Double
-    //var total_buy_out: Double
-    //var player_count: Int
     var host_id: String
     var sb_bb: String
     var is_active: Bool

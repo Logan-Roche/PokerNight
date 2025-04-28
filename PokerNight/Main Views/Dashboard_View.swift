@@ -134,7 +134,7 @@ struct Dashboard_View: View {
                     .padding(.bottom, geometry.size.height * 0.03)
                     
                     VStack {
-                        Text("Net History")
+                        Text("Net Per Game")
                             .font(
                                 .custom(
                                     "comfortaa",
@@ -150,165 +150,189 @@ struct Dashboard_View: View {
                                 )
                             )
                         
-                        Chart {
-                            let netValues = game_view_model.games.map {
-                                $0
-                                    .users[auth_view_model.user!.uid]!.buy_out != 0.0 ? $0
-                                    .users[auth_view_model.user!.uid]!.net + $0.chip_error_divided : $0
-                                    .users[auth_view_model.user!.uid]!.net
-                            }
-                            let minNet = netValues.min() ?? 0
-                            let maxNet = netValues.max() ?? 0
-                            let zeroPosition: CGFloat = (maxNet != minNet)
-                            ? CGFloat((maxNet - 0) / (maxNet - minNet))
-                            : 0.5
-                            let adjustedZeroPosition = max(
-                                zeroPosition - 0.03,
-                                0.0
-                            )
-                            
-
-                            
-                            ForEach(
-                                game_view_model.games
-                                    .sorted(by: { $0.date < $1.date }),
-                                id: \.id
-                            ) { game in
-                                AreaMark(
-                                    x: .value("Date", game.date, unit: .day),
-                                    y: 
-                                            .value(
-                                                "Net",
-                                                (
-                                                    game
-                                                        .users[auth_view_model.user!.uid]!.buy_out != 0.0 ? game
-                                                        .users[auth_view_model.user!.uid]!.net + game.chip_error_divided : game
-                                                        .users[auth_view_model.user!.uid]!.net
-                                                )
-                                            )
-                                )
-                                .interpolationMethod(.catmullRom)
-                                .foregroundStyle(
-                                    LinearGradient(
-                                        gradient: Gradient(
-                                            stops: [
-                                                .init(
-                                                    color: .gradientColorLeft,
-                                                    location: 0.0
-                                                ),
-                                                .init(
-                                                    color: .offBlack,
-                                                    location: adjustedZeroPosition
-                                                ),
-                                                .init(
-                                                    color: .gradientColorRight,
-                                                    location: 1.0
-                                                )
-                                            ]
-                                        ),
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    )
-                                    .opacity(0.7)
-                                )
-                                LineMark(
-                                    x: .value("Date", game.date, unit: .day),
-                                    y: 
-                                            .value(
-                                                "Net",
-                                                game
-                                                    .users[auth_view_model.user!.uid]!.buy_out != 0.0 ? game
-                                                    .users[auth_view_model.user!.uid]!.net + game.chip_error_divided : game
-                                                    .users[auth_view_model.user!.uid]!.net
-                                            )
-                                )
-                                .interpolationMethod(.catmullRom)
-                                .foregroundStyle(
-                                    .linearGradient(
-                                        colors: [.gradientColorLeft],
-                                        startPoint: .bottom, endPoint: .top
-                                    )
-                                )
-                                .lineStyle(
-                                    StrokeStyle(lineWidth: 4, lineCap: .round)
-                                )
-                                .alignsMarkStylesWithPlotArea()
-                                .symbol(Circle())
-                                .symbolSize(100)
-                                
-                                
-                                .alignsMarkStylesWithPlotArea()
-                            }
-                            
-                            if let selectedGame {
-                                RuleMark(
-                                    x:
-                                            .value(
-                                                "Date",
-                                                selectedGame.date,
-                                                unit: .day
-                                            )
-                                )
-                                .foregroundStyle(.gradientColorLeft)
-                                .annotation(
-                                    position: .top,
-                                    overflowResolution: .init(
-                                        x: .fit(to: .automatic),
-                                        y: .fit(to: .automatic)
-                                    )
-                                ) {
-                                    VStack{
-                                        Text(selectedGame.date
-                                            .formatted(
-                                                date: .abbreviated,
-                                                time: .omitted
-                                            )
-                                        )
-                                        .font(
-                                            .custom(
-                                                "comfortaa",
-                                                size: geometry.size.width * 0.04
-                                            )
-                                        )
-                                        .padding(
-                                            .bottom,
-                                            geometry.size.height * 0.01
-                                        )
                         
-                                            
-                                        Text(
-                                            "\( (selectedGame.users[auth_view_model.user!.uid]!.buy_out != 0.0 ? selectedGame.users[auth_view_model.user!.uid]!.net + selectedGame.chip_error_divided : selectedGame.users[auth_view_model.user!.uid]!.net) >= 0 ? "+" : "-")$\(String(format: "%.2f", abs(selectedGame.users[auth_view_model.user!.uid]!.buy_out != 0.0 ? selectedGame.users[auth_view_model.user!.uid]!.net + selectedGame.chip_error_divided : selectedGame.users[auth_view_model.user!.uid]!.net)))"
-                                        )
-                                        .font(
-                                            .custom(
-                                                "comfortaa",
-                                                size: geometry.size.width * 0.04
+                        if !game_view_model.games.isEmpty, let userID = auth_view_model.user?.uid {
+                            Chart {
+                                let netValues = game_view_model.games.compactMap { game -> Double? in
+                                            guard let userStats = game.users[userID] else { return nil }
+                                            return userStats.buy_out != 0.0
+                                                ? userStats.net + game.chip_error_divided
+                                                : userStats.net
+                                        }
+                                        
+                                if !netValues.isEmpty {
+                                    let minNet = netValues.min() ?? 0
+                                    let maxNet = netValues.max() ?? 0
+                                    let zeroPosition: CGFloat = (maxNet != minNet)
+                                    ? CGFloat((maxNet - 0) / (maxNet - minNet))
+                                    : 0.5
+                                    let adjustedZeroPosition = max(zeroPosition - 0.03, 0.0)
+                                    
+                                    
+                                    
+                                    ForEach(
+                                        game_view_model.games
+                                            .sorted(by: { $0.date < $1.date }),
+                                        id: \.id
+                                    ) { game in
+                                        if game.is_active == false {
+                                            if !game.is_active, let userStats = game.users[userID] {
+                                            AreaMark(
+                                                x:
+                                                        .value(
+                                                            "Date",
+                                                            game.date,
+                                                            unit: .day
+                                                        ),
+                                                y:
+                                                        .value(
+                                                            "Net",
+                                                            (
+                                                                userStats.buy_out != 0.0 ? userStats.net + game.chip_error_divided : userStats.net
+                                                            )
+                                                        )
                                             )
-                                        )
-
-
+                                            .interpolationMethod(.catmullRom)
+                                            .foregroundStyle(
+                                                LinearGradient(
+                                                    gradient: Gradient(
+                                                        stops: [
+                                                            .init(
+                                                                color: .gradientColorLeft,
+                                                                location: 0.0
+                                                            ),
+                                                            .init(
+                                                                color: .gradientColorLeft,
+                                                                location: 0.25
+                                                            ),
+                                                            .init(
+                                                                color: .offBlack,
+                                                                location: adjustedZeroPosition
+                                                            ),
+                                                            .init(
+                                                                color: .gradientColorRight,
+                                                                location: 0.75
+                                                            ),
+                                                            .init(
+                                                                color: .gradientColorRight,
+                                                                location: 1.0
+                                                            )
+                                                        ]
+                                                    ),
+                                                    startPoint: .top,
+                                                    endPoint: .bottom
+                                                )
+                                                .opacity(0.7)
+                                            )
+                                            LineMark(
+                                                x:
+                                                        .value(
+                                                            "Date",
+                                                            game.date,
+                                                            unit: .day
+                                                        ),
+                                                y:
+                                                        .value(
+                                                            "Net",
+                                                            userStats.buy_out != 0.0 ? userStats.net + game.chip_error_divided : userStats.net
+                                                        )
+                                            )
+                                            .interpolationMethod(.catmullRom)
+                                            .foregroundStyle(
+                                                .linearGradient(
+                                                    colors: [.gradientColorLeft],
+                                                    startPoint: .bottom, endPoint: .top
+                                                )
+                                            )
+                                            .lineStyle(
+                                                StrokeStyle(
+                                                    lineWidth: 4,
+                                                    lineCap: .round
+                                                )
+                                            )
+                                            .alignsMarkStylesWithPlotArea()
+                                            .symbol(Circle())
+                                            .symbolSize(100)
+                                            
+                                            
+                                            .alignsMarkStylesWithPlotArea()
+                                        }
+                                        }
+                                        
+                                        if let selectedGame {
+                                            RuleMark(
+                                                x:
+                                                        .value(
+                                                            "Date",
+                                                            selectedGame.date,
+                                                            unit: .day
+                                                        )
+                                            )
+                                            .foregroundStyle(.gradientColorLeft)
+                                            .annotation(
+                                                position: .top,
+                                                overflowResolution: .init(
+                                                    x: .fit(to: .automatic),
+                                                    y: .fit(to: .automatic)
+                                                )
+                                            ) {
+                                                VStack{
+                                                    Text(selectedGame.date
+                                                        .formatted(
+                                                            date: .abbreviated,
+                                                            time: .omitted
+                                                        )
+                                                    )
+                                                    .font(
+                                                        .custom(
+                                                            "comfortaa",
+                                                            size: geometry.size.width * 0.04
+                                                        )
+                                                    )
+                                                    .padding(
+                                                        .bottom,
+                                                        geometry.size.height * 0.01
+                                                    )
+                                                    
+                                                    
+                                                    Text(
+                                                        "\( (selectedGame.users[auth_view_model.user!.uid]!.buy_out != 0.0 ? selectedGame.users[auth_view_model.user!.uid]!.net + selectedGame.chip_error_divided : selectedGame.users[auth_view_model.user!.uid]!.net) >= 0 ? "+" : "-")$\(String(format: "%.2f", abs(selectedGame.users[auth_view_model.user!.uid]!.buy_out != 0.0 ? selectedGame.users[auth_view_model.user!.uid]!.net + selectedGame.chip_error_divided : selectedGame.users[auth_view_model.user!.uid]!.net)))"
+                                                    )
+                                                    .font(
+                                                        .custom(
+                                                            "comfortaa",
+                                                            size: geometry.size.width * 0.04
+                                                        )
+                                                    )
+                                                    
+                                                    
+                                                }
+                                                .frame(
+                                                    width: geometry.size.width * 0.35
+                                                )
+                                                .padding(geometry.size.width * 0.02)
+                                                .background(
+                                                    RoundedRectangle(cornerRadius: 10)
+                                                        .fill(gradient)
+                                                )
+                                            }
+                                            
+                                        }
                                     }
-                                    .frame(width: geometry.size.width * 0.35)
-                                    .padding(geometry.size.width * 0.02)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .fill(gradient)
-                                    )
                                 }
-                                
                             }
-                            
+                            .chartScrollableAxes(.horizontal)
+                            .chartScrollPosition(initialX: Date())
+                            .chartXVisibleDomain(
+                                length: 3600 * 24 * selected_time_unit
+                            )
+                            .chartXSelection(value: $rawSelectedDate)
+                            .frame(
+                                width: geometry.size.width * 0.9,
+                                height: geometry.size.width * 0.9
+                            )
                         }
-                        .chartScrollableAxes(.horizontal)
-                        .chartScrollPosition(initialX: Date())
-                        .chartXVisibleDomain(
-                            length: 3600 * 24 * selected_time_unit
-                        )
-                        .chartXSelection(value: $rawSelectedDate)
-                        .frame(
-                            width: geometry.size.width * 0.9,
-                            height: geometry.size.width * 0.9
-                        )
+
                         
                         Picker("Time Scope",selection: $selected_time_unit) {
                             Text("-")
@@ -330,8 +354,10 @@ struct Dashboard_View: View {
                     )
                     
                     
+                    
+                    
                     VStack {
-                        Text("Recent Player")
+                        Text("Recent Players")
                             .font(
                                 .custom(
                                     "comfortaa",
@@ -383,6 +409,9 @@ struct Dashboard_View: View {
                 .frame(maxWidth: .infinity)
             }
             .background(.colorScheme)
+            .onAppear() {
+                auth_view_model.requestPrivacyAuthorization()
+            }
             
         }
     }

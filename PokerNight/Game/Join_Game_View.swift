@@ -91,9 +91,9 @@ struct Join_Game_View: View {
                                         game_view_model
                                             .Add_or_Update_User_To_Game(
                                                 gameId: game_view_model.game.id ?? " ",
-                                                user_id: current_user!.id,
+                                                user_id: auth_view_model.user!.uid,
                                                 user_stats: User_Stats(
-                                                    name: auth_view_model.user!.displayName! ,
+                                                    name: auth_view_model.user!.displayName ?? "Unknown" ,
                                                     buy_in: 0,
                                                     buy_out: 0.00001,
                                                     net: 0.00001,

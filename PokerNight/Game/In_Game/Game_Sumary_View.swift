@@ -213,10 +213,10 @@ struct Game_Sumary_View: View {
                                 interstital_ads_manager.displayInterstitialAd()
                             }
                         
-                            game_view_model
-                                .fetchAndCalculateUserStats(
-                                    for: auth_view_model.user!.uid
-                                )
+//                            game_view_model
+//                                .fetchAndCalculateUserStats(
+//                                    for: auth_view_model.user!.uid
+//                                )
                             game_view_model
                                 .Leave_Game(
                                     userId: auth_view_model.user!.uid,
@@ -275,10 +275,10 @@ struct Game_Sumary_View: View {
                                 interstital_ads_manager.displayInterstitialAd()
                             }
                         
-                            game_view_model
-                                .fetchAndCalculateUserStats(
-                                    for: auth_view_model.user!.uid
-                                )
+//                            game_view_model
+//                                .fetchAndCalculateUserStats(
+//                                    for: auth_view_model.user!.uid
+//                                )
                             game_view_model
                                 .Leave_Game(
                                     userId: auth_view_model.user!.uid,

@@ -5,7 +5,7 @@ struct User_Model: Identifiable, Codable {
     var email: String
     var displayName: String?
     var photoURL: String?
-    var totalBuyIns: Double
-    var gamesPlayed: Int
+    //var totalBuyIns: Double
+    //var gamesPlayed: Int
     var current_game: String?
 }

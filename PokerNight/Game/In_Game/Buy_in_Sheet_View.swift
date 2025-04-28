@@ -86,7 +86,7 @@ struct Buy_in_Sheet_View: View {
                                 user_id: Auth
                                     .auth().currentUser!.uid,
                                 user_stats: User_Stats(
-                                    name: auth_view_model.user!.displayName! ,
+                                    name: auth_view_model.user!.displayName ?? "Unknown" ,
                                     buy_in: game_view_model.game.users[Auth
                                         .auth().currentUser!.uid]!.buy_in + Double(
                                             amount

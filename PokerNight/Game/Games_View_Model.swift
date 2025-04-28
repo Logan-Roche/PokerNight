@@ -1,10 +1,3 @@
-//
-//  Games_View_Model.swift
-//  PokerNight
-//
-//  Created by Logan Roche on 3/18/25.
-//
-
 import Foundation
 import FirebaseFirestore
 import FirebaseAuth
@@ -46,6 +39,7 @@ class Games_View_Model: ObservableObject {
         // Remove any existing listener to avoid duplicates
         userListener?.remove()
 
+        print("startListeningForCurrentGame")
         userListener = db.collection("Users").document(userID)
             .addSnapshotListener { [weak self] (document, error) in
                 guard let doc = document, doc.exists, let data = doc.data() else {
@@ -71,6 +65,7 @@ class Games_View_Model: ObservableObject {
         gameId: String,
         completion: @escaping (Game?, Error?) -> Void
     ) {
+        
         print("Fetch Game Function Called")
         db.collection("Games").document(gameId).getDocument {
             snapshot,
@@ -174,6 +169,7 @@ class Games_View_Model: ObservableObject {
     func Start_Game(game: Game, completion: @escaping (String?) -> Void) {
         do {
             // Create a copy of `game` with a nil ID
+            print("Start game function called")
             var gameToSave = game
             gameToSave.id = nil  // Avoid warning
 
@@ -239,6 +235,15 @@ class Games_View_Model: ObservableObject {
                 print("User left game successfully!")
             }
         }
+        
+        self.games.append(game)
+        
+        let localGames = self.games.compactMap { doc in
+            self.convertFirestoreGameToLocalGame(doc)
+        }
+        
+        self.saveLocalGames(localGames)
+        
         if game.host_id == userId {
             db.collection("Games").document(game.id!).updateData([
                 "chip_error_divided": chip_error_divided,
@@ -516,72 +521,338 @@ class Games_View_Model: ObservableObject {
         for userID: String,
         completion: @escaping ([Game]) -> Void
     ) {
+        print("fetch past games function call")
         
-
+        let local_games = self.loadLocalGames()
+        let firestoreGames = local_games.compactMap { convertLocalGameToFirestoreGame($0) }
+        
+        if firestoreGames.count > 0 {
+            print("✅ Games are loaded from local storage")
+            completion(firestoreGames)
+            return
+        }
+        
+        print("📡 No local games found — grabbing from Firebase...")
+        
         db.collection("Games")
             .whereField("user_ids", arrayContains: userID)
-            .whereField("is_active", isEqualTo: false)
             .getDocuments { (snapshot, error) in
                 guard let documents = snapshot?.documents, error == nil else {
-                    print(
-                        "Error fetching past games: \(error?.localizedDescription ?? "Unknown error")"
-                    )
+                    print("❌ Error fetching past games:", error?.localizedDescription ?? "Unknown error")
                     completion([])
                     return
                 }
-
+                
                 let games: [Game] = documents.compactMap { doc in
                     try? doc.data(as: Game.self)
                 }
-
+                
+            
+                let localGames = games.compactMap { self.convertFirestoreGameToLocalGame($0) }
+                
+                self.saveLocalGames(localGames)
+                
+                print("✅ Saved \(localGames.count) games to local storage.")
+                
                 completion(games)
             }
     }
+
     
     func fetchAndCalculateUserStats(for userID: String) {
-        fetchPastGames(for: userID) { games in
+        print("Starting fetchAndCalculateUserStats...")
+        
+        // 1. First, load games from local storage
+        self.fetchPastGames(for: userID) { games in
             DispatchQueue.main.async {
                 self.games = games
-                self.totalGames = games.count
                 
-                var winCount = 0
-                var totalNet: Double = 0.0
-                var totalROI: Double = 0.0
-                
-                for game in games {
-                    if let userStats = game.users[userID] {
-                        let buyIn = userStats.buy_in
-                        let buyOut = userStats.buy_out
-                        let net = userStats.net + game.chip_error_divided
-                        print(net)
-                        
-                        if net > 0 {
-                            winCount += 1
-                        }
-                        
-                        totalNet += net
-                        
-                        if buyIn > 0 {
-                            let roi = (
-                                (buyOut + game.chip_error_divided) - buyIn
-                            ) / buyIn
-                            totalROI += roi
-                        }
-                    }
+                // 2. Now sync any still-active games
+                self.syncActiveGamesWithFirebase(for: userID) {
+                    print("✅ Finished syncing active games.")
+                    
+                    // 3. wait to  calculate stats based on loaded local games
+                    self.calculateStats(for: userID, basedOn: games)
                 }
                 
-                self.winRate = games.count > 0 ? Double(winCount) / Double(
-                    games.count
-                ) : 0.0
-                self.averageROI = games.count > 0 ? totalROI / Double(
-                    games.count
-                ) : 0.0
-                self.totalProfit = totalNet
+                
             }
         }
     }
 
     
+    func calculateStats(for userID: String, basedOn games: [Game]) {
+        self.totalGames = games.count
 
+        var winCount = 0
+        var totalNet: Double = 0.0
+        var totalROI: Double = 0.0
+        
+        for game in games {
+            if let userStats = game.users[userID] {
+                let buyIn = userStats.buy_in
+                let buyOut = userStats.buy_out
+                let net = buyOut != 0 ? userStats.net + game.chip_error_divided : userStats.net
+                
+                if net > 0 {
+                    winCount += 1
+                }
+                
+                totalNet += net
+                
+                if buyIn > 0 {
+                    let roi = ((buyOut != 0 ? buyOut + game.chip_error_divided : 0.0) - buyIn) / buyIn
+                    totalROI += roi
+                }
+            }
+        }
+        
+        let roiGamesCount = games.filter { $0.users[userID]?.buy_in ?? 0 > 0 }.count
+        self.averageROI = roiGamesCount > 0 ? totalROI / Double(roiGamesCount) : 0.0
+        self.winRate = games.count > 0 ? Double(winCount) / Double(games.count) : 0.0
+        self.totalProfit = totalNet
+        
+        print("✅ Finished calculating user stats.")
+    }
+
+    
+    func syncActiveGamesWithFirebase(for userID: String, completion: @escaping () -> Void) {
+        print("🔄 Starting sync for active games...")
+
+        let activeGames = self.games.filter { $0.is_active }
+        
+        guard !activeGames.isEmpty else {
+            print("✅ No active games to sync.")
+            completion()
+            return
+        }
+        
+        let group = DispatchGroup()
+        
+        for activeGame in activeGames {
+            guard let gameId = activeGame.id else {
+                print("⚠️ Active game missing ID, skipping.")
+                continue
+            }
+            
+            group.enter()
+            
+            db.collection("Games").document(gameId).getDocument { (snapshot, error) in
+                defer { group.leave() }
+                
+                guard let snapshot = snapshot, snapshot.exists, let data = snapshot.data() else {
+                    print("⚠️ Game \(gameId) not found on server or error occurred.")
+                    return
+                }
+                
+                var usersDict: [String: Game.User_Stats] = [:]
+                var transactionsArray: [Transaction] = []
+                
+                if let usersData = data["users"] as? [String: [String: Any]] {
+                    for (key, value) in usersData {
+                        if let buyIn = value["buy_in"] as? Double,
+                           let buyOut = value["buy_out"] as? Double,
+                           let net = value["net"] as? Double,
+                           let name = value["name"] as? String,
+                           let photo_url = value["photo_url"] as? String {
+                            usersDict[key] = Game.User_Stats(
+                                name: name,
+                                buy_in: buyIn,
+                                buy_out: buyOut,
+                                net: net,
+                                photo_url: photo_url
+                            )
+                        }
+                    }
+                }
+                
+                if let transactionsData = data["transactions"] as? [[String: Any]] {
+                    for transactionDict in transactionsData {
+                        if let userId = transactionDict["userId"] as? String,
+                           let name = transactionDict["name"] as? String,
+                           let type = transactionDict["type"] as? String,
+                           let amount = transactionDict["amount"] as? Double?,
+                           let timestamp = transactionDict["timestamp"] as? Timestamp {
+                            
+                            let transaction = Transaction(
+                                id: transactionDict["id"] as? String ?? UUID().uuidString,
+                                userId: userId,
+                                name: name,
+                                type: type,
+                                amount: amount,
+                                timestamp: timestamp.dateValue()
+                            )
+                            
+                            transactionsArray.append(transaction)
+                        }
+                    }
+                }
+                
+                DispatchQueue.main.async {
+                    if let index = self.games.firstIndex(where: { $0.id == gameId }) {
+                        self.games[index] = Game(
+                            id: snapshot.documentID,
+                            date: (data["date"] as? Timestamp)?.dateValue() ?? Date(),
+                            title: data["title"] as? String ?? "Unknown",
+                            host_id: data["host_id"] as? String ?? "",
+                            sb_bb: data["sb_bb"] as? String ?? "",
+                            is_active: data["is_active"] as? Bool ?? false,
+                            chip_error_divided: data["chip_error_divided"] as? Double ?? 0,
+                            users: usersDict,
+                            user_ids: (data["user_ids"] as? [String]) ?? [],
+                            transactions: transactionsArray
+                        )
+                    }
+                }
+            }
+        }
+        
+        group.notify(queue: .main) {
+            print("✅ Finished syncing all active games. Saving to local storage...")
+            
+            let localGames = self.games.compactMap { self.convertFirestoreGameToLocalGame($0) }
+            self.saveLocalGames(localGames)
+            
+            completion()
+        }
+    }
+
+
+
+    
+    func getDocumentsDirectory() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    }
+
+
+    
+    func saveLocalGames(_ localGames: [LocalGame]) {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        
+        do {
+            let data = try encoder.encode(localGames)
+            let url = getDocumentsDirectory().appendingPathComponent("past_games.json")
+            try data.write(to: url, options: .atomic)
+            print("✅ Successfully saved games to local storage.")
+        } catch {
+            print("❌ Failed to save games locally:", error)
+        }
+    }
+    
+    func loadLocalGames() -> [LocalGame] {
+        let url = getDocumentsDirectory().appendingPathComponent("past_games.json")
+        
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            print("📂 No past_games.json found — returning empty list.")
+            return []
+        }
+        
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            let localGames = try decoder.decode([LocalGame].self, from: data)
+            print("📦 Found \(localGames.count) local games.")
+            return localGames
+        } catch {
+            print("❌ Failed to load local games:", error)
+            return []
+        }
+    }
+
+    
+    func convertFirestoreGameToLocalGame(_ game: Game) -> LocalGame? {
+        guard let id = game.id else {
+            print("❌ Cannot convert Game to LocalGame: missing ID.")
+            return nil
+        }
+        
+        let convertedUsers = game.users.mapValues { userStats in
+            LocalGame.User_Stats(
+                name: userStats.name,
+                buy_in: userStats.buy_in,
+                buy_out: userStats.buy_out,
+                net: userStats.net,
+                photo_url: userStats.photo_url
+            )
+        }
+        
+        let convertedTransactions = game.transactions.compactMap { transaction -> LocalGame.LocalTransaction? in
+            guard let transactionID = transaction.id else {
+                print("⚠️ Skipping transaction with missing ID.")
+                return nil
+            }
+            
+            return LocalGame.LocalTransaction(
+                id: transactionID,
+                userId: transaction.userId,
+                name: transaction.name,
+                type: transaction.type,
+                amount: transaction.amount,
+                timestamp: transaction.timestamp
+            )
+        }
+        
+        return LocalGame(
+            id: id,
+            date: game.date,
+            title: game.title,
+            host_id: game.host_id,
+            sb_bb: game.sb_bb,
+            is_active: game.is_active,
+            chip_error_divided: game.chip_error_divided,
+            users: convertedUsers,
+            user_ids: game.user_ids,
+            transactions: convertedTransactions
+        )
+    }
+
+    
+    func convertLocalGameToFirestoreGame(_ localGame: LocalGame) -> Game {
+        let convertedUsers = localGame.users.mapValues { userStats in
+            Game.User_Stats(
+                name: userStats.name,
+                buy_in: userStats.buy_in,
+                buy_out: userStats.buy_out,
+                net: userStats.net,
+                photo_url: userStats.photo_url
+            )
+        }
+        
+        let convertedTransactions = localGame.transactions.map { transaction in
+            Transaction(
+                id: transaction.id,
+                userId: transaction.userId,
+                name: transaction.name,
+                type: transaction.type,
+                amount: transaction.amount,
+                timestamp: transaction.timestamp
+            )
+        }
+        
+        return Game(
+            id: localGame.id, // if your Game init allows setting id manually, otherwise nil
+            date: localGame.date,
+            title: localGame.title,
+            host_id: localGame.host_id,
+            sb_bb: localGame.sb_bb,
+            is_active: localGame.is_active,
+            chip_error_divided: localGame.chip_error_divided,
+            users: convertedUsers,
+            user_ids: localGame.user_ids,
+            transactions: convertedTransactions
+        )
+    }
+
+    
+    
+
+    
+    
+    
 }
+
+
+
 

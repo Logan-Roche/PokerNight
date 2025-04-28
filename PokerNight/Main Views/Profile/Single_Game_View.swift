@@ -122,8 +122,9 @@ struct Single_Game_View: View {
                                 
                                 GridRow {
                                     Text("Name")
-                                    Text("Buy Out")
+                                    Text("Buy In")
                                     Text("Adjusted Buy Out")
+                                    Text("Net")
                                 }
                                 .font(
                                     .custom(
@@ -163,7 +164,20 @@ struct Single_Game_View: View {
                                             .padding(.vertical, 10)
                                             
                                             Text(
-                                                "$\(stats.buy_out,specifier: "%.2f")"
+                                                "$\(stats.buy_in,specifier: "%.2f")"
+                                            )
+                                            .font(
+                                                .custom(
+                                                    "comfortaa",
+                                                    size: geometry.size.width * 0.035
+                                                )
+                                            )
+                                            .foregroundStyle(
+                                                colorScheme == .light ? .black : .white
+                                            )
+                                            
+                                            Text(
+                                                "\(((stats.buy_out != 0 ? stats.buy_out + chip_error_divided : stats.buy_out) < 0 ? "-" : ""))$\(String(format: "%.2f", abs(stats.buy_out != 0 ? stats.buy_out + chip_error_divided : stats.buy_out)))"
                                             )
                                             .font(
                                                 .custom(
@@ -177,7 +191,7 @@ struct Single_Game_View: View {
                                             
                                             
                                             Text(
-                                                "\(((stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out) < 0 ? "-" : ""))$\(String(format: "%.2f", abs(stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out)))"
+                                                "\(((stats.buy_out == 0 ? stats.net : stats.net + chip_error_divided) < 0 ? "-" : ""))$\(String(format: "%.2f", abs(stats.buy_out == 0 ? stats.net : stats.net + chip_error_divided)))"
                                             )
 
                                             .font(
@@ -195,6 +209,104 @@ struct Single_Game_View: View {
                             }
                         }
                         .fixedSize(horizontal: false, vertical: true)
+//                        VStack {
+//                            Grid(
+//                                alignment: .center,
+//                                horizontalSpacing: 15,
+//                                verticalSpacing: 10
+//                            ) {
+//                                
+//                                
+//                                GridRow {
+//                                    Text("Name")
+//                                    Text("Buy In")
+//                                    Text("Adjusted Buy Out")
+//                                    Text("Net")
+//                                }
+//                                .font(
+//                                    .custom(
+//                                        "comfortaa",
+//                                        size: geometry.size.width * 0.035
+//                                    )
+//                                )
+//                                .foregroundStyle(
+//                                    colorScheme == .light ? .black : .white
+//                                )
+//                                
+//                                Divider()
+//                                
+//                                // Item Rows
+//                                ForEach(
+//                                    Array(selected_game.users.keys).sorted(),
+//                                    id: \.self
+//                                ) { key in
+//                                    //ForEach(Array(sampleUsers.keys).sorted(), id: \.self) { key in
+//                                    
+//                                    if let stats = game_view_model.game.users[key] {
+//                                        //if let stats = sampleUsers[key] {
+//                                        
+//                                        GridRow {
+//                                            HStack {
+//                                                Text("\(stats.name)")
+//                                                    .font(
+//                                                        .custom(
+//                                                            "comfortaa",
+//                                                            size: geometry.size.width * 0.035
+//                                                        )
+//                                                    )
+//                                                    .foregroundStyle(
+//                                                        colorScheme == .light ? .black : .white
+//                                                    )
+//                                            }
+//                                            .padding(.vertical, 10)
+//                                            
+//                                            Text(
+//                                                "$\(stats.buy_in,specifier: "%.2f")"
+//                                            )
+//                                            .font(
+//                                                .custom(
+//                                                    "comfortaa",
+//                                                    size: geometry.size.width * 0.035
+//                                                )
+//                                            )
+//                                            .foregroundStyle(
+//                                                colorScheme == .light ? .black : .white
+//                                            )
+//                                            
+//                                            Text(
+//                                                "\(((stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out) < 0 ? "-" : ""))$\(String(format: "%.2f", abs(stats.buy_out > 0.00001 ? stats.buy_out + chip_error_divided : stats.buy_out)))"
+//                                            )
+//                                            .font(
+//                                                .custom(
+//                                                    "comfortaa",
+//                                                    size: geometry.size.width * 0.035
+//                                                )
+//                                            )
+//                                            .foregroundStyle(
+//                                                colorScheme == .light ? .black : .white
+//                                            )
+//                                            
+//                                            Text(
+//                                                stats.net != 0.00001
+//                                                ? "$\(String(format: "%.2f", stats.net))"
+//                                                : "N/A"
+//                                            )
+//                                            .font(
+//                                                .custom(
+//                                                    "comfortaa",
+//                                                    size: geometry.size.width * 0.035
+//                                                )
+//                                            )
+//                                            .foregroundStyle(
+//                                                colorScheme == .light ? .black : .white
+//                                            )
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        .fixedSize(horizontal: false, vertical: true)
+
                     }
                     .padding()
                     .background(.offBlack)

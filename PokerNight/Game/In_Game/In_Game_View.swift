@@ -617,7 +617,7 @@ struct In_Game_View: View {
             .background(.colorScheme)
             .edgesIgnoringSafeArea(.vertical)
             .onChange(of: show_buy_in_sheet) { old, new in
-                if !show_buy_in_sheet && auth_view_model.user?.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" {
+                if !show_buy_in_sheet && auth_view_model.user?.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" && auth_view_model.isTrackingAccessAvailable() {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         interstital_ads_manager.displayInterstitialAd()
                     }
