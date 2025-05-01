@@ -6,6 +6,7 @@ import FirebaseStorage
 
 import AppTrackingTransparency
 import AdSupport
+import GoogleMobileAds
 
 // For Sign in with Apple
 import AuthenticationServices
@@ -68,11 +69,15 @@ class Authentication_View_Model: ObservableObject {
             switch status {
             case .authorized:
                 print("Log: ATTrackingManager request successful")
+                
             case .denied,
                  .notDetermined,
                  .restricted:
+                
+                MobileAds.shared.requestConfiguration.setPublisherFirstPartyIDEnabled(false)
                 break
             @unknown default:
+                MobileAds.shared.requestConfiguration.setPublisherFirstPartyIDEnabled(false)
                 break
             }
         }
@@ -202,6 +207,37 @@ class Authentication_View_Model: ObservableObject {
         confirm_password = ""
     }
     
+    func updateDisplayName(newName: String, completion: @escaping (Bool, String?) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            completion(false, "No user is currently signed in.")
+            return
+        }
+
+        let uid = user.uid
+        let db = Firestore.firestore()
+
+        // Step 1: Update Firestore
+        db.collection("Users").document(uid).updateData([
+            "displayName": newName
+        ]) { error in
+            if let error = error {
+                completion(false, "Failed to update Firestore: \(error.localizedDescription)")
+                return
+            }
+
+            // Step 2: Update Firebase Auth Profile
+            let changeRequest = user.createProfileChangeRequest()
+            changeRequest.displayName = newName
+            changeRequest.commitChanges { error in
+                if let error = error {
+                    completion(false, "Failed to update Firebase Auth: \(error.localizedDescription)")
+                } else {
+                    completion(true, nil)
+                }
+            }
+        }
+    }
+
     
     func uploadProfileImage(
         image: UIImage,

@@ -379,7 +379,7 @@ struct Profile_View: View {
                     
                     
                     Button {
-                        if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" && auth_view_model.isTrackingAccessAvailable(){
+                        if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2"{
                             interstital_ads_manager.displayInterstitialAd()
                         }
                         selectedTab = .all_game_view

@@ -142,8 +142,14 @@ struct ContentView: View {
                     }
                 }
             if game_view_model.games.isEmpty && auth_view_model.user != nil {
-                game_view_model
-                    .fetchAndCalculateUserStats(for: auth_view_model.user!.uid)
+                
+                if let userID = Auth.auth().currentUser?.uid, !userID.isEmpty {
+                    game_view_model.fetchAndCalculateUserStats(for: userID)
+                }
+
+    
+//                game_view_model
+//                    .fetchAndCalculateUserStats(for: auth_view_model.user!.uid)
             }
         }
     }

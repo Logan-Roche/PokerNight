@@ -74,6 +74,7 @@ struct Buy_in_Sheet_View: View {
                             .Add_Transaction(
                                 gameId: game_view_model.currentGameID,
                                 user_id: auth_view_model.user?.uid ?? "",
+                                display_name: auth_view_model.user?.displayName ?? "",
                                 type: game_view_model.game.users[Auth
                                     .auth().currentUser!.uid]!.buy_in == 0 ? "Buy In: " : "Re-Buy: ",
                                 amount: Double(amount)

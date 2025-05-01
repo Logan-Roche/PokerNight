@@ -13,6 +13,11 @@ struct Profile_Settings_View: View {
     
     @State private var selectedItem: PhotosPickerItem?
     @State private var selectedImage: UIImage?
+    @State private var name: String = ""
+    
+    var isFormValid: Bool {
+        !name.isEmpty
+    }
     
     let gradient = LinearGradient(
         colors: [.gradientColorLeft, .gradientColorRight],
@@ -24,7 +29,12 @@ struct Profile_Settings_View: View {
     var body: some View {
         GeometryReader { geometry in
             VStack {
-                    
+                ScrollView {
+                
+                Text("Change Profile Photo")
+                    .font(.custom("comfortaa", size: 17))
+                    .foregroundColor(colorScheme == .light ? .black : .white)
+                
                 PhotosPicker(
                     selection: $selectedItem,
                     matching: .images,
@@ -68,27 +78,77 @@ struct Profile_Settings_View: View {
                         selectedTab = .dashboard
                     }
                 }
-
-                Button("Log Out"){
-                    
-                    game_view_model.saveLocalGames([])
-                    game_view_model.games = []
-                    auth_view_model.Sign_Out()
-                    
-                }
                 .padding()
-                .buttonStyle(.bordered)
-                .tint(.yellow)
                 
-                Button("Delete Account"){
-                    show_confirmation_sheet.toggle()
+                Divider()
+                
+                Text("Change Name")
+                    .font(.custom("comfortaa", size: 17))
+                    .foregroundColor(colorScheme == .light ? .black : .white)
+                    .padding()
+                TextField("Enter Game Title", text: $name)
+                        .submitLabel(.done)
+                    .padding()
+                    .background(.offBlack)
+                    .cornerRadius(4)
+                    .foregroundColor(.gray)
+                    .font(.custom("roboto-regular", size: 15))
+                    .padding(
+                        EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1)
+                    )
+                
+                Button(
+                    action: {
+                        auth_view_model.updateDisplayName(newName: name) { success, errorMessage in
+                            if success {
+                                print("✅ Display name updated in both Auth and Firestore.")
+                            } else {
+                                print("❌ Error updating name:", errorMessage ?? "Unknown error")
+                            }
+                        }
+                        selectedTab = .dashboard
+                    }) {
+                        Text("Change Name")
+                            .font(.custom("Roboto", size: 17))
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(gradient)
+                            .cornerRadius(10)
+                            .shadow(radius: 3)
+                            .opacity(isFormValid ? 1 : 0.5)
+                    }
+                    .padding()
+                    .disabled(!isFormValid)
+                
+                Divider()
+                
+                HStack {
                     
+                    
+                    Button("Delete Account"){
+                        show_confirmation_sheet.toggle()
+                        
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+                    
+                    Button("Log Out"){
+                        
+                        game_view_model.saveLocalGames([])
+                        game_view_model.games = []
+                        auth_view_model.Sign_Out()
+                        
+                    }
+                    .padding()
+                    .buttonStyle(.bordered)
+                    .tint(.yellow)
                 }
-                .padding()
-                .buttonStyle(.bordered)
-                .tint(.red)
-                    
                 
+                Spacer()
+            }
+                .scrollDismissesKeyboard(.immediately)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.colorScheme)

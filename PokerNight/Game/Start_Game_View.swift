@@ -37,247 +37,256 @@ struct Start_Game_View: View {
     }
     
     var body: some View {
-        VStack {
-            
-            ZStack {
-                Rectangle()
-                    .fill(.offBlack)
-                    .frame(height: 125)
-                    .cornerRadius(30)
-                    .shadow(radius: 5)
-                
-                Text("Start Game")
-                    .foregroundColor(colorScheme == .light ? .black : .white)
-                    .font(.custom("comfortaa", size: 35))
-                    .padding(.top, 45)
-            }
-            .padding(.bottom, 40)
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Game Title")
-                    .font(.custom("comfortaa", size: 17))
-                    .foregroundColor(colorScheme == .light ? .black : .white)
-                
-                TextField("Enter Game Title", text: $title)
-                    .focused($focus, equals: .title )
-                    .submitLabel(.next)
-                    .onSubmit {
-                        self.focus = .sb
-                    }
-                    .padding()
-                    .background(.offBlack)
-                    .cornerRadius(4)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(
-                                colorScheme == .light ? .gray : .black,
-                                lineWidth: 1.5
+        GeometryReader { geometry in
+            VStack {
+                ScrollView {
+                    ZStack {
+                        Rectangle()
+                            .fill(.offBlack)
+                            .frame(
+                                height: geometry.size.height * 0.95
                             )
-                    )
-                    .foregroundColor(.gray)
-                    .font(.custom("roboto-regular", size: 15))
-                    .padding(
-                        EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1)
-                    )
-                
-                Text("Small Blind")
-                    .font(.custom("comfortaa", size: 17))
-                    .foregroundColor(colorScheme == .light ? .black : .white)
-                
-                TextField("Enter SB Amount", text: $sb)
-                    .keyboardType(.numberPad)
-                    .focused($focus, equals: .sb )
-                    .padding()
-                    .background(.offBlack)
-                    .cornerRadius(4)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(
-                                colorScheme == .light ? .gray : .black,
-                                lineWidth: 1.5
+                            .cornerRadius(
+                                geometry.size.width * 0.05
                             )
-                    )
-                    .foregroundColor(.gray)
-                    .font(.custom("roboto-regular", size: 15))
-                    .padding(
-                        EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1)
-                    )
-                
-                Text("Big Blind")
-                    .font(.custom("comfortaa", size: 17))
-                    .foregroundColor(colorScheme == .light ? .black : .white)
-                
-                TextField("Enter BB Amount", text: $bb)
-                    .keyboardType(.numberPad)
-                    .focused($focus, equals: .bb )
-                    .submitLabel(.done)
-                    .padding()
-                    .background(.offBlack)
-                    .cornerRadius(4)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(
-                                colorScheme == .light ? .gray : .black,
-                                lineWidth: 1.5
-                            )
-                    )
-                    .foregroundColor(.gray)
-                    .font(.custom("roboto-regular", size: 15))
-                    .padding(
-                        EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1)
-                    )
-                    .toolbar {
-                        if focus == .sb || focus == .bb {
-                            ToolbarItemGroup(placement: .keyboard) {
-                                Spacer()  // Push the button to the right
-                                if focus == .sb {
-                                    Button("Next") {
-                                        self.focus = .bb
-                                    }
-                                    .buttonStyle(.bordered)
-                                    .tint(.blue)
-                                }
-                                else {
-                                    Button("Done") {
-                                        self.focus = nil
-                                    }
-                                    .buttonStyle(.bordered)
-                                    .tint(.blue)
-                                }
-                            }
-                        }
-                    }
-                
-                Text("Currency")
-                    .font(.custom("comfortaa", size: 17))
-                    .foregroundColor(colorScheme == .light ? .black : .white)
-                Picker("Currency",selection: $cents) {
-                    Image(systemName: "centsign")
-                        .tag(true)
-                    
-                    Image(systemName: "dollarsign")
-                        .tag(false)
-                    
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                
-            }
-            .padding(.horizontal)
-            
-            Button(
-                action: {
-                    game_view_model.game.host_id = Auth.auth().currentUser!.uid
-                    game_view_model.game.is_active = true
-                    game_view_model.game.sb_bb = cents ? "\(sb)¢ / \(bb)¢" : "$\(sb) / $\(bb)"
-                    game_view_model.game.title = title
-                    game_view_model.game.date = Date()
-    
-                    if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2" && auth_view_model.isTrackingAccessAvailable(){
-                        interstital_ads_manager.displayInterstitialAd()
-                    }
-                
-                    game_view_model
-                        .Start_Game(game: game_view_model.game) { gameId in
-                            if let gameId = gameId {
+                            .shadow(radius: 5)
+                            .offset(y: -geometry.size.height * 0.4)
                         
-                                game_view_model.game.id = gameId
-                                game_view_model.currentGameID = gameId
-                                print(
-                                    "New game ID: \(game_view_model.game.id ?? "No game ID")"
+                        Text("Start Game")
+                            .foregroundStyle(
+                                colorScheme == .light ? .black : .white
+                            )
+                            .font(
+                                .custom(
+                                    "comfortaa",
+                                    size: geometry.size.width * 0.08
                                 )
+                            )
+                            .padding(.top, geometry.size.height * 0.08)
+                    }
+                    .frame(maxHeight: geometry.size.height * 0.15)
+                    .padding(.bottom)
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Game Title")
+                            .font(.custom("comfortaa", size: 17))
+                            .foregroundColor(colorScheme == .light ? .black : .white)
                         
-                                game_view_model
-                                    .updateUserCurrentGame(
-                                        newGameId: game_view_model.game.id ?? "No game ID"
-                                    ) { success in
-                                        if success {
-                                            print(
-                                                "Current game updated successfully"
-                                            )
-                                        } else {
-                                            print(
-                                                "Failed to update current game"
-                                            )
-                                        }
+                        TextField("Enter Game Title", text: $title)
+                            .focused($focus, equals: .title )
+                            .submitLabel(.next)
+                            .onSubmit {
+                                self.focus = .sb
+                            }
+                            .padding()
+                            .background(.offBlack)
+                            .cornerRadius(4)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(
+                                        colorScheme == .light ? .gray : .black,
+                                        lineWidth: 1.5
+                                    )
+                            )
+                            .foregroundColor(.gray)
+                            .font(.custom("roboto-regular", size: 15))
+                            .padding(
+                                EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1)
+                            )
+                        
+                        Text("Small Blind")
+                            .font(.custom("comfortaa", size: 17))
+                            .foregroundColor(colorScheme == .light ? .black : .white)
+                        
+                        TextField("Enter SB Amount", text: $sb)
+                            .keyboardType(.numberPad)
+                            .focused($focus, equals: .sb )
+                            .padding()
+                            .background(.offBlack)
+                            .cornerRadius(4)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(
+                                        colorScheme == .light ? .gray : .black,
+                                        lineWidth: 1.5
+                                    )
+                            )
+                            .foregroundColor(.gray)
+                            .font(.custom("roboto-regular", size: 15))
+                            .padding(
+                                EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1)
+                            )
+                        
+                        Text("Big Blind")
+                            .font(.custom("comfortaa", size: 17))
+                            .foregroundColor(colorScheme == .light ? .black : .white)
+                        
+                        TextField("Enter BB Amount", text: $bb)
+                            .keyboardType(.numberPad)
+                            .focused($focus, equals: .bb )
+                            .submitLabel(.done)
+                            .padding()
+                            .background(.offBlack)
+                            .cornerRadius(4)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(
+                                        colorScheme == .light ? .gray : .black,
+                                        lineWidth: 1.5
+                                    )
+                            )
+                            .foregroundColor(.gray)
+                            .font(.custom("roboto-regular", size: 15))
+                            .padding(
+                                EdgeInsets(top: 0, leading: 1, bottom: 20, trailing: 1)
+                            )
+                        
+                        Text("Currency")
+                            .font(.custom("comfortaa", size: 17))
+                            .foregroundColor(colorScheme == .light ? .black : .white)
+                        Picker("Currency",selection: $cents) {
+                            Image(systemName: "centsign")
+                                .tag(true)
                             
+                            Image(systemName: "dollarsign")
+                                .tag(false)
+                            
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+                        
+                    }
+                    .padding(.horizontal)
+                    
+                    Button(
+                        action: {
+                            game_view_model.game.host_id = Auth.auth().currentUser!.uid
+                            game_view_model.game.is_active = true
+                            game_view_model.game.sb_bb = cents ? "\(sb)¢ / \(bb)¢" : "$\(sb) / $\(bb)"
+                            game_view_model.game.title = title
+                            game_view_model.game.date = Date()
+                            
+                            if auth_view_model.user!.uid != "nyyEs88t04eGTXlIKYYZqdXofib2"{
+                                interstital_ads_manager.displayInterstitialAd()
+                            }
+                            
+                            game_view_model
+                                .Start_Game(game: game_view_model.game) { gameId in
+                                    if let gameId = gameId {
+                                        
+                                        game_view_model.game.id = gameId
+                                        game_view_model.currentGameID = gameId
+                                        print(
+                                            "New game ID: \(game_view_model.game.id ?? "No game ID")"
+                                        )
+                                        
                                         game_view_model
-                                            .Add_or_Update_User_To_Game(
-                                                gameId: game_view_model.game.id ?? " ",
-                                                user_id: Auth
-                                                    .auth().currentUser!.uid,
-                                                user_stats: User_Stats(
-                                                    name: auth_view_model.user!.displayName ?? "Unknown" ,
-                                                    buy_in: 0,
-                                                    buy_out: 0.00001,
-                                                    net: 0.00001,
-                                                    photo_url: auth_view_model.user?.photoURL?.absoluteString ?? ""
-                                                )
-                                            ){ error in
-                                                if let error = error {
+                                            .updateUserCurrentGame(
+                                                newGameId: game_view_model.game.id ?? "No game ID"
+                                            ) { success in
+                                                if success {
                                                     print(
-                                                        "Failed to add user: \(error.localizedDescription)"
+                                                        "Current game updated successfully"
                                                     )
                                                 } else {
                                                     print(
-                                                        "User added/updated successfully!"
+                                                        "Failed to update current game"
                                                     )
                                                 }
-                                            }
-                                        game_view_model
-                                            .Add_Transaction(
-                                                gameId: game_view_model.currentGameID,
-                                                user_id: auth_view_model.user?.uid ?? "",
-                                                type: "Joined Game: ",
-                                                amount: 0.001
-                                            ) {_ in
-                                            }
-                                        game_view_model
-                                            .Fetch_Game(
-                                                gameId: game_view_model.currentGameID
-                                            ) {
-                                                game,
-                                                _ in
-                                                if let game = game {
-                                                    game_view_model.game = game
-                                                    game_view_model.game.id = game_view_model.currentGameID
-                                                    game_view_model
-                                                        .startListening(
-                                                            gameId: game_view_model.currentGameID
+                                                
+                                                game_view_model
+                                                    .Add_or_Update_User_To_Game(
+                                                        gameId: game_view_model.game.id ?? "temp",
+                                                        user_id: Auth
+                                                            .auth().currentUser!.uid,
+                                                        user_stats: User_Stats(
+                                                            name: auth_view_model.user!.displayName ?? "Unknown" ,
+                                                            buy_in: 0,
+                                                            buy_out: 0.00001,
+                                                            net: 0.00001,
+                                                            photo_url: auth_view_model.user?.photoURL?.absoluteString ?? ""
                                                         )
-                                                    selectedTab = .in_game
-                                                }
+                                                    ){ error in
+                                                        if let error = error {
+                                                            print(
+                                                                "Failed to add user: \(error.localizedDescription)"
+                                                            )
+                                                        } else {
+                                                            print(
+                                                                "User added/updated successfully!"
+                                                            )
+                                                        }
+                                                    }
+                                                game_view_model
+                                                    .Add_Transaction(
+                                                        gameId: game_view_model.currentGameID,
+                                                        user_id: auth_view_model.user?.uid ?? "",
+                                                        display_name: auth_view_model.user?.displayName ?? "",
+                                                        type: "Joined Game: ",
+                                                        amount: 0.001
+                                                    ) {_ in
+                                                    }
+                                                game_view_model
+                                                    .Fetch_Game(
+                                                        gameId: game_view_model.currentGameID
+                                                    ) {
+                                                        game,
+                                                        _ in
+                                                        if let game = game {
+                                                            game_view_model.game = game
+                                                            game_view_model.game.id = game_view_model.currentGameID
+                                                            game_view_model
+                                                                .startListening(
+                                                                    gameId: game_view_model.currentGameID
+                                                                )
+                                                            selectedTab = .in_game
+                                                        }
+                                                    }
+                                                
                                             }
-                                    
+                                    } else {
+                                        print("Failed to add game.")
                                     }
-                            } else {
-                                print("Failed to add game.")
-                            }
+                                }
+                            
+                            
+                            
+                        }) {
+                            Text("Start Game")
+                                .font(.custom("Roboto", size: 17))
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(gradient)
+                                .cornerRadius(10)
+                                .shadow(radius: 3)
+                                .opacity(isFormValid ? 1 : 0.5)
                         }
-                
-        
-    
-                }) {
-                    Text("Start Game")
-                        .font(.custom("Roboto", size: 17))
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(gradient)
-                        .cornerRadius(10)
-                        .shadow(radius: 3)
-                        .opacity(isFormValid ? 1 : 0.5)
+                        .padding(
+                            EdgeInsets(top: 30, leading: 15, bottom: 15, trailing: 15)
+                        )
+                        .disabled(!isFormValid)
+                    
+                    Spacer()
                 }
-                .padding(
-                    EdgeInsets(top: 30, leading: 15, bottom: 15, trailing: 15)
-                )
-                .disabled(!isFormValid)
+                .scrollDismissesKeyboard(.immediately)
+            }
             
-            Spacer()
+            .onAppear() {
+                game_view_model.game = Game(date: Date(),
+                                            title: "",
+                                            host_id: "" ,
+                                            sb_bb: "N/A",
+                                            is_active: false,
+                                            chip_error_divided: 0,
+                                            users: [:],
+                                            user_ids: [],
+                                            transactions: [])
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(.colorScheme)
+            .edgesIgnoringSafeArea(.all)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.colorScheme)
-        .edgesIgnoringSafeArea(.all)
     }
 }
 

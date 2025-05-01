@@ -33,11 +33,20 @@ class Games_View_Model: ObservableObject {
     private var gameListener: ListenerRegistration?
     private var userListener: ListenerRegistration?
     
+    private var currentGameListenerId: String?
+
+    
     
     
     func startListeningForCurrentGame(userID: String) {
         // Remove any existing listener to avoid duplicates
+                
+        if userID.isEmpty {
+            return
+        }
+        
         userListener?.remove()
+
 
         print("startListeningForCurrentGame")
         userListener = db.collection("Users").document(userID)
@@ -65,6 +74,15 @@ class Games_View_Model: ObservableObject {
         gameId: String,
         completion: @escaping (Game?, Error?) -> Void
     ) {
+        guard !gameId.isEmpty else {
+                print("❌ Skipping game fetch – gameId is empty")
+                completion(nil, NSError(
+                    domain: "Fetch_Game",
+                    code: -1,
+                    userInfo: [NSLocalizedDescriptionKey: "Game ID is empty"]
+                ))
+                return
+            }
         
         print("Fetch Game Function Called")
         db.collection("Games").document(gameId).getDocument {
@@ -199,6 +217,21 @@ class Games_View_Model: ObservableObject {
         completion: @escaping (Error?) -> Void
     ) {
         
+        guard !gameId.isEmpty else {
+                print("❌ Skipping add or update – gameId is empty")
+                completion(nil)
+                return
+            }
+        
+        guard !user_id.isEmpty else {
+                print("❌ Skipping add or update – user_id is empty")
+                completion(nil)
+                return
+            }
+
+
+        
+        
         let user_stats: [String: Any] = [
             "name": user_stats.name,
             "buy_in": user_stats.buy_in,
@@ -251,16 +284,16 @@ class Games_View_Model: ObservableObject {
             ]) { error in
             }
         }
-        game.id = ""
-        game.date = Date()
-        game.title = ""
-        game.host_id = ""
-        game.sb_bb = "N/A"
-        game.is_active = false
-        game.chip_error_divided = 0
-        game.users = [:]
-        game.user_ids = []
-        game.transactions = []
+        
+        self.game = Game(date: Date(),
+                         title: "",
+                         host_id: "" ,
+                         sb_bb: "N/A",
+                         is_active: false,
+                         chip_error_divided: 0,
+                         users: [:],
+                         user_ids: [],
+                         transactions: [])
         
         currentGameID = " "
     
@@ -268,8 +301,23 @@ class Games_View_Model: ObservableObject {
     
     func startListening(gameId: String) {
         // Remove any existing listener to avoid duplicates
-        gameListener?.remove()
-        print("Listening to Game Function Called")
+//        gameListener?.remove()
+//        print("Listening to Game Function Called")
+//        
+//        guard !gameId.isEmpty else {
+//                print("❌ Skipping start lisenting – gameId is empty")
+//                return
+//            }
+        
+        guard !gameId.isEmpty else { return }
+
+            // ⛔️ Already listening to this doc?  Do nothing.
+//            if currentGameListenerId == gameId { return }
+
+            // 🔄 Otherwise tear down the old one and attach once
+            gameListener?.remove()
+            currentGameListenerId = gameId
+
         
         gameListener = db.collection("Games").document(gameId)
             .addSnapshotListener { [weak self] (document, error) in
@@ -391,6 +439,20 @@ class Games_View_Model: ObservableObject {
         amount: Double?,
         completion: @escaping (Error?) -> Void
     ) {
+        
+        guard !gameId.isEmpty else {
+                print("❌ Skipping add transation – gameId is empty")
+                completion(nil)
+                return
+            }
+        guard !user_id.isEmpty else {
+                print("❌ Skipping add transaction – userid is empty")
+                completion(nil)
+                return
+            }
+
+        
+
         
         let new_transaction = Transaction(
             id: nil,
@@ -522,6 +584,11 @@ class Games_View_Model: ObservableObject {
         completion: @escaping ([Game]) -> Void
     ) {
         print("fetch past games function call")
+        guard !userID.isEmpty else {
+            print("❌ Skipping query – userID is empty")
+            completion([])
+            return
+        }
         
         let local_games = self.loadLocalGames()
         let firestoreGames = local_games.compactMap { convertLocalGameToFirestoreGame($0) }
@@ -561,6 +628,12 @@ class Games_View_Model: ObservableObject {
     
     func fetchAndCalculateUserStats(for userID: String) {
         print("Starting fetchAndCalculateUserStats...")
+        
+        guard !userID.isEmpty else {
+                print("❌ Skipping fetchAndCalculateUserStats – userid is empty")
+                return
+            }
+
         
         // 1. First, load games from local storage
         self.fetchPastGames(for: userID) { games in
@@ -618,6 +691,12 @@ class Games_View_Model: ObservableObject {
     
     func syncActiveGamesWithFirebase(for userID: String, completion: @escaping () -> Void) {
         print("🔄 Starting sync for active games...")
+        
+        guard !userID.isEmpty else {
+                print("❌ Skipping syncactivegames – userID is empty")
+                return
+            }
+
 
         let activeGames = self.games.filter { $0.is_active }
         
